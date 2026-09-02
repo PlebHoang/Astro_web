@@ -3,9 +3,8 @@
 
 <div id="three-container" class="fixed inset-0 z-0 pointer-events-auto overflow-hidden bg-black">
   <canvas id="three-canvas" class="w-full h-full block"></canvas>
-  
-  <!-- Subtle dark vignette overlay -->
-  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(0,0,0,0.6)_100%)]"></div>
+  <!-- Deep space vignette -->
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]"></div>
 </div>
 
 <script>
@@ -18,10 +17,12 @@
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    // Scene, Camera, Renderer
+    // Scene with Exponential Fog for true depth
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
-    camera.position.z = 400;
+    scene.fog = new THREE.FogExp2(0x000000, 0.0012);
+
+    const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 3000);
+    camera.position.z = 450;
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -32,85 +33,80 @@
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // --- Starfield Particle System ---
-    const starCount = 3500;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(starCount * 3);
-    const colors = new Float32Array(starCount * 3);
-    const sizes = new Float32Array(starCount);
-
-    const palette = [
-      new THREE.Color("#ffffff"),
-      new THREE.Color("#e2e8f0"),
-      new THREE.Color("#38bdf8"), // cyan starlight
-      new THREE.Color("#c084fc"), // violet starlight
-      new THREE.Color("#f472b6"), // rose starlight
-    ];
-
-    for (let i = 0; i < starCount; i++) {
-      const idx = i * 3;
-      // Spherical distribution
-      const r = THREE.MathUtils.randFloat(100, 900);
-      const theta = THREE.MathUtils.randFloat(0, Math.PI * 2);
-      const phi = Math.acos(THREE.MathUtils.randFloatSpread(2));
-
-      positions[idx] = r * Math.sin(phi) * Math.cos(theta);
-      positions[idx + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[idx + 2] = r * Math.cos(phi);
-
-      const color = palette[Math.floor(Math.random() * palette.length)];
-      colors[idx] = color.r;
-      colors[idx + 1] = color.g;
-      colors[idx + 2] = color.b;
-
-      sizes[i] = Math.random() * 2.5 + 0.8;
-    }
-
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
-
-    // Custom circular particle texture
+    // Particle texture
     const particleCanvas = document.createElement("canvas");
     particleCanvas.width = 32;
     particleCanvas.height = 32;
     const pctx = particleCanvas.getContext("2d");
     if (pctx) {
-      const gradient = pctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-      gradient.addColorStop(0, "rgba(255,255,255,1)");
-      gradient.addColorStop(0.3, "rgba(255,255,255,0.8)");
-      gradient.addColorStop(0.8, "rgba(255,255,255,0.1)");
-      gradient.addColorStop(1, "rgba(255,255,255,0)");
-      pctx.fillStyle = gradient;
+      const grad = pctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, "rgba(255, 255, 255, 1)");
+      grad.addColorStop(0.25, "rgba(240, 245, 255, 0.85)");
+      grad.addColorStop(0.65, "rgba(200, 220, 255, 0.15)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      pctx.fillStyle = grad;
       pctx.beginPath();
       pctx.arc(16, 16, 16, 0, Math.PI * 2);
       pctx.fill();
     }
-    const particleTexture = new THREE.CanvasTexture(particleCanvas);
+    const starTexture = new THREE.CanvasTexture(particleCanvas);
 
-    const material = new THREE.PointsMaterial({
-      size: 3,
-      vertexColors: true,
-      map: particleTexture,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    // --- Multi-Layer Depth Starfield ---
+    // Layer 1: Deep Field Distant Stars
+    const createStarLayer = (count: number, minR: number, maxR: number, size: number, opacity: number) => {
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      const col = new Float32Array(count * 3);
 
-    const starfield = new THREE.Points(geometry, material);
-    scene.add(starfield);
+      for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        const radius = THREE.MathUtils.randFloat(minR, maxR);
+        const theta = THREE.MathUtils.randFloat(0, Math.PI * 2);
+        const phi = Math.acos(THREE.MathUtils.randFloatSpread(2));
 
-    // --- Nebula Explosions Pool ---
-    interface NebulaExplosion {
+        pos[i3] = radius * Math.sin(phi) * Math.cos(theta);
+        pos[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        pos[i3 + 2] = radius * Math.cos(phi);
+
+        // Monochromatic starlight temperatures (silver-white to subtle ice-blue)
+        const shade = Math.random() > 0.8 ? 0.95 : 1.0;
+        col[i3] = shade;
+        col[i3 + 1] = shade;
+        col[i3 + 2] = 1.0;
+      }
+
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size,
+        vertexColors: true,
+        map: starTexture,
+        transparent: true,
+        opacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+
+      const points = new THREE.Points(geo, mat);
+      scene.add(points);
+      return points;
+    };
+
+    const deepLayer = createStarLayer(2500, 700, 1800, 2.0, 0.45);
+    const midLayer = createStarLayer(1800, 300, 700, 3.2, 0.85);
+    const nearLayer = createStarLayer(350, 50, 300, 5.0, 0.95);
+
+    // --- Dynamic Supernova Particle Burst Pool ---
+    interface StarBurst {
       points: THREE.Points;
       velocities: Float32Array;
       birth: number;
       duration: number;
     }
-    const explosions: NebulaExplosion[] = [];
+    const bursts: StarBurst[] = [];
 
-    function spawnNebula(x: number, y: number) {
-      // Map screen coords to 3D world coords
+    function spawnStarlightBurst(x: number, y: number) {
       const vec = new THREE.Vector3(
         (x / width) * 2 - 1,
         -(y / height) * 2 + 1,
@@ -118,103 +114,90 @@
       );
       vec.unproject(camera);
       vec.sub(camera.position).normalize();
-      const distance = 280;
-      const targetPos = camera.position.clone().add(vec.multiplyScalar(distance));
+      const targetPos = camera.position.clone().add(vec.multiplyScalar(220));
 
-      const particleCount = 200;
-      const nebGeo = new THREE.BufferGeometry();
-      const nebPos = new Float32Array(particleCount * 3);
-      const nebCol = new Float32Array(particleCount * 3);
-      const velocities = new Float32Array(particleCount * 3);
+      const pCount = 180;
+      const bGeo = new THREE.BufferGeometry();
+      const bPos = new Float32Array(pCount * 3);
+      const bVel = new Float32Array(pCount * 3);
 
-      const explosionColors = [
-        new THREE.Color("#38bdf8"),
-        new THREE.Color("#a855f7"),
-        new THREE.Color("#ec4899"),
-        new THREE.Color("#fbbf24"),
-        new THREE.Color("#ffffff"),
-      ];
-
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < pCount; i++) {
         const i3 = i * 3;
-        nebPos[i3] = targetPos.x;
-        nebPos[i3 + 1] = targetPos.y;
-        nebPos[i3 + 2] = targetPos.z;
+        bPos[i3] = targetPos.x;
+        bPos[i3 + 1] = targetPos.y;
+        bPos[i3 + 2] = targetPos.z;
 
-        const speed = Math.random() * 2.2 + 0.5;
+        const speed = Math.random() * 2.8 + 0.6;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(Math.random() * 2 - 1);
 
-        velocities[i3] = speed * Math.sin(phi) * Math.cos(theta);
-        velocities[i3 + 1] = speed * Math.sin(phi) * Math.sin(theta);
-        velocities[i3 + 2] = speed * Math.cos(phi);
-
-        const col = explosionColors[Math.floor(Math.random() * explosionColors.length)];
-        nebCol[i3] = col.r;
-        nebCol[i3 + 1] = col.g;
-        nebCol[i3 + 2] = col.b;
+        bVel[i3] = speed * Math.sin(phi) * Math.cos(theta);
+        bVel[i3 + 1] = speed * Math.sin(phi) * Math.sin(theta);
+        bVel[i3 + 2] = speed * Math.cos(phi);
       }
 
-      nebGeo.setAttribute("position", new THREE.BufferAttribute(nebPos, 3));
-      nebGeo.setAttribute("color", new THREE.BufferAttribute(nebCol, 3));
+      bGeo.setAttribute("position", new THREE.BufferAttribute(bPos, 3));
 
-      const nebMat = new THREE.PointsMaterial({
-        size: 5.5,
-        vertexColors: true,
-        map: particleTexture,
+      const bMat = new THREE.PointsMaterial({
+        size: 4.5,
+        color: new THREE.Color(0xffffff),
+        map: starTexture,
         transparent: true,
         opacity: 1,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
 
-      const points = new THREE.Points(nebGeo, nebMat);
-      scene.add(points);
+      const burstPoints = new THREE.Points(bGeo, bMat);
+      scene.add(burstPoints);
 
-      explosions.push({
-        points,
-        velocities,
+      bursts.push({
+        points: burstPoints,
+        velocities: bVel,
         birth: performance.now(),
-        duration: 1800, // ms
+        duration: 1500,
       });
 
-      // Dispatch event for audio feedback
       window.dispatchEvent(new CustomEvent("cosmic-nebula-spawn"));
     }
 
-    // --- Interaction listeners ---
-    let targetRotationX = 0;
-    let targetRotationY = 0;
+    // --- Interaction & Scroll Depth Parallax ---
+    let targetRotX = 0;
+    let targetRotY = 0;
+    let scrollY = window.scrollY;
+    let targetCameraZ = 450;
     let isDragging = false;
-    let previousMouseX = 0;
-    let previousMouseY = 0;
+    let prevX = 0;
+    let prevY = 0;
+
+    window.addEventListener("scroll", () => {
+      scrollY = window.scrollY;
+      // Fly camera forward as user navigates down the page
+      targetCameraZ = 450 - (scrollY * 0.15);
+    });
 
     window.addEventListener("pointerdown", (e) => {
-      // Don't trigger if clicked on an interactive UI element (button, link, input)
       const target = e.target as HTMLElement;
-      if (target.closest("button, a, input, textarea, select")) {
-        return;
-      }
+      if (target.closest("button, a, input, textarea, select")) return;
       isDragging = true;
-      previousMouseX = e.clientX;
-      previousMouseY = e.clientY;
-      spawnNebula(e.clientX, e.clientY);
+      prevX = e.clientX;
+      prevY = e.clientY;
+      spawnStarlightBurst(e.clientX, e.clientY);
     });
 
     window.addEventListener("pointermove", (e) => {
       if (isDragging) {
-        const deltaX = e.clientX - previousMouseX;
-        const deltaY = e.clientY - previousMouseY;
-        targetRotationY += deltaX * 0.003;
-        targetRotationX += deltaY * 0.003;
-        previousMouseX = e.clientX;
-        previousMouseY = e.clientY;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        targetRotY += dx * 0.0025;
+        targetRotX += dy * 0.0025;
+        prevX = e.clientX;
+        prevY = e.clientY;
       } else {
-        // Subtle mouse parallax
         const normX = (e.clientX / width - 0.5) * 2;
         const normY = (e.clientY / height - 0.5) * 2;
-        targetRotationY = normX * 0.25;
-        targetRotationX = normY * 0.25;
+        targetRotY = normX * 0.2;
+        targetRotX = normY * 0.2;
       }
     });
 
@@ -222,7 +205,6 @@
       isDragging = false;
     });
 
-    // Window resize
     window.addEventListener("resize", () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -231,9 +213,8 @@
       renderer.setSize(width, height);
     });
 
-    // Expose trigger globally so buttons can trigger nebula bursts
     (window as any).triggerNebulaBurst = (x?: number, y?: number) => {
-      spawnNebula(x ?? width / 2, y ?? height / 2);
+      spawnStarlightBurst(x ?? width / 2, y ?? height / 2);
     };
 
     // --- Render Loop ---
@@ -242,37 +223,43 @@
     function animate() {
       requestAnimationFrame(animate);
       const now = performance.now();
-      const delta = (now - lastTime) / 1000;
-      lastTime = now;
 
-      // Smooth camera/starfield rotation
-      starfield.rotation.y += (targetRotationY - starfield.rotation.y) * 0.05 + 0.0003;
-      starfield.rotation.x += (targetRotationX - starfield.rotation.x) * 0.05;
+      // Smooth camera depth glide
+      camera.position.z += (targetCameraZ - camera.position.z) * 0.05;
 
-      // Update nebula explosions
-      for (let i = explosions.length - 1; i >= 0; i--) {
-        const exp = explosions[i];
-        const age = now - exp.birth;
-        const progress = age / exp.duration;
+      // Parallax differential rotation between depth tiers
+      nearLayer.rotation.y += (targetRotY * 1.5 - nearLayer.rotation.y) * 0.08 + 0.0006;
+      nearLayer.rotation.x += (targetRotX * 1.5 - nearLayer.rotation.x) * 0.08;
+
+      midLayer.rotation.y += (targetRotY - midLayer.rotation.y) * 0.04 + 0.0003;
+      midLayer.rotation.x += (targetRotX - midLayer.rotation.x) * 0.04;
+
+      deepLayer.rotation.y += (targetRotY * 0.5 - deepLayer.rotation.y) * 0.02 + 0.0001;
+      deepLayer.rotation.x += (targetRotX * 0.5 - deepLayer.rotation.x) * 0.02;
+
+      // Update bursts
+      for (let i = bursts.length - 1; i >= 0; i--) {
+        const b = bursts[i];
+        const age = now - b.birth;
+        const progress = age / b.duration;
 
         if (progress >= 1) {
-          scene.remove(exp.points);
-          exp.points.geometry.dispose();
-          (exp.points.material as THREE.Material).dispose();
-          explosions.splice(i, 1);
+          scene.remove(b.points);
+          b.points.geometry.dispose();
+          (b.points.material as THREE.Material).dispose();
+          bursts.splice(i, 1);
         } else {
-          const positions = exp.points.geometry.attributes.position.array as Float32Array;
-          for (let j = 0; j < exp.velocities.length; j += 3) {
-            positions[j] += exp.velocities[j];
-            positions[j + 1] += exp.velocities[j + 1];
-            positions[j + 2] += exp.velocities[j + 2];
-            // slight drag
-            exp.velocities[j] *= 0.98;
-            exp.velocities[j + 1] *= 0.98;
-            exp.velocities[j + 2] *= 0.98;
+          const positions = b.points.geometry.attributes.position.array as Float32Array;
+          for (let j = 0; j < b.velocities.length; j += 3) {
+            positions[j] += b.velocities[j];
+            positions[j + 1] += b.velocities[j + 1];
+            positions[j + 2] += b.velocities[j + 2];
+            b.velocities[j] *= 0.96;
+            b.velocities[j + 1] *= 0.96;
+            b.velocities[j + 2] *= 0.96;
           }
-          exp.points.geometry.attributes.position.needsUpdate = true;
-          (exp.points.material as THREE.PointsMaterial).opacity = (1 - progress) * 0.9;
+          b.points.geometry.attributes.position.needsUpdate = true;
+          (b.points.material as THREE.PointsMaterial).opacity = (1 - progress) * 0.95;
         }
       }
 

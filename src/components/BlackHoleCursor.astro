@@ -7,21 +7,21 @@
   class="fixed pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300 opacity-0 hidden md:block"
   aria-hidden="true"
 >
-  <!-- Accretion disk glow ring -->
+  <!-- Monochromatic Accretion Disk & Photon Ring -->
   <div class="relative w-16 h-16 flex items-center justify-center">
-    <!-- Outer gravitational lensing photon ring -->
-    <div class="absolute inset-0 rounded-full border border-purple-400/40 animate-ping opacity-30"></div>
-    <div class="absolute inset-[-4px] rounded-full bg-gradient-to-tr from-purple-600/30 via-cyan-400/20 to-pink-500/30 blur-md animate-spin duration-1000"></div>
+    <!-- Outer gravitational photon boundary -->
+    <div class="absolute inset-0 rounded-full border border-white/20 animate-ping opacity-25"></div>
+    <div class="absolute inset-[-2px] rounded-full border border-white/40 opacity-40 animate-spin duration-700"></div>
     
-    <!-- Event Horizon Inner Core (Pure Pitch Black Singularity) -->
-    <div class="relative w-7 h-7 rounded-full bg-black border border-white/60 shadow-[0_0_20px_rgba(255,255,255,0.8),inset_0_0_8px_rgba(168,85,247,0.8)] flex items-center justify-center">
-      <div class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></div>
+    <!-- Event Horizon Singularity (Pure Void Black) -->
+    <div class="relative w-7 h-7 rounded-full bg-black border border-white/80 shadow-[0_0_25px_rgba(255,255,255,0.7),inset_0_0_8px_rgba(255,255,255,0.4)] flex items-center justify-center">
+      <div class="w-1 h-1 rounded-full bg-white animate-pulse"></div>
     </div>
   </div>
 </div>
 
 <!-- Shockwave Wave Ring (Triggered on Click) -->
-<div id="gravitational-shockwave" class="fixed pointer-events-none z-40 rounded-full border-2 border-purple-400/80 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-700 ease-out"></div>
+<div id="gravitational-shockwave" class="fixed pointer-events-none z-40 rounded-full border border-white/80 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-600 ease-out"></div>
 
 <!-- Gravitational Lensing Engine Script -->
 <script>
@@ -31,9 +31,7 @@
   let mouseY = -100;
   let cursorX = -100;
   let cursorY = -100;
-  let isLensingActive = true;
 
-  // Track mouse coordinates
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -44,7 +42,6 @@
     if (cursor) cursor.style.opacity = "0";
   });
 
-  // Shockwave burst on click
   window.addEventListener("click", (e) => {
     if (!shockwave) return;
     shockwave.style.left = `${e.clientX}px`;
@@ -55,18 +52,17 @@
     shockwave.style.transform = "translate(-50%, -50%) scale(1)";
 
     requestAnimationFrame(() => {
-      shockwave.style.width = "260px";
-      shockwave.style.height = "260px";
+      shockwave.style.width = "280px";
+      shockwave.style.height = "280px";
       shockwave.style.opacity = "0";
     });
   });
 
-  // Gravitational Text Warping Loop
-  const warpRadius = 140; // Pixels around singularity
-  const maxDisplacement = 18; // Max pull in px
+  // Gravitational Text Warping
+  const warpRadius = 150;
+  const maxDisplacement = 20;
 
   function updateGravitationalLensing() {
-    // Smooth cursor interpolation
     cursorX += (mouseX - cursorX) * 0.25;
     cursorY += (mouseY - cursorY) * 0.25;
 
@@ -75,36 +71,32 @@
       cursor.style.top = `${cursorY}px`;
     }
 
-    if (isLensingActive) {
-      // Find all warpable elements currently in viewport
-      const elements = document.querySelectorAll<HTMLElement>(
-        "h1, h2, h3, .gravitational-warp-target, .space-card"
-      );
+    const elements = document.querySelectorAll<HTMLElement>(
+      "h1, h2, h3, .gravitational-warp-target, .space-card"
+    );
 
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const elCenterX = rect.left + rect.width / 2;
-        const elCenterY = rect.top + rect.height / 2;
+    elements.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const elCenterX = rect.left + rect.width / 2;
+      const elCenterY = rect.top + rect.height / 2;
 
-        const dx = cursorX - elCenterX;
-        const dy = cursorY - elCenterY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+      const dx = cursorX - elCenterX;
+      const dy = cursorY - elCenterY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < warpRadius && distance > 0) {
-          const force = (1 - distance / warpRadius);
-          const pullX = (dx / distance) * force * maxDisplacement;
-          const pullY = (dy / distance) * force * maxDisplacement;
-          const rotateZ = (dx / warpRadius) * force * 3;
+      if (distance < warpRadius && distance > 0) {
+        const force = (1 - distance / warpRadius);
+        const pullX = (dx / distance) * force * maxDisplacement;
+        const pullY = (dy / distance) * force * maxDisplacement;
+        const rotateZ = (dx / warpRadius) * force * 3.5;
 
-          el.style.transform = `translate(${pullX}px, ${pullY}px) rotate(${rotateZ}deg)`;
-          el.classList.add("gravitational-lens-active");
-        } else if (el.style.transform && el.style.transform !== "none") {
-          // Reset smoothly
-          el.style.transform = "";
-          el.classList.remove("gravitational-lens-active");
-        }
-      });
-    }
+        el.style.transform = `translate(${pullX}px, ${pullY}px) rotate(${rotateZ}deg)`;
+        el.classList.add("gravitational-lens-active");
+      } else if (el.style.transform && el.style.transform !== "none") {
+        el.style.transform = "";
+        el.classList.remove("gravitational-lens-active");
+      }
+    });
 
     requestAnimationFrame(updateGravitationalLensing);
   }

@@ -7,7 +7,6 @@ const events = [
     time: "20:30 - 23:30 CET",
     location: "Campus Green (near South Hall lawn)",
     details: "Our flagship weekend outdoor session. We set up the 8\" Dobsonian telescope, track planetary targets, and share hot tea. Weather confirmation posted 3 hours prior on Instagram.",
-    badgeColor: "bg-purple-500/10 text-purple-300 border-purple-500/30"
   },
   {
     title: "Cosmic Cinema: 'Interstellar' & Kip Thorne Astrophysics",
@@ -16,7 +15,6 @@ const events = [
     time: "20:00 - 23:00 CET",
     location: "Student Activity Center (SAC) Lounge",
     details: "Popcorn, drinks, and a full screening followed by an engaging discussion on black hole physics, event horizons, and gravitational lensing.",
-    badgeColor: "bg-blue-500/10 text-blue-300 border-blue-500/30"
   },
   {
     title: "Hands-on Astrophotography & Stacking Workshop",
@@ -25,7 +23,6 @@ const events = [
     time: "18:00 - 19:45 CET",
     location: "Research III Seminar Room + Lawn",
     details: "Learn how to use manual focus, long exposure, and free software (Siril) to capture colorful nebulae with your phone or camera.",
-    badgeColor: "bg-pink-500/10 text-pink-300 border-pink-500/30"
   }
 ];
 ---
@@ -36,7 +33,7 @@ const events = [
     <!-- Section Header (Matching University Layout Section 3) -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 reveal">
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-purple-300 uppercase tracking-widest mb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest mb-3">
           Calendar
         </div>
         <h2 class="text-3xl sm:text-4xl font-bold font-orbitron text-white tracking-tight gravitational-warp-target">
@@ -54,7 +51,7 @@ const events = [
         <span class="text-xl">📡</span>
         <div class="text-xs">
           <strong class="text-white font-space-mono">Weather Protocols:</strong>
-          <span class="text-slate-300 ml-1">Outdoor Campus Green sessions depend on clear skies. Confirmations are posted 3 hours before sunset on <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="text-purple-300 underline font-semibold">@astronomy.cub</a>.</span>
+          <span class="text-slate-300 ml-1">Outdoor Campus Green sessions depend on clear skies. Confirmations are posted 3 hours before sunset on <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="text-white underline font-semibold">@astronomy.cub</a>.</span>
         </div>
       </div>
       <a
@@ -73,7 +70,7 @@ const events = [
         <div class={`space-card p-6 flex flex-col justify-between reveal reveal-delay-${idx + 1}`}>
           <div>
             <div class="flex items-center justify-between gap-2 mb-3">
-              <span class={`px-2.5 py-0.5 rounded-full text-[10px] font-space-mono border ${ev.badgeColor}`}>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-space-mono border border-white/10 bg-white/5 text-slate-300">
                 {ev.tag}
               </span>
               <span class="text-[10px] font-space-mono text-slate-400">
@@ -96,12 +93,12 @@ const events = [
           </div>
 
           <div class="pt-3 border-t border-white/10 flex items-center justify-between">
-            <span class="text-[10px] font-space-mono text-emerald-400">Free for Students</span>
+            <span class="text-[10px] font-space-mono text-slate-400">Free for Students</span>
             <a
               href="https://www.instagram.com/astronomy.cub/"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-xs font-bold font-orbitron text-purple-300 hover:text-white transition"
+              class="text-xs font-bold font-orbitron text-white hover:text-slate-300 transition"
             >
               RSVP →
             </a>

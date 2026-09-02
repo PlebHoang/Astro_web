@@ -26,7 +26,6 @@ const targets = [
     name: "Lunar Terminator (Clavius Crater)",
     optics: "8\" Dobsonian @ 150x",
     description: "High-contrast shadow detail along the lunar day/night boundary.",
-    color: "from-slate-800 to-slate-950",
     symbol: "🌔"
   },
   {
@@ -34,7 +33,6 @@ const targets = [
     name: "Jupiter & 4 Galilean Moons",
     optics: "Motorized Tracking Scope",
     description: "Cloud belts, the Great Red Spot, and Io, Europa, Ganymede, Callisto.",
-    color: "from-amber-900 to-slate-950",
     symbol: "🪐"
   },
   {
@@ -42,7 +40,6 @@ const targets = [
     name: "Orion Nebula (M42)",
     optics: "Deep Sky Long Exposure",
     description: "Diffuse emission nebula 1,344 light years from Earth.",
-    color: "from-purple-900 to-slate-950",
     symbol: "🌌"
   },
   {
@@ -50,7 +47,6 @@ const targets = [
     name: "Campus Green Stargazing Circle",
     optics: "Widefield Observation",
     description: "Students gathered with warm tea and scopes under the Bremen night sky.",
-    color: "from-indigo-950 to-slate-950",
     symbol: "✨"
   }
 ];
@@ -64,10 +60,10 @@ const targets = [
       <div class="lg:col-span-5 space-card p-8 sm:p-10 flex flex-col justify-between reveal">
         <div>
           <div class="flex items-center justify-between mb-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-purple-300 uppercase tracking-widest">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest">
               Announcements
             </div>
-            <span class="text-[10px] font-space-mono text-slate-400">Semester Feed</span>
+            <span class="text-[10px] font-space-mono text-slate-500">Semester Feed</span>
           </div>
 
           <h2 class="text-2xl sm:text-3xl font-bold font-orbitron text-white tracking-tight mb-6 gravitational-warp-target">
@@ -77,14 +73,14 @@ const targets = [
           <!-- News Items -->
           <div class="space-y-4 mb-8">
             {newsPosts.map((post) => (
-              <article class="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-purple-500/30 transition group">
+              <article class="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 transition group">
                 <div class="flex items-center justify-between gap-2 mb-1.5">
-                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 font-space-mono border border-purple-500/20">
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-300 font-space-mono border border-white/10">
                     {post.tag}
                   </span>
-                  <span class="text-[10px] font-space-mono text-slate-400">{post.date}</span>
+                  <span class="text-[10px] font-space-mono text-slate-500">{post.date}</span>
                 </div>
-                <h3 class="text-sm font-bold font-orbitron text-white group-hover:text-purple-300 transition mb-1">
+                <h3 class="text-sm font-bold font-orbitron text-white group-hover:text-slate-200 transition mb-1">
                   {post.title}
                 </h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
@@ -96,11 +92,11 @@ const targets = [
         </div>
 
         <!-- Social Media Connection Card (From University Screenshot) -->
-        <div class="p-5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-pink-950/30 to-black border border-purple-500/25">
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/10">
           <h3 class="text-sm font-bold font-orbitron text-white mb-1.5 flex items-center gap-1.5">
             Connect with Us on Social Media! ☀️
           </h3>
-          <p class="text-xs text-slate-300 mb-4">
+          <p class="text-xs text-slate-400 mb-4 font-inter">
             Live observation alerts, meteor warnings, and photos posted on our Instagram channels.
           </p>
 
@@ -109,7 +105,7 @@ const targets = [
               href="https://www.instagram.com/astronomy.cub/"
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3.5 py-1.5 rounded-lg bg-white text-black font-orbitron text-xs font-bold hover:bg-slate-200 transition shadow-md"
+              class="px-3.5 py-1.5 rounded-lg bg-white text-black font-orbitron text-xs font-bold hover:bg-slate-200 transition shadow-sm"
             >
               Join us! 🎏
             </a>
@@ -117,7 +113,7 @@ const targets = [
               href="https://www.instagram.com/astronomy.cub/"
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-pink-300 text-xs font-space-mono border border-pink-500/20 transition"
+              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-space-mono border border-white/10 transition"
             >
               @astronomy.cub
             </a>
@@ -125,7 +121,7 @@ const targets = [
               href="https://www.instagram.com/cubastrosoc/"
               target="_blank"
               rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-purple-300 text-xs font-space-mono border border-purple-500/20 transition"
+              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-space-mono border border-white/10 transition"
             >
               @cubastrosoc
             </a>
@@ -137,10 +133,10 @@ const targets = [
       <div id="viewfinder" class="lg:col-span-7 space-card p-8 sm:p-10 flex flex-col justify-between reveal reveal-delay-1">
         <div>
           <div class="flex items-center justify-between mb-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-cyan-300 uppercase tracking-widest">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest">
               Interactive Telescope Viewfinder
             </div>
-            <span class="text-[10px] font-space-mono text-emerald-400">Optics Live</span>
+            <span class="text-[10px] font-space-mono text-slate-400">Optics Live</span>
           </div>
 
           <h2 class="text-2xl sm:text-3xl font-bold font-orbitron text-white tracking-tight mb-2 gravitational-warp-target">
@@ -151,29 +147,28 @@ const targets = [
           </p>
 
           <!-- Interactive Telescope Eyepiece Viewfinder Simulator -->
-          <div class="relative w-full aspect-video rounded-2xl bg-black border border-white/20 overflow-hidden flex items-center justify-center p-6 shadow-inner">
+          <div class="relative w-full aspect-video rounded-2xl bg-black border border-white/15 overflow-hidden flex items-center justify-center p-6 shadow-2xl">
             <!-- Simulated Circular Eyepiece Border -->
-            <div class="relative w-64 sm:w-80 h-64 sm:h-80 rounded-full border-4 border-slate-700/80 shadow-[0_0_50px_rgba(0,0,0,0.9),inset_0_0_40px_rgba(0,0,0,0.8)] overflow-hidden flex items-center justify-center">
+            <div class="relative w-64 sm:w-80 h-64 sm:h-80 rounded-full border-4 border-slate-700/80 shadow-[0_0_60px_rgba(0,0,0,0.95),inset_0_0_40px_rgba(0,0,0,0.85)] overflow-hidden flex items-center justify-center bg-black">
               
               <!-- Background target canvas display -->
-              <div id="viewfinder-bg" class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center transition-all duration-700">
+              <div id="viewfinder-bg" class="absolute inset-0 bg-black flex items-center justify-center transition-all duration-700">
                 <span id="viewfinder-symbol" class="text-7xl drop-shadow-[0_0_35px_rgba(255,255,255,0.7)] transition-all duration-500">
                   🌔
                 </span>
               </div>
 
               <!-- Optical Crosshairs & Reticle Overlay -->
-              <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-60">
-                <!-- Center Crosshair Lines -->
-                <div class="w-full h-[1px] bg-red-500/40"></div>
-                <div class="h-full w-[1px] bg-red-500/40 absolute"></div>
-                <div class="w-20 h-20 rounded-full border border-red-500/30 absolute"></div>
-                <div class="w-40 h-40 rounded-full border border-red-500/20 absolute"></div>
+              <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40">
+                <div class="w-full h-[1px] bg-white/50"></div>
+                <div class="h-full w-[1px] bg-white/50 absolute"></div>
+                <div class="w-20 h-20 rounded-full border border-white/40 absolute"></div>
+                <div class="w-44 h-44 rounded-full border border-white/20 absolute"></div>
               </div>
 
               <!-- Eyepiece Specs Stamp -->
               <div class="absolute bottom-4 inset-x-0 text-center pointer-events-none">
-                <span id="viewfinder-optics-stamp" class="text-[9px] font-space-mono text-red-400/90 bg-black/60 px-2 py-0.5 rounded">
+                <span id="viewfinder-optics-stamp" class="text-[9px] font-space-mono text-slate-300 bg-black/80 border border-white/20 px-2 py-0.5 rounded">
                   8" Dobsonian @ 150x
                 </span>
               </div>
@@ -185,13 +180,12 @@ const targets = [
             {targets.map((tgt, i) => (
               <button
                 type="button"
-                class={`viewfinder-btn text-left p-2.5 rounded-xl border transition text-xs font-space-mono ${i === 0 ? 'bg-white/10 border-purple-400 text-white' : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:border-white/20'}`}
+                class={`viewfinder-btn text-left p-2.5 rounded-xl border transition text-xs font-space-mono ${i === 0 ? 'bg-white/10 border-white text-white' : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:border-white/30'}`}
                 data-id={tgt.id}
                 data-name={tgt.name}
                 data-optics={tgt.optics}
                 data-desc={tgt.description}
                 data-symbol={tgt.symbol}
-                data-color={tgt.color}
               >
                 <div class="text-base mb-1">{tgt.symbol}</div>
                 <div class="font-bold text-[11px] truncate text-slate-200">{tgt.name}</div>
@@ -214,7 +208,7 @@ const targets = [
             href="https://www.instagram.com/astronomy.cub/"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-xs text-purple-300 hover:text-white font-space-mono shrink-0 transition"
+            class="text-xs text-slate-300 hover:text-white font-space-mono shrink-0 transition underline"
           >
             Instagram Gallery →
           </a>
@@ -228,7 +222,6 @@ const targets = [
 <!-- Viewfinder Script -->
 <script>
   const btns = document.querySelectorAll(".viewfinder-btn");
-  const bg = document.getElementById("viewfinder-bg");
   const symbol = document.getElementById("viewfinder-symbol");
   const stamp = document.getElementById("viewfinder-optics-stamp");
   const title = document.getElementById("viewfinder-title");
@@ -237,10 +230,10 @@ const targets = [
   btns.forEach((btn) => {
     btn.addEventListener("click", () => {
       btns.forEach((b) => {
-        b.classList.remove("bg-white/10", "border-purple-400", "text-white");
+        b.classList.remove("bg-white/10", "border-white", "text-white");
         b.classList.add("bg-white/[0.02]", "border-white/10", "text-slate-400");
       });
-      btn.classList.add("bg-white/10", "border-purple-400", "text-white");
+      btn.classList.add("bg-white/10", "border-white", "text-white");
       btn.classList.remove("bg-white/[0.02]", "border-white/10", "text-slate-400");
 
       const s = btn.getAttribute("data-symbol");
@@ -253,7 +246,6 @@ const targets = [
       if (title) title.textContent = name || "";
       if (desc) desc.textContent = d || "";
 
-      // Trigger slight sound & pulse
       window.dispatchEvent(new CustomEvent("cosmic-click"));
     });
   });
