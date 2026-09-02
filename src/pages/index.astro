@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import WelcomeHero from "../components/WelcomeHero.astro";
+import AboutLeadership from "../components/AboutLeadership.astro";
+import NewsHighlights from "../components/NewsHighlights.astro";
+import EventCalendar from "../components/EventCalendar.astro";
+import RegistrationCTA from "../components/RegistrationCTA.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout
+  title="Constructor University Astronomical Society | Official Club Portal"
+  description="Official home of the Constructor University Astronomical Society in Bremen. Stargazing on Campus Green, deep-sky astrophotography, telescope access, and cosmic cinema nights."
+>
+  <Navbar />
+  <main>
+    <WelcomeHero />
+    <AboutLeadership />
+    <NewsHighlights />
+    <EventCalendar />
+    <RegistrationCTA />
+  </main>
+  <Footer />
+</Layout>

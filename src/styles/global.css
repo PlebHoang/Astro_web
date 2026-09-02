@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #000000;
+  --color-surface-950: #040509;
+  --color-surface-900: #090b11;
+  --color-surface-800: #121520;
+  --color-starlight: #f8fafc;
+  --color-silver: #94a3b8;
+  --color-muted: #64748b;
+  --color-nebula-cyan: #38bdf8;
+  --color-nebula-violet: #a855f7;
+  --color-nebula-rose: #f43f5e;
+  --color-gold: #fbbf24;
+}
+
+:root {
+  --font-orbitron: "Orbitron", sans-serif;
+  --font-audiowide: "Audiowide", cursive;
+  --font-space-mono: "Space Mono", monospace;
+  --font-jetbrains: "JetBrains Mono", monospace;
+  --font-inter: "Inter", sans-serif;
+}
+
+/* --- Base & Scroll --- */
+html {
+  scroll-behavior: smooth;
+  background-color: #000000;
+  color: #f8fafc;
+}
+
+body {
+  background-color: #000000;
+  color: #f8fafc;
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* --- Typography Helpers --- */
+.font-orbitron {
+  font-family: var(--font-orbitron);
+}
+
+.font-audiowide {
+  font-family: var(--font-audiowide);
+}
+
+.font-space-mono {
+  font-family: var(--font-space-mono);
+}
+
+.font-jetbrains {
+  font-family: var(--font-jetbrains);
+}
+
+::selection {
+  background: #a855f7;
+  color: #ffffff;
+}
+
+/* --- Gravitational Lensing & Text Warping Effect --- */
+.gravitational-warp-target {
+  position: relative;
+  transition: transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1), filter 0.15s ease-out;
+  will-change: transform, filter;
+}
+
+.gravitational-lens-active {
+  filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.45));
+}
+
+/* --- Monochromatic Hairline Cards --- */
+.space-card {
+  position: relative;
+  background: rgba(8, 10, 16, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.space-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.05), 0 0 20px rgba(168, 85, 247, 0.1);
+  transform: translateY(-2px);
+}
+
+/* --- Glowing Headings --- */
+.glow-title {
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.35), 0 0 60px rgba(168, 85, 247, 0.2);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+}
+
+.glow-violet {
+  text-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+}
+
+/* --- Scroll Reveal System --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* --- Hairline Grid Overlay --- */
+.bg-cosmic-grid {
+  background-size: 60px 60px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* --- Minimalist Scrollbar --- */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.5);
+}

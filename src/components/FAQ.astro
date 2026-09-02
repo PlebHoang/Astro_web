@@ -1,0 +1,108 @@
+---
+const faqs = [
+  {
+    q: "Do I need to own a telescope or study physics to join?",
+    a: "Not at all! Over 80% of our members are complete beginners studying Computer Science, IEM, Business, Biochemistry, and other majors. The society provides all telescopes, binoculars, and filters. All you need is curiosity about the cosmos."
+  },
+  {
+    q: "Where and when do stargazing sessions take place?",
+    a: "Our primary observation spot is Campus Green (the open lawn near South Hall and the central paths). We meet whenever the Bremen skies are clear, typically starting 30-45 minutes after astronomical dusk. Session confirmations are posted to our Instagram stories (@astronomy.cub)."
+  },
+  {
+    q: "Is joining the society free for students?",
+    a: "Yes! Membership and admission to all our campus stargazing sessions, movie screenings, and workshops are 100% free for all Constructor University undergraduate and graduate students."
+  },
+  {
+    q: "How do weather cancellations work in Bremen?",
+    a: "Because northern German weather changes quickly, our observing team monitors satellite cloud-radar maps throughout the day. We make the final weather call approximately 2 to 3 hours before sunset on our Instagram stories and community channels."
+  },
+  {
+    q: "Can I take astrophotography photos with just my smartphone?",
+    a: "Yes! We have specialized smartphone-to-eyepiece adapters that securely mount your phone onto the 8\" Dobsonian telescope. You can capture sharp, high-contrast photos of the Moon's craters, Jupiter's disk, and bright star clusters."
+  },
+  {
+    q: "How can I get involved in organizing events or operating telescopes?",
+    a: "We love new active organizers! Come to any of our meetings or shoot us a DM on Instagram (@astronomy.cub). We'll happily train you on collimating telescopes, polar alignment, and finding deep-sky Messier objects."
+  }
+];
+---
+
+<section id="faq" class="py-24 relative overflow-hidden">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4">
+        Everything You Need To Know
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-bold font-display text-white tracking-tight mb-4">
+        Frequently Asked Questions
+      </h2>
+      <p class="text-slate-300 text-base sm:text-lg">
+        Got questions about joining, our gear, or stargazing on campus? We've got answers.
+      </p>
+    </div>
+
+    <!-- Accordion Items -->
+    <div class="space-y-4 reveal">
+      {faqs.map((faq, idx) => (
+        <div class="faq-item card-glow overflow-hidden transition-all duration-300">
+          <button
+            type="button"
+            class="faq-trigger w-full p-6 text-left flex items-center justify-between gap-4 focus:outline-none"
+            aria-expanded="false"
+          >
+            <span class="text-base sm:text-lg font-bold font-display text-white pr-4">
+              {faq.q}
+            </span>
+            <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-purple-300 faq-icon transition-transform duration-300">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </button>
+
+          <div class="faq-content hidden px-6 pb-6 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-white/5 pt-4">
+            <p>{faq.a}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Extra Question Box -->
+    <div class="mt-12 text-center p-6 rounded-2xl bg-white/[0.02] border border-white/5 reveal">
+      <p class="text-sm text-slate-300">
+        Still have a question? Send us a direct message on Instagram:
+        <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 font-semibold ml-1 underline">
+          @astronomy.cub
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Accordion Script -->
+<script>
+  const triggers = document.querySelectorAll(".faq-trigger");
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const parent = trigger.closest(".faq-item");
+      const content = parent?.querySelector(".faq-content");
+      const icon = parent?.querySelector(".faq-icon");
+      const isExpanded = trigger.getAttribute("aria-expanded") === "true";
+
+      // Toggle current
+      if (isExpanded) {
+        trigger.setAttribute("aria-expanded", "false");
+        content?.classList.add("hidden");
+        icon?.classList.remove("rotate-180");
+        parent?.classList.remove("border-purple-500/40");
+      } else {
+        trigger.setAttribute("aria-expanded", "true");
+        content?.classList.remove("hidden");
+        icon?.classList.add("rotate-180");
+        parent?.classList.add("border-purple-500/40");
+      }
+    });
+  });
+</script>

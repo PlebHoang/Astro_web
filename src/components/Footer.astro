@@ -1,0 +1,103 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 bg-black text-slate-400 py-14 relative z-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+      
+      <!-- Brand & University Location -->
+      <div class="space-y-3">
+        <a href="#" class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/20 flex items-center justify-center text-white">
+            <svg class="w-3.5 h-3.5 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="block text-xs font-bold tracking-wider text-white font-orbitron uppercase">CUB ASTRO SOC</span>
+            <span class="block text-[9px] text-slate-500 font-space-mono">Constructor University</span>
+          </div>
+        </a>
+
+        <p class="text-xs text-slate-400 font-inter leading-relaxed">
+          Official Student Astronomy Society of Constructor University Bremen.
+        </p>
+
+        <div class="text-[10px] font-space-mono text-purple-400">
+          📍 Campus Green • 53.1672° N, 8.6534° E
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-[11px] font-space-mono uppercase text-white font-semibold mb-3">Navigation</h4>
+        <ul class="space-y-2 text-xs font-inter">
+          <li><a href="#about-leadership" class="hover:text-white transition">About Us</a></li>
+          <li><a href="#leaders" class="hover:text-white transition">Club Leaders</a></li>
+          <li><a href="#news-highlights" class="hover:text-white transition">Club News</a></li>
+          <li><a href="#viewfinder" class="hover:text-white transition">Telescope Viewfinder</a></li>
+          <li><a href="#events" class="hover:text-white transition">Events & Calendar</a></li>
+          <li><a href="#register" class="hover:text-white transition">Membership Registration</a></li>
+        </ul>
+      </div>
+
+      <!-- University Portal Links -->
+      <div>
+        <h4 class="text-[11px] font-space-mono uppercase text-white font-semibold mb-3">University Hub</h4>
+        <ul class="space-y-2 text-xs font-inter text-slate-400">
+          <li>
+            <a href="https://constructor.university" target="_blank" rel="noopener noreferrer" class="hover:text-purple-300 transition">
+              Constructor University Bremen ↗
+            </a>
+          </li>
+          <li>Campus Ring 1, 28759 Bremen, Germany</li>
+          <li class="pt-1">
+            <span class="text-slate-300 block">Community Coordinators:</span>
+            <a href="mailto:community@constructor.university" class="text-purple-400 hover:underline">
+              community@constructor.university
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Social Dispatch -->
+      <div>
+        <h4 class="text-[11px] font-space-mono uppercase text-white font-semibold mb-3">Instagram Dispatches</h4>
+        <div class="space-y-2.5 text-xs font-space-mono">
+          <a
+            href="https://www.instagram.com/astronomy.cub/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-pink-400 hover:text-pink-300 transition"
+          >
+            <span>📷</span>
+            <span>@astronomy.cub</span>
+          </a>
+
+          <a
+            href="https://www.instagram.com/cubastrosoc/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
+          >
+            <span>🏛️</span>
+            <span>@cubastrosoc</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] font-space-mono text-slate-500">
+      <p>© {year} Constructor University Astronomical Society. All student rights reserved.</p>
+      <div class="flex items-center gap-3">
+        <a href="https://constructor.university" target="_blank" rel="noopener noreferrer" class="hover:text-slate-300">University Main Site</a>
+        <span>•</span>
+        <a href="#main-nav" class="text-purple-400 hover:text-purple-300">Back to Top ↑</a>
+      </div>
+    </div>
+  </div>
+</footer>

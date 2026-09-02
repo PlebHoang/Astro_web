@@ -1,0 +1,226 @@
+---
+---
+
+<section class="relative min-h-screen pt-32 pb-20 flex items-center justify-center overflow-hidden">
+  <!-- Interactive Constellation Canvas -->
+  <canvas id="hero-canvas" class="absolute inset-0 z-0 pointer-events-auto opacity-70"></canvas>
+
+  <!-- Ambient lighting gradients -->
+  <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-tr from-purple-600/20 via-indigo-600/20 to-pink-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="absolute bottom-10 left-10 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- Announcement Badge -->
+    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.05] border border-white/10 backdrop-blur-md shadow-xl mb-8 animate-fade-in hover:border-purple-500/50 transition duration-300">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+      </span>
+      <span class="text-xs sm:text-sm font-medium text-slate-300">
+        Constructor University Astronomical Society
+      </span>
+      <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">
+        Active 2026
+      </span>
+    </div>
+
+    <!-- Main Title -->
+    <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black font-display tracking-tight text-white leading-[1.08] mb-6">
+      Unveiling The <br class="hidden sm:inline" />
+      <span class="gradient-text drop-shadow-[0_0_35px_rgba(168,85,247,0.4)]">Cosmos</span>
+      From Campus Green
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-300 font-normal leading-relaxed mb-10 text-slate-300/90">
+      We bring the universe to Constructor University students. Join us for clear-sky telescope sessions, astrophysics movie nights, deep-sky astrophotography, and cosmic debates.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+      <a
+        href="#events"
+        class="w-full sm:w-auto px-8 py-3.5 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full shadow-xl shadow-purple-900/40 hover:shadow-purple-700/50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 group"
+      >
+        <span>Next Stargazing Session</span>
+        <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+
+      <a
+        href="https://www.instagram.com/astronomy.cub/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-full sm:w-auto px-8 py-3.5 text-sm sm:text-base font-semibold text-slate-200 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 rounded-full backdrop-blur-md transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
+      >
+        <svg class="w-4 h-4 text-pink-400" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        <span>@astronomy.cub</span>
+      </a>
+    </div>
+
+    <!-- Telemetry Cards Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+      <div class="card-glow p-4 text-left">
+        <div class="text-[11px] text-purple-300/80 font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
+          Location
+        </div>
+        <div class="text-base font-bold text-white font-display">Campus Green</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">53.1672°N, 8.6534°E</div>
+      </div>
+
+      <div class="card-glow p-4 text-left">
+        <div class="text-[11px] text-blue-300/80 font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+          Observation
+        </div>
+        <div class="text-base font-bold text-white font-display">Clear Sky Nights</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">Campus alerts live</div>
+      </div>
+
+      <div class="card-glow p-4 text-left">
+        <div class="text-[11px] text-emerald-300/80 font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+          Gear Access
+        </div>
+        <div class="text-base font-bold text-white font-display">High-Power Scopes</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">Free for all students</div>
+      </div>
+
+      <div class="card-glow p-4 text-left">
+        <div class="text-[11px] text-pink-300/80 font-mono uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-pink-400 inline-block"></span>
+          Community
+        </div>
+        <div class="text-base font-bold text-white font-display">150+ Members</div>
+        <div class="text-[11px] text-slate-400 font-mono mt-0.5">Beginners & pros</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Down Indicator -->
+  <a href="#about" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-400 hover:text-white transition flex flex-col items-center gap-1 text-xs">
+    <span class="text-[10px] tracking-widest uppercase font-mono">Scroll</span>
+    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+    </svg>
+  </a>
+</section>
+
+<!-- Constellation Interactive Script -->
+<script>
+  const canvas = document.getElementById("hero-canvas") as HTMLCanvasElement;
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener("resize", () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    interface Star {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      baseAlpha: number;
+      alpha: number;
+      color: string;
+    }
+
+    const starCount = Math.floor((width * height) / 10000);
+    const stars: Star[] = [];
+    const colors = ["#a855f7", "#3b82f6", "#ec4899", "#ffffff", "#e0e7ff"];
+
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        radius: Math.random() * 1.8 + 0.5,
+        baseAlpha: Math.random() * 0.7 + 0.3,
+        alpha: Math.random() * 0.7 + 0.3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
+
+    let mouseX = -1000;
+    let mouseY = -1000;
+
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    window.addEventListener("mouseleave", () => {
+      mouseX = -1000;
+      mouseY = -1000;
+    });
+
+    function animate() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw connections
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            const alpha = (1 - dist / 110) * 0.2;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
+            ctx.stroke();
+          }
+        }
+
+        // Mouse connection
+        const mdx = stars[i].x - mouseX;
+        const mdy = stars[i].y - mouseY;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 140) {
+          const malpha = (1 - mdist / 140) * 0.5;
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(236, 72, 153, ${malpha})`;
+          ctx.lineWidth = 1;
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+        }
+
+        // Update position
+        stars[i].x += stars[i].vx;
+        stars[i].y += stars[i].vy;
+
+        if (stars[i].x < 0) stars[i].x = width;
+        if (stars[i].x > width) stars[i].x = 0;
+        if (stars[i].y < 0) stars[i].y = height;
+        if (stars[i].y > height) stars[i].y = 0;
+
+        // Draw star
+        ctx.beginPath();
+        ctx.arc(stars[i].x, stars[i].y, stars[i].radius, 0, Math.PI * 2);
+        ctx.fillStyle = stars[i].color;
+        ctx.globalAlpha = stars[i].alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+</script>

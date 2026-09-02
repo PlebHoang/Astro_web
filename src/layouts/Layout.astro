@@ -1,0 +1,66 @@
+---
+import "../styles/global.css";
+import ThreeStarfield from "../components/ThreeStarfield.astro";
+import BlackHoleCursor from "../components/BlackHoleCursor.astro";
+import AudioSynthesizer from "../components/AudioSynthesizer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Constructor University Astronomical Society | Official Club Portal",
+  description = "Official digital portal of Constructor University Astronomical Society in Bremen. Stargazing on Campus Green, deep-sky astrophotography, telescope access, and cosmic cinema.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Astro Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@400;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen antialiased selection:bg-purple-600 selection:text-white bg-black">
+    <!-- 3D Three.js Interactive WebGL Starfield -->
+    <ThreeStarfield />
+
+    <!-- Gravitational Lensing / Black Hole Cursor -->
+    <BlackHoleCursor />
+
+    <!-- Web Audio API Cosmic Sound Synthesizer Engine -->
+    <AudioSynthesizer />
+
+    <!-- Page Content Hierarchy -->
+    <div class="relative z-10">
+      <slot />
+    </div>
+
+    <!-- Scroll Reveal Intersection Observer -->
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      );
+
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>
