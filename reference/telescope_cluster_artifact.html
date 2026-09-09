@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>C>U Astronomical Society — Interactive Telescope Web Cluster</title>
+  <title>Telescope Sky View — Andromeda & The Big Dipper</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -15,14 +15,14 @@
       user-select: none;
     }
     body {
-      background-color: #030407;
+      background-color: #000000;
       color: #f8fafc;
       font-family: 'Inter', sans-serif;
       overflow: hidden;
       width: 100vw;
       height: 100vh;
     }
-    #cluster-canvas {
+    #sky-canvas {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -31,31 +31,70 @@
       cursor: grab;
       z-index: 1;
     }
-    #cluster-canvas:active {
+    #sky-canvas:active {
       cursor: grabbing;
     }
 
-    /* Vignette & Grids */
-    .cosmic-vignette {
+    /* Telescope Eyepiece Reticle & Circular Aperture */
+    .eyepiece-overlay {
       position: absolute;
       inset: 0;
       pointer-events: none;
       z-index: 2;
-      background: radial-gradient(circle at center, transparent 35%, rgba(2, 3, 6, 0.85) 100%);
+      box-shadow: inset 0 0 120px 60px rgba(0, 0, 0, 0.95);
+      transition: opacity 0.4s ease;
     }
-    .grid-overlay {
+    .eyepiece-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(80vh, 80vw);
+      height: min(80vh, 80vw);
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.55), inset 0 0 40px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+      z-index: 3;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .eyepiece-reticle.reticle-off {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+    .reticle-crosshair {
       position: absolute;
       inset: 0;
-      pointer-events: none;
-      z-index: 2;
-      opacity: 0.15;
-      background-size: 50px 50px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reticle-crosshair::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.15) 35%, transparent 48%, transparent 52%, rgba(255,255,255,0.15) 65%, transparent 95%);
+    }
+    .reticle-crosshair::after {
+      content: "";
+      position: absolute;
+      height: 100%;
+      width: 1px;
+      background: linear-gradient(180deg, transparent 5%, rgba(255,255,255,0.15) 35%, transparent 48%, transparent 52%, rgba(255,255,255,0.15) 65%, transparent 95%);
+    }
+    .reticle-ring-inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 25%;
+      height: 25%;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
     }
 
-    /* UI Overlay */
+    /* UI Chrome */
     .ui-layer {
       position: absolute;
       inset: 0;
@@ -64,50 +103,49 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 28px 36px;
+      padding: 24px 30px;
     }
     .interactive {
       pointer-events: auto;
     }
 
-    /* Header Bar */
-    .header-bar {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      gap: 16px;
     }
-    .logo-container {
+    .brand-block {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .brand-title {
       font-family: 'Orbitron', sans-serif;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 17px;
       letter-spacing: 2px;
-      text-transform: uppercase;
       color: #ffffff;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
     .brand-sub {
       font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1.5px;
+      font-size: 10px;
+      letter-spacing: 1px;
       color: #94a3b8;
       text-transform: uppercase;
     }
 
-    /* Control Deck */
     .control-deck {
-      background: rgba(8, 10, 16, 0.75);
+      background: rgba(6, 7, 12, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
+      border-radius: 14px;
       backdrop-filter: blur(20px);
-      padding: 16px 20px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
     }
     .btn {
@@ -115,150 +153,162 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.15);
       background: rgba(255, 255, 255, 0.04);
       color: #e2e8f0;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .btn:hover {
       background: rgba(255, 255, 255, 0.15);
       color: #ffffff;
       border-color: rgba(255, 255, 255, 0.4);
-      transform: translateY(-1px);
     }
     .btn.active {
       background: #ffffff;
       color: #000000;
       border-color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
 
-    /* Telemetry HUD Bottom */
-    .hud-bottom {
+    .bottom-hud {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
+      gap: 16px;
     }
-    .telemetry-card {
-      background: rgba(8, 10, 16, 0.7);
+    .hud-card {
+      background: rgba(6, 7, 12, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       backdrop-filter: blur(16px);
-      padding: 12px 18px;
+      padding: 10px 16px;
       font-family: 'Space Mono', monospace;
       font-size: 11px;
       color: #94a3b8;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
-    .telemetry-card strong {
+    .hud-card strong {
       color: #f8fafc;
       font-family: 'Orbitron', sans-serif;
-      font-size: 13px;
+      font-size: 12px;
     }
-
-    /* Node Hover Tooltip */
-    #node-tooltip {
-      position: absolute;
-      pointer-events: none;
-      z-index: 30;
-      background: rgba(5, 7, 12, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
+    .speed-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       color: #ffffff;
-      transform: translate(-50%, -140%);
-      opacity: 0;
-      transition: opacity 0.15s ease;
-      white-space: nowrap;
     }
-    #node-tooltip .desc {
-      color: #94a3b8;
-      font-size: 9px;
-      margin-top: 2px;
+    .speed-bar {
+      width: 60px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .speed-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 20%;
+      background: #ffffff;
+      transition: width 0.1s ease;
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Canvas -->
-  <canvas id="cluster-canvas"></canvas>
-  <div class="cosmic-vignette"></div>
-  <div class="grid-overlay"></div>
+  <!-- Fullscreen Telescope Canvas -->
+  <canvas id="sky-canvas"></canvas>
 
-  <!-- Tooltip -->
-  <div id="node-tooltip">
-    <div id="tt-title">Node</div>
-    <div id="tt-desc" class="desc">Details</div>
+  <!-- Circular Eyepiece Reticle -->
+  <div class="eyepiece-overlay"></div>
+  <div class="eyepiece-reticle" id="reticle">
+    <div class="reticle-crosshair"></div>
+    <div class="reticle-ring-inner"></div>
+    <span style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">N 000°</span>
+    <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">S 180°</span>
+    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">E 090°</span>
+    <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">W 270°</span>
   </div>
 
   <!-- UI Overlay -->
   <div class="ui-layer">
-    <!-- Header -->
-    <div class="header-bar">
-      <div class="logo-container">
-        <div style="width: 38px; height: 38px; border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="brand-block">
+        <div style="width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.25); border-radius: 9px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
           </svg>
         </div>
         <div>
           <div class="brand-title">C>U ASTRO SOC</div>
-          <div class="brand-sub">Telescope Web Cluster • Prototype Lab</div>
+          <div class="brand-sub">Telescope Sky Observatory</div>
         </div>
       </div>
 
-      <!-- Controls -->
+      <!-- Target Selection Deck -->
       <div class="control-deck interactive">
-        <button class="btn active" id="btn-mode-telescope">
-          <span>🔭 Telescope 3D</span>
+        <button class="btn active" id="btn-target-dipper">
+          <span>✨ Big Dipper</span>
         </button>
-        <button class="btn" id="btn-mode-dipper">
-          <span>✨ Constellation (Ref)</span>
+        <button class="btn" id="btn-target-andromeda">
+          <span>🌀 Andromeda M31</span>
         </button>
-        <button class="btn" id="btn-mode-neural">
-          <span>🧠 Web Cluster</span>
+        <button class="btn" id="btn-target-warp">
+          <span>🚀 Hyperspace</span>
         </button>
-        <button class="btn" id="btn-fire-pulse" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4);">
-          <span>⚡ Fire Starlight Beam</span>
+        <button class="btn" id="btn-toggle-reticle">
+          <span id="reticle-label">🔭 Reticle: On</span>
+        </button>
+        <button class="btn" id="btn-zoom-level">
+          <span id="zoom-label">🔍 20x Finder</span>
         </button>
       </div>
     </div>
 
-    <!-- Bottom Telemetry HUD -->
-    <div class="hud-bottom">
-      <div class="telemetry-card interactive">
-        <span>INTERACTION ENGINE</span>
-        <strong>DRAG TO ROTATE 3D • HOVER NODES • CLICK TO PULSE</strong>
-        <span style="color: #64748b; font-size: 10px; margin-top: 4px;">Direct port from OpenAI web cluster dynamics</span>
+    <!-- Bottom HUD -->
+    <div class="bottom-hud">
+      <div class="hud-card interactive">
+        <span>STAR WARS TRAVEL WARP</span>
+        <div class="speed-indicator">
+          <span style="font-size: 10px;">SCROLL TO ACCELERATE</span>
+          <div class="speed-bar"><div class="speed-fill" id="speed-fill"></div></div>
+          <span id="speed-label" style="font-size: 10px; font-weight: bold;">0.2c</span>
+        </div>
+        <span style="color: #64748b; font-size: 9px; margin-top: 2px;">Drag canvas to orbit in 3D • Scroll wheel to warp through stars</span>
       </div>
 
-      <div class="telemetry-card interactive" style="text-align: right;">
-        <span>CONSTRUCTOR UNIVERSITY BREMEN</span>
-        <strong>53.1672° N, 8.6534° E</strong>
-        <span style="color: #cbd5e1; font-size: 10px; margin-top: 4px;">Optics: 8" Reflector • 1200mm Focal Length</span>
+      <div class="hud-card interactive" style="text-align: right;">
+        <span id="target-header">TARGET: URSA MAJOR (BIG DIPPER)</span>
+        <strong id="target-coords">RA 11h 03m / DEC +55°11' • MAG 1.8</strong>
+        <span style="color: #cbd5e1; font-size: 9px; margin-top: 2px;">Pointer stars Merak & Dubhe lead to Polaris</span>
       </div>
     </div>
   </div>
 
   <script>
-    // --- Interactive Web Cluster Engine ---
-    const canvas = document.getElementById("cluster-canvas");
+    // --- Canvas & Core Setup (Ponytail Minimalist Architecture) ---
+    const canvas = document.getElementById("sky-canvas");
     const ctx = canvas.getContext("2d");
-    const tooltip = document.getElementById("node-tooltip");
-    const ttTitle = document.getElementById("tt-title");
-    const ttDesc = document.getElementById("tt-desc");
+    const reticle = document.getElementById("reticle");
+    const reticleLabel = document.getElementById("reticle-label");
+    const zoomLabel = document.getElementById("zoom-label");
+    const speedFill = document.getElementById("speed-fill");
+    const speedLabel = document.getElementById("speed-label");
+    const targetHeader = document.getElementById("target-header");
+    const targetCoords = document.getElementById("target-coords");
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
@@ -268,550 +318,409 @@
       height = canvas.height = window.innerHeight;
     });
 
-    // Web Audio Sound Engine (Zero external audio dependency)
-    let audioCtx = null;
-    function playBeep(freq = 880, dur = 0.12, type = 'sine') {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur);
-      } catch (e) {}
+    // --- State Variables ---
+    let currentTarget = "dipper"; // "dipper" | "andromeda" | "warp"
+    let isReticleOn = true;
+    let zoomLevel = 1; // 1 = 20x Wide Finder, 2.5 = High Magnification Eyepiece
+    let targetZoom = 1;
+
+    // Camera & 3D Celestial Orientation
+    let camYaw = 0;
+    let camPitch = 0;
+    let targetYaw = 0;
+    let targetPitch = 0;
+    let warpSpeed = 1.2; // Base forward speed
+    let targetWarpSpeed = 1.2;
+    let scrollBoost = 0;
+
+    // --- Starfield System (Traveling in Star Wars hyperspace) ---
+    const starCount = 1200;
+    const stars = [];
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * 2000,
+        y: (Math.random() - 0.5) * 2000,
+        z: Math.random() * 2000 + 50,
+        pz: 0,
+        size: Math.random() * 1.6 + 0.6,
+        alpha: Math.random() * 0.7 + 0.3
+      });
     }
 
-    // --- NODE STRUCTURE ---
-    // Coordinates defined relative to center (0, 0, 0)
-    // Mode 1: 3D Telescope (Tripod, Mount, Primary Mirror Cell, Optical Tube Assembly, Eyepiece, Secondary Spider, Aperture)
-    // Mode 2: Ursa Major Constellation from reference.jpg (scaled and centered)
-    // Mode 3: Fluid OpenAI Organic Neural Network Cluster
+    // --- TARGET 1: The Big Dipper (Ursa Major) from reference.jpg ---
+    // Accurate 7 stars of Ursa Major + Polaris pointer
+    const dipperStars = [
+      { name: "Alkaid", x: 180, y: -150, z: 900, size: 3.5, label: "η UMa" },
+      { name: "Mizar",  x: 100, y: -100, z: 900, size: 3.8, label: "ζ UMa (Double)" },
+      { name: "Alioth", x: 60,  y: -40,  z: 900, size: 3.6, label: "ε UMa" },
+      { name: "Megrez", x: 10,  y: 40,   z: 900, size: 3.0, label: "δ UMa" },
+      { name: "Dubhe",  x: -60, y: 30,   z: 900, size: 4.2, label: "α UMa (Pointer)" },
+      { name: "Merak",  x: -70, y: 120,  z: 900, size: 4.0, label: "β UMa (Pointer)" },
+      { name: "Phecda", x: 0,   y: 130,  z: 900, size: 3.4, label: "γ UMa" },
+      // Polaris (North Star)
+      { name: "Polaris", x: -70, y: -260, z: 900, size: 4.6, label: "North Star α UMi" }
+    ];
 
-    const nodeDefinitions = [
-      // 1. Aperture Rim - Top Front (Pointer tip in reference: 581, 301)
-      { id: 'aperture_top', label: 'Aperture Front Lens', desc: 'Light intake aperture • 200mm (8")',
-        posTelescope: [180, -180, 40],
-        posDipper: [220, -170, 0],
-        posNeural: [160, -150, 60]
-      },
-      // 2. Aperture Rim - Bottom Front
-      { id: 'aperture_bot', label: 'Aperture Baffle', desc: 'Front anti-reflective ring',
-        posTelescope: [210, -130, -40],
-        posDipper: [160, -100, 20],
-        posNeural: [190, -90, -40]
-      },
-      // 3. Secondary Spider Mount (Pointer mid in reference: 476, 363)
-      { id: 'secondary_spider', label: 'Secondary Mirror Spider', desc: '4-vane diffraction spike mount',
-        posTelescope: [100, -90, 0],
-        posDipper: [90, -90, 0],
-        posNeural: [80, -80, 50]
-      },
-      // 4. Eyepiece & Focuser (Pointer lower in reference: 430, 425)
-      { id: 'eyepiece', label: 'Crayford Eyepiece Focuser', desc: 'Dual-speed 2" optical focuser',
-        posTelescope: [60, -150, 70],
-        posDipper: [40, -20, 30],
-        posNeural: [30, -130, 90]
-      },
-      // 5. Optical Tube Center Ring (Junction in reference: 374, 530)
-      { id: 'tube_center', label: 'Tube Ring Pivot', desc: 'Altitude bearing pivot joint',
-        posTelescope: [0, 0, 0],
-        posDipper: [-20, 60, 0],
-        posNeural: [0, 0, 0]
-      },
-      // 6. Finderscope
-      { id: 'finderscope', label: '9x50 Optical Finderscope', desc: 'Acrobat target acquisition guide',
-        posTelescope: [40, -60, 80],
-        posDipper: [10, -50, 60],
-        posNeural: [50, -40, 80]
-      },
-      // 7. Primary Mirror Cell (reference bowl bottom-right: 378, 625)
-      { id: 'primary_cell', label: 'Primary Mirror Cell', desc: 'Parabolic Pyrex mirror cell',
-        posTelescope: [-120, 100, -20],
-        posDipper: [-10, 150, -20],
-        posNeural: [-100, 90, -40]
-      },
-      // 8. Mirror Base Support (reference bowl bottom-left: 228, 734)
-      { id: 'mount_base', label: 'Dobsonian Rocker Base', desc: 'Smooth Teflon azimuth rotation base',
-        posTelescope: [-140, 170, 0],
-        posDipper: [-160, 230, 0],
-        posNeural: [-130, 160, 30]
-      },
-      // 9. Mount Alt-Bearing (reference bowl top-left: 195, 668)
-      { id: 'mount_alt', label: 'Altitude Trunnion', desc: 'Equatorial balanced axis',
-        posTelescope: [-60, 120, 30],
-        posDipper: [-180, 160, 20],
-        posNeural: [-70, 120, 60]
-      },
-      // 10. Tripod Leg Left
-      { id: 'tripod_left', label: 'Stainless Tripod Foot 1', desc: 'Ground vibration dampener',
-        posTelescope: [-230, 280, 100],
-        posDipper: [-210, 260, 50],
-        posNeural: [-200, 240, 80]
-      },
-      // 11. Tripod Leg Right
-      { id: 'tripod_right', label: 'Stainless Tripod Foot 2', desc: 'Ground vibration dampener',
-        posTelescope: [-150, 290, -120],
-        posDipper: [-120, 250, -60],
-        posNeural: [-140, 260, -90]
-      },
-      // 12. Tripod Leg Center
-      { id: 'tripod_center', label: 'Stainless Tripod Foot 3', desc: 'Ground vibration dampener',
-        posTelescope: [-60, 270, 50],
-        posDipper: [-70, 220, 20],
-        posNeural: [-50, 240, 40]
+    const dipperLines = [
+      [0, 1], [1, 2], [2, 3], // Handle
+      [3, 4], [4, 5], [5, 6], [6, 3], // Bowl
+      [5, 4], [4, 7] // Pointer line through Dubhe to Polaris!
+    ];
+
+    // --- TARGET 2: Andromeda Galaxy (M31) Spiral Particle System ---
+    const andromedaParticleCount = 1400;
+    const andromedaStars = [];
+    const galaxyTilt = 38 * (Math.PI / 180); // Tilted ellipse angle
+
+    for (let i = 0; i < andromedaParticleCount; i++) {
+      // Logarithmic spiral distribution
+      const arm = i % 2 === 0 ? 0 : Math.PI;
+      const dist = Math.pow(Math.random(), 2.2) * 260 + 6;
+      const angle = dist * 0.035 + arm + (Math.random() - 0.5) * 0.45;
+      
+      // Elliptical planar coordinates
+      const gx = Math.cos(angle) * dist * 1.8;
+      const gy = Math.sin(angle) * dist * 0.65; // compressed for tilt
+      const gz = (Math.random() - 0.5) * (30 - dist * 0.08); // bulge thickness
+
+      // Rotate ellipse by galaxyTilt
+      const rx = gx * Math.cos(galaxyTilt) - gy * Math.sin(galaxyTilt);
+      const ry = gx * Math.sin(galaxyTilt) + gy * Math.cos(galaxyTilt);
+
+      // Core density luminescence
+      const isCore = dist < 45;
+      andromedaStars.push({
+        x: rx - 600, // Located at an offset angle in sky
+        y: ry - 80,
+        z: 900 + gz,
+        dist: dist,
+        isCore: isCore,
+        alpha: isCore ? Math.random() * 0.7 + 0.3 : Math.random() * 0.4 + 0.1,
+        size: isCore ? Math.random() * 2.2 + 1.2 : Math.random() * 1.4 + 0.6
+      });
+    }
+
+    // --- Target Presets & Switching ---
+    function setTarget(t) {
+      currentTarget = t;
+      document.querySelectorAll(".control-deck .btn").forEach(b => b.classList.remove("active"));
+
+      if (t === "dipper") {
+        document.getElementById("btn-target-dipper").classList.add("active");
+        targetYaw = 0;
+        targetPitch = 0;
+        targetWarpSpeed = 1.0;
+        targetHeader.textContent = "TARGET: URSA MAJOR (BIG DIPPER)";
+        targetCoords.textContent = "RA 11h 03m / DEC +55°11' • MAG 1.8";
+      } else if (t === "andromeda") {
+        document.getElementById("btn-target-andromeda").classList.add("active");
+        targetYaw = 0.65; // Pan to Andromeda
+        targetPitch = 0.1;
+        targetWarpSpeed = 1.2;
+        targetHeader.textContent = "TARGET: MESSIER 31 (ANDROMEDA GALAXY)";
+        targetCoords.textContent = "RA 00h 42m / DEC +41°16' • 2.537 Mly DISTANCE";
+      } else if (t === "warp") {
+        document.getElementById("btn-target-warp").classList.add("active");
+        targetWarpSpeed = 18.0; // Hyperdrive warp speed!
+        targetHeader.textContent = "PROPULSION: HYPERSPACE WARP TUNNEL";
+        targetCoords.textContent = "VELOCITY: 0.99c • STAR WARS TRAVEL ENGAGED";
       }
-    ];
-
-    // Structural Edge Connections (Index pairs)
-    const edgeConnections = [
-      // Optical Tube Assembly
-      [0, 1], [0, 2], [1, 2], [2, 4], [2, 5], [4, 5], [0, 5], [1, 5],
-      // Finderscope
-      [2, 3], [4, 3], [5, 3],
-      // Tube to Primary Mirror
-      [4, 6], [5, 6], [1, 6],
-      // Mount and Rocker Box
-      [6, 7], [6, 8], [7, 8], [4, 8],
-      // Tripod Legs
-      [7, 9], [7, 10], [7, 11], [8, 9], [8, 11]
-    ];
-
-    // Reference Ursa Major direct line sequence:
-    // 0 -> 2 -> 3 -> 4 -> 6 -> 7 -> 8 -> 4 (replicates reference.jpg)
-    const referenceEdges = [
-      [0, 2], [2, 3], [3, 4],
-      [4, 6], [6, 7], [7, 8], [8, 4]
-    ];
-
-    // Ambient floating stardust particles
-    const dustCount = 80;
-    const dustParticles = [];
-    for (let i = 0; i < dustCount; i++) {
-      dustParticles.push({
-        x: (Math.random() - 0.5) * 800,
-        y: (Math.random() - 0.5) * 600,
-        z: (Math.random() - 0.5) * 400,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        vz: (Math.random() - 0.5) * 0.4,
-        size: Math.random() * 2 + 1,
-        alpha: Math.random() * 0.5 + 0.2
-      });
     }
 
-    // Active Node Instances with Realtime Physics
-    let currentMode = 'telescope'; // 'telescope' | 'dipper' | 'neural'
-    const nodes = nodeDefinitions.map((def, idx) => ({
-      ...def,
-      x: def.posTelescope[0],
-      y: def.posTelescope[1],
-      z: def.posTelescope[2],
-      targetX: def.posTelescope[0],
-      targetY: def.posTelescope[1],
-      targetZ: def.posTelescope[2],
-      vx: 0,
-      vy: 0,
-      vz: 0,
-      radius: idx === 0 ? 8 : (idx < 5 ? 6 : 5),
-      screenX: 0,
-      screenY: 0,
-      screenScale: 1,
-      isHovered: false,
-      pulse: 0
-    }));
+    document.getElementById("btn-target-dipper").addEventListener("click", () => setTarget("dipper"));
+    document.getElementById("btn-target-andromeda").addEventListener("click", () => setTarget("andromeda"));
+    document.getElementById("btn-target-warp").addEventListener("click", () => setTarget("warp"));
 
-    // Mode Switcher
-    function setMode(mode) {
-      currentMode = mode;
-      document.querySelectorAll('.control-deck .btn').forEach(b => b.classList.remove('active'));
-      if (mode === 'telescope') document.getElementById('btn-mode-telescope').classList.add('active');
-      if (mode === 'dipper') document.getElementById('btn-mode-dipper').classList.add('active');
-      if (mode === 'neural') document.getElementById('btn-mode-neural').classList.add('active');
+    // Toggle Reticle
+    document.getElementById("btn-toggle-reticle").addEventListener("click", () => {
+      isReticleOn = !isReticleOn;
+      if (isReticleOn) {
+        reticle.classList.remove("reticle-off");
+        reticleLabel.textContent = "🔭 Reticle: On";
+      } else {
+        reticle.classList.add("reticle-off");
+        reticleLabel.textContent = "🔭 Reticle: Off";
+      }
+    });
 
-      nodes.forEach(n => {
-        let p = n.posTelescope;
-        if (mode === 'dipper') p = n.posDipper;
-        if (mode === 'neural') p = n.posNeural;
-        n.targetX = p[0];
-        n.targetY = p[1];
-        n.targetZ = p[2];
-      });
+    // Toggle Zoom (20x Finder vs High Power Eyepiece)
+    document.getElementById("btn-zoom-level").addEventListener("click", () => {
+      if (targetZoom === 1) {
+        targetZoom = 2.4;
+        zoomLabel.textContent = "🔍 80x Scope";
+      } else {
+        targetZoom = 1;
+        zoomLabel.textContent = "🔍 20x Finder";
+      }
+    });
 
-      playBeep(440, 0.2, 'triangle');
-    }
+    // --- Scroll & Wheel Interaction (Star Wars Warp Speed) ---
+    window.addEventListener("wheel", (e) => {
+      scrollBoost += Math.abs(e.deltaY) * 0.025;
+      if (e.deltaY < 0) {
+        // Zoom forward
+        targetZoom = Math.min(3.2, targetZoom + 0.15);
+      } else {
+        targetZoom = Math.max(0.7, targetZoom - 0.15);
+      }
+    }, { passive: true });
 
-    document.getElementById('btn-mode-telescope').addEventListener('click', () => setMode('telescope'));
-    document.getElementById('btn-mode-dipper').addEventListener('click', () => setMode('dipper'));
-    document.getElementById('btn-mode-neural').addEventListener('click', () => setMode('neural'));
+    // Page Scroll Boost
+    window.addEventListener("scroll", () => {
+      scrollBoost += 1.5;
+    }, { passive: true });
 
-    // Starlight Photon Pulses traveling along lines
-    const activePulses = [];
-    function firePulse() {
-      const edges = currentMode === 'dipper' ? referenceEdges : edgeConnections;
-      edges.forEach((edge, idx) => {
-        setTimeout(() => {
-          activePulses.push({
-            startIdx: edge[0],
-            endIdx: edge[1],
-            progress: 0,
-            speed: 0.025 + Math.random() * 0.015
-          });
-        }, idx * 30);
-      });
-      playBeep(1174.66, 0.4, 'sine');
-    }
-    document.getElementById('btn-fire-pulse').addEventListener('click', firePulse);
-
-    // Auto trigger occasional starlight pulse
-    setInterval(() => {
-      if (Math.random() > 0.4) firePulse();
-    }, 4500);
-
-    // 3D Rotation State (Pitch, Yaw, Roll)
-    let rotX = 0.15;
-    let rotY = -0.3;
-    let targetRotX = 0.15;
-    let targetRotY = -0.3;
+    // --- Drag to Orbit & Pan Camera ---
     let isDragging = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-    let mouseX = -1000;
-    let mouseY = -1000;
+    let prevX = 0;
+    let prevY = 0;
 
-    canvas.addEventListener('mousedown', (e) => {
+    canvas.addEventListener("mousedown", (e) => {
       isDragging = true;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
+      prevX = e.clientX;
+      prevY = e.clientY;
     });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+    window.addEventListener("mouseup", () => isDragging = false);
+    window.addEventListener("mousemove", (e) => {
       if (isDragging) {
-        const dx = e.clientX - lastMouseX;
-        const dy = e.clientY - lastMouseY;
-        targetRotY += dx * 0.005;
-        targetRotX += dy * 0.005;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        targetYaw -= dx * 0.0035;
+        targetPitch -= dy * 0.0035;
+        prevX = e.clientX;
+        prevY = e.clientY;
       }
     });
 
-    // Touch support for mobile devices
-    canvas.addEventListener('touchstart', (e) => {
+    // Touch Support
+    canvas.addEventListener("touchstart", (e) => {
       if (e.touches.length > 0) {
         isDragging = true;
-        lastMouseX = e.touches[0].clientX;
-        lastMouseY = e.touches[0].clientY;
+        prevX = e.touches[0].clientX;
+        prevY = e.touches[0].clientY;
       }
     });
-    window.addEventListener('touchend', () => isDragging = false);
-    canvas.addEventListener('touchmove', (e) => {
+    window.addEventListener("touchend", () => isDragging = false);
+    canvas.addEventListener("touchmove", (e) => {
       if (isDragging && e.touches.length > 0) {
-        const dx = e.touches[0].clientX - lastMouseX;
-        const dy = e.touches[0].clientY - lastMouseY;
-        targetRotY += dx * 0.008;
-        targetRotX += dy * 0.008;
-        lastMouseX = e.touches[0].clientX;
-        lastMouseY = e.touches[0].clientY;
+        const dx = e.touches[0].clientX - prevX;
+        const dy = e.touches[0].clientY - prevY;
+        targetYaw -= dx * 0.005;
+        targetPitch -= dy * 0.005;
+        prevX = e.touches[0].clientX;
+        prevY = e.touches[0].clientY;
       }
     });
 
-    // 3D Vector Math Helper
-    function project3D(x, y, z, cx, cy) {
-      // Rotate Y (Yaw)
-      const cosY = Math.cos(rotY);
-      const sinY = Math.sin(rotY);
+    // --- 3D Perspective Projection Function ---
+    function project(x, y, z, cx, cy) {
+      // Camera Yaw (Y-axis)
+      const cosY = Math.cos(camYaw);
+      const sinY = Math.sin(camYaw);
       const x1 = x * cosY + z * sinY;
       const z1 = -x * sinY + z * cosY;
 
-      // Rotate X (Pitch)
-      const cosX = Math.cos(rotX);
-      const sinX = Math.sin(rotX);
-      const y2 = y * cosX - z1 * sinX;
-      const z2 = y * sinX + z1 * cosX;
+      // Camera Pitch (X-axis)
+      const cosP = Math.cos(camPitch);
+      const sinP = Math.sin(camPitch);
+      const y2 = y * cosP - z1 * sinP;
+      const z2 = y * sinP + z1 * cosP;
 
-      // Perspective projection
-      const cameraDistance = 650;
-      const fov = 500;
-      const depth = cameraDistance + z2;
-      const scale = depth > 0 ? fov / depth : 0;
+      const fov = 650 * zoomLevel;
+      const depth = z2;
+
+      if (depth <= 10) return null;
+      const scale = fov / depth;
 
       return {
-        screenX: cx + x1 * scale,
-        screenY: cy + y2 * scale,
+        sx: cx + x1 * scale,
+        sy: cy + y2 * scale,
         scale: scale,
-        z: z2
+        depth: depth
       };
     }
 
-    // --- MAIN ANIMATION & PHYSICS LOOP ---
-    let frame = 0;
-    function render() {
-      frame++;
-      ctx.clearRect(0, 0, width, height);
-
-      const centerX = width * 0.48;
-      const centerY = height * 0.48;
-
-      // Smooth rotation dampening with subtle celestial auto-wobble
-      rotX += (targetRotX - rotX) * 0.08;
-      rotY += (targetRotY - rotY) * 0.08;
-      if (!isDragging) {
-        targetRotY += 0.001; // gentle cosmic idle rotation
-      }
-
-      // Update ambient dust particles
-      dustParticles.forEach(dp => {
-        dp.x += dp.vx;
-        dp.y += dp.vy;
-        dp.z += dp.vz;
-        if (dp.x > 400) dp.x = -400;
-        if (dp.x < -400) dp.x = 400;
-        if (dp.y > 300) dp.y = -300;
-        if (dp.y < -300) dp.y = 300;
-
-        const proj = project3D(dp.x, dp.y, dp.z, centerX, centerY);
-        ctx.beginPath();
-        ctx.arc(proj.screenX, proj.screenY, dp.size * proj.scale, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${dp.alpha * Math.min(1, proj.scale)})`;
-        ctx.fill();
-      });
-
-      // Update Node Springs & Mouse Gravity
-      let hoveredNode = null;
-      nodes.forEach((node, i) => {
-        // Spring pull to target position
-        const k = 0.08; // spring stiffness
-        const damp = 0.82; // damping
-        const fx = (node.targetX - node.x) * k;
-        const fy = (node.targetY - node.y) * k;
-        const fz = (node.targetZ - node.z) * k;
-
-        node.vx = (node.vx + fx) * damp;
-        node.vy = (node.vy + fy) * damp;
-        node.vz = (node.vz + fz) * damp;
-
-        node.x += node.vx;
-        node.y += node.vy;
-        node.z += node.vz;
-
-        // Project to screen space
-        const proj = project3D(node.x, node.y, node.z, centerX, centerY);
-        node.screenX = proj.screenX;
-        node.screenY = proj.screenY;
-        node.screenScale = proj.scale;
-        node.depthZ = proj.z;
-
-        // Mouse proximity physics (OpenAI interactive web cluster feel)
-        const dx = mouseX - node.screenX;
-        const dy = mouseY - node.screenY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 100) {
-          // Push away slightly on close hover (spring recoil)
-          const push = (1 - dist / 100) * 8;
-          node.vx -= (dx / dist) * push * 0.4;
-          node.vy -= (dy / dist) * push * 0.4;
-        }
-
-        if (dist < node.radius * node.screenScale + 12) {
-          if (!node.isHovered) {
-            playBeep(600 + i * 80, 0.15, 'sine');
-          }
-          node.isHovered = true;
-          hoveredNode = node;
-        } else {
-          node.isHovered = false;
-        }
-
-        // Pulse decay
-        if (node.pulse > 0) node.pulse -= 0.03;
-      });
-
-      // Update Tooltip
-      if (hoveredNode) {
-        tooltip.style.opacity = '1';
-        tooltip.style.left = `${hoveredNode.screenX}px`;
-        tooltip.style.top = `${hoveredNode.screenY}px`;
-        ttTitle.textContent = hoveredNode.label;
-        ttDesc.textContent = hoveredNode.desc;
-      } else {
-        tooltip.style.opacity = '0';
-      }
-
-      // Choose active edge set
-      const edges = currentMode === 'dipper' ? referenceEdges : edgeConnections;
-
-      // Draw Connections (Web Cluster Lines with Depth & Glow)
-      edges.forEach(([iA, iB]) => {
-        const nodeA = nodes[iA];
-        const nodeB = nodes[iB];
-        if (!nodeA || !nodeB) return;
-
-        const avgScale = (nodeA.screenScale + nodeB.screenScale) * 0.5;
-        const alpha = Math.min(0.85, Math.max(0.15, avgScale * 0.7));
-
-        ctx.beginPath();
-        ctx.moveTo(nodeA.screenX, nodeA.screenY);
-        ctx.lineTo(nodeB.screenX, nodeB.screenY);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.35})`;
-        ctx.lineWidth = Math.max(1, 1.4 * avgScale);
-        ctx.stroke();
-
-        // Subtle glow pass
-        ctx.beginPath();
-        ctx.moveTo(nodeA.screenX, nodeA.screenY);
-        ctx.lineTo(nodeB.screenX, nodeB.screenY);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.15})`;
-        ctx.lineWidth = Math.max(2, 3.5 * avgScale);
-        ctx.stroke();
-      });
-
-      // Update & Render Moving Starlight Pulses
-      for (let i = activePulses.length - 1; i >= 0; i--) {
-        const p = activePulses[i];
-        p.progress += p.speed;
-
-        if (p.progress >= 1) {
-          nodes[p.endIdx].pulse = 1;
-          activePulses.splice(i, 1);
-        } else {
-          const nA = nodes[p.startIdx];
-          const nB = nodes[p.endIdx];
-          const px = nA.screenX + (nB.screenX - nA.screenX) * p.progress;
-          const py = nA.screenY + (nB.screenY - nA.screenY) * p.progress;
-          const scale = nA.screenScale + (nB.screenScale - nA.screenScale) * p.progress;
-
-          ctx.beginPath();
-          ctx.arc(px, py, 3.5 * scale, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#ffffff';
-          ctx.shadowBlur = 12;
-          ctx.fill();
-          ctx.shadowBlur = 0; // reset
-        }
-      }
-
-      // Draw Nodes (Stars)
-      // Sort nodes back-to-front for proper depth layering
-      const sortedNodes = [...nodes].sort((a, b) => a.depthZ - b.depthZ);
-
-      sortedNodes.forEach(node => {
-        const r = node.radius * node.screenScale;
-        const isHover = node.isHovered;
-        const pulseVal = Math.max(0, node.pulse);
-
-        // 1. Outer Atmospheric Starlight Halo
-        const haloGrad = ctx.createRadialGradient(
-          node.screenX, node.screenY, 0,
-          node.screenX, node.screenY, r * (isHover ? 3.5 : 2.5) + pulseVal * 10
-        );
-        haloGrad.addColorStop(0, isHover ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.25)');
-        haloGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
-        haloGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-        ctx.beginPath();
-        ctx.arc(node.screenX, node.screenY, r * (isHover ? 3.5 : 2.5) + pulseVal * 10, 0, Math.PI * 2);
-        ctx.fillStyle = haloGrad;
-        ctx.fill();
-
-        // 2. Star Core (Five-pointed Star or Circle based on mode)
-        if (currentMode === 'dipper' || node.id === 'aperture_top') {
-          // Draw 5-pointed star matching reference.jpg
-          drawStar(ctx, node.screenX, node.screenY, 5, r * 1.5, r * 0.7, isHover ? '#ffffff' : '#f1f5f9');
-        } else {
-          ctx.beginPath();
-          ctx.arc(node.screenX, node.screenY, r, 0, Math.PI * 2);
-          ctx.fillStyle = isHover ? '#ffffff' : '#e2e8f0';
-          ctx.fill();
-        }
-
-        // 3. Central bright pinpoint
-        ctx.beginPath();
-        ctx.arc(node.screenX, node.screenY, Math.max(1.5, r * 0.35), 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-
-        // Star label in constellation mode
-        if (currentMode === 'dipper') {
-          ctx.font = '10px "Space Mono", monospace';
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.fillText(node.label.split(' ')[0], node.screenX + r + 6, node.screenY + 4);
-        }
-      });
-
-      // Aperture Starlight Beam Emitter (Photon ray pointing out from telescope aperture)
-      if (currentMode === 'telescope') {
-        const topNode = nodes[0];
-        const secNode = nodes[2];
-        const dirX = topNode.screenX - secNode.screenX;
-        const dirY = topNode.screenY - secNode.screenY;
-        const len = Math.sqrt(dirX * dirX + dirY * dirY);
-
-        if (len > 0) {
-          const normX = dirX / len;
-          const normY = dirY / len;
-          const beamLength = 140 * topNode.screenScale;
-
-          const beamGrad = ctx.createLinearGradient(
-            topNode.screenX, topNode.screenY,
-            topNode.screenX + normX * beamLength,
-            topNode.screenY + normY * beamLength
-          );
-          beamGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
-          beamGrad.addColorStop(0.3, 'rgba(200, 220, 255, 0.2)');
-          beamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-          ctx.beginPath();
-          ctx.moveTo(topNode.screenX, topNode.screenY);
-          ctx.lineTo(topNode.screenX + normX * beamLength, topNode.screenY + normY * beamLength);
-          ctx.strokeStyle = beamGrad;
-          ctx.lineWidth = 3 * topNode.screenScale;
-          ctx.stroke();
-        }
-      }
-
-      requestAnimationFrame(render);
-    }
-
-    // Helper: 5-pointed Star Drawing Function
-    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fillStyle) {
+    // Helper to draw 5-pointed stars
+    function drawStar(ctx, cx, cy, spikes, rOut, rIn, style) {
       let rot = Math.PI / 2 * 3;
       let x = cx;
       let y = cy;
       const step = Math.PI / spikes;
 
       ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
+      ctx.moveTo(cx, cy - rOut);
       for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
+        x = cx + Math.cos(rot) * rOut;
+        y = cy + Math.sin(rot) * rOut;
         ctx.lineTo(x, y);
         rot += step;
-
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
+        x = cx + Math.cos(rot) * rIn;
+        y = cy + Math.sin(rot) * rIn;
         ctx.lineTo(x, y);
         rot += step;
       }
-      ctx.lineTo(cx, cy - outerRadius);
+      ctx.lineTo(cx, cy - rOut);
       ctx.closePath();
-      ctx.fillStyle = fillStyle;
+      ctx.fillStyle = style;
       ctx.fill();
     }
 
-    render();
+    // --- Main Render Loop ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Smooth camera interpolation
+      camYaw += (targetYaw - camYaw) * 0.08;
+      camPitch += (targetPitch - camPitch) * 0.08;
+      zoomLevel += (targetZoom - zoomLevel) * 0.08;
+
+      // Warp speed physics (Star Wars acceleration on scroll/button)
+      scrollBoost *= 0.92; // decay scroll boost
+      warpSpeed += (targetWarpSpeed + scrollBoost - warpSpeed) * 0.08;
+
+      // Update HUD speed readout
+      const speedNorm = Math.min(1, warpSpeed / 20);
+      speedFill.style.width = `${Math.round(speedNorm * 100)}%`;
+      speedLabel.textContent = `${(warpSpeed * 0.15).toFixed(2)}c`;
+
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, width, height);
+
+      const cx = width * 0.5;
+      const cy = height * 0.5;
+
+      // 1. Render Traveling Starfield (Star Wars Hyperspace motion trails)
+      const isHyperdrive = warpSpeed > 3.0;
+
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        s.pz = s.z; // Previous z for streak trails
+        s.z -= warpSpeed * 3.5;
+
+        // Recycle star when it passes camera
+        if (s.z <= 20) {
+          s.z = 2000;
+          s.pz = 2000;
+          s.x = (Math.random() - 0.5) * 2000;
+          s.y = (Math.random() - 0.5) * 2000;
+        }
+
+        const curr = project(s.x, s.y, s.z, cx, cy);
+        if (!curr) continue;
+
+        if (isHyperdrive) {
+          // Motion trail streak towards viewer
+          const prev = project(s.x, s.y, s.pz, cx, cy);
+          if (prev) {
+            ctx.beginPath();
+            ctx.moveTo(prev.sx, prev.sy);
+            ctx.lineTo(curr.sx, curr.sy);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, s.alpha * (warpSpeed / 12))})`;
+            ctx.lineWidth = Math.max(1, s.size * curr.scale * 0.8);
+            ctx.stroke();
+          }
+        } else {
+          // Sharp point star with subtle glow
+          ctx.beginPath();
+          ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+          ctx.fill();
+        }
+      }
+
+      // 2. Render Target: Andromeda Galaxy (M31) Spiral
+      const andromedaCenter = project(-600, -80, 900, cx, cy);
+      if (andromedaCenter) {
+        // Draw galactic haze / core glow
+        const coreR = 75 * andromedaCenter.scale;
+        const coreGrad = ctx.createRadialGradient(
+          andromedaCenter.sx, andromedaCenter.sy, 0,
+          andromedaCenter.sx, andromedaCenter.sy, coreR
+        );
+        coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.75)");
+        coreGrad.addColorStop(0.25, "rgba(220, 235, 255, 0.45)");
+        coreGrad.addColorStop(0.65, "rgba(180, 205, 240, 0.12)");
+        coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        ctx.beginPath();
+        ctx.arc(andromedaCenter.sx, andromedaCenter.sy, coreR, 0, Math.PI * 2);
+        ctx.fillStyle = coreGrad;
+        ctx.fill();
+
+        // Draw individual spiral arm particles
+        for (let i = 0; i < andromedaStars.length; i++) {
+          const as = andromedaStars[i];
+          const p = project(as.x, as.y, as.z, cx, cy);
+          if (!p) continue;
+
+          ctx.beginPath();
+          ctx.arc(p.sx, p.sy, Math.max(0.8, as.size * p.scale), 0, Math.PI * 2);
+          ctx.fillStyle = as.isCore ? "rgba(255, 255, 255, 0.85)" : `rgba(210, 228, 255, ${as.alpha})`;
+          ctx.fill();
+        }
+
+        // Andromeda Label
+        if (zoomLevel > 1.2) {
+          ctx.font = '11px "Space Mono", monospace';
+          ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+          ctx.fillText("M31 • Andromeda Core", andromedaCenter.sx + 40 * andromedaCenter.scale, andromedaCenter.sy - 20 * andromedaCenter.scale);
+        }
+      }
+
+      // 3. Render Target: The Big Dipper (Ursa Major) from reference.jpg
+      const projectedDipper = dipperStars.map(ds => project(ds.x, ds.y, ds.z, cx, cy));
+
+      // Draw Constellation Connecting Lines
+      dipperLines.forEach(([idxA, idxB]) => {
+        const pA = projectedDipper[idxA];
+        const pB = projectedDipper[idxB];
+        if (!pA || !pB) return;
+
+        const isPointerLine = (idxA === 4 && idxB === 7) || (idxA === 5 && idxB === 4);
+
+        ctx.beginPath();
+        ctx.moveTo(pA.sx, pA.sy);
+        ctx.lineTo(pB.sx, pB.sy);
+        ctx.strokeStyle = isPointerLine ? "rgba(255, 255, 255, 0.45)" : "rgba(255, 255, 255, 0.28)";
+        ctx.lineWidth = isPointerLine ? 1.5 : 1.2;
+        if (isPointerLine && idxB === 7) {
+          ctx.setLineDash([4, 6]); // Dashed pointer line to Polaris!
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset
+      });
+
+      // Draw 5-Pointed Stars (Ursa Major)
+      projectedDipper.forEach((p, idx) => {
+        if (!p) return;
+        const ds = dipperStars[idx];
+        const r = ds.size * p.scale;
+
+        // Halo
+        const halo = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, r * 3.5);
+        halo.addColorStop(0, "rgba(255, 255, 255, 0.8)");
+        halo.addColorStop(0.4, "rgba(255, 255, 255, 0.15)");
+        halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.beginPath();
+        ctx.arc(p.sx, p.sy, r * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
+        ctx.fill();
+
+        // 5-Pointed Star Core (Authentic to reference.jpg)
+        drawStar(ctx, p.sx, p.sy, 5, r * 1.6, r * 0.75, "#ffffff");
+
+        // Star Name Label
+        if (zoomLevel > 0.8) {
+          ctx.font = '10px "Space Mono", monospace';
+          ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+          ctx.fillText(ds.name, p.sx + r + 6, p.sy + 3);
+        }
+      });
+    }
+
+    animate();
   </script>
 </body>
 </html>
