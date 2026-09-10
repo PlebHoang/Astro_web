@@ -3,724 +3,1263 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telescope Sky View — Andromeda & The Big Dipper</title>
+  <title>CUB Astronomical Society — 3D Telescope Sky & Stargazing Finder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            'space-mono': ['"Space Mono"', 'monospace'],
+            inter: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
-    body {
-      background-color: #000000;
-      color: #f8fafc;
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-    #sky-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: grab;
-      z-index: 1;
-    }
-    #sky-canvas:active {
-      cursor: grabbing;
-    }
-
-    /* Telescope Eyepiece Reticle & Circular Aperture */
-    .eyepiece-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 2;
-      box-shadow: inset 0 0 120px 60px rgba(0, 0, 0, 0.95);
-      transition: opacity 0.4s ease;
-    }
-    .eyepiece-reticle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(80vh, 80vw);
-      height: min(80vh, 80vw);
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.55), inset 0 0 40px rgba(0, 0, 0, 0.8);
-      pointer-events: none;
-      z-index: 3;
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .eyepiece-reticle.reticle-off {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(1.15);
-    }
-    .reticle-crosshair {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .reticle-crosshair::before {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.15) 35%, transparent 48%, transparent 52%, rgba(255,255,255,0.15) 65%, transparent 95%);
-    }
-    .reticle-crosshair::after {
-      content: "";
-      position: absolute;
-      height: 100%;
-      width: 1px;
-      background: linear-gradient(180deg, transparent 5%, rgba(255,255,255,0.15) 35%, transparent 48%, transparent 52%, rgba(255,255,255,0.15) 65%, transparent 95%);
-    }
-    .reticle-ring-inner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 25%;
-      height: 25%;
-      border-radius: 50%;
-      border: 1px dashed rgba(255, 255, 255, 0.18);
-    }
-
-    /* UI Chrome */
-    .ui-layer {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 24px 30px;
-    }
-    .interactive {
-      pointer-events: auto;
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .brand-block {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .brand-title {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 800;
-      font-size: 17px;
-      letter-spacing: 2px;
-      color: #ffffff;
-      text-transform: uppercase;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-    .brand-sub {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      color: #94a3b8;
-      text-transform: uppercase;
-    }
-
-    .control-deck {
-      background: rgba(6, 7, 12, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      backdrop-filter: blur(20px);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
-    }
-    .btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 7px 14px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.04);
-      color: #e2e8f0;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-    .btn.active {
-      background: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-
-    .bottom-hud {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 16px;
-    }
-    .hud-card {
-      background: rgba(6, 7, 12, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      backdrop-filter: blur(16px);
-      padding: 10px 16px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: #94a3b8;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .hud-card strong {
-      color: #f8fafc;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 12px;
-    }
-    .speed-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #ffffff;
-    }
-    .speed-bar {
-      width: 60px;
-      height: 3px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
-    }
-    .speed-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 20%;
-      background: #ffffff;
-      transition: width 0.1s ease;
-    }
+    * { box-sizing: border-box; user-select: none; }
+    body { background-color: #000000; color: #f8fafc; overflow: hidden; width: 100vw; height: 100vh; }
   </style>
 </head>
-<body>
+<body class="relative w-screen h-screen overflow-hidden bg-black font-inter select-none">
 
   <!-- Fullscreen Telescope Canvas -->
-  <canvas id="sky-canvas"></canvas>
+  <canvas id="sky-canvas" class="absolute inset-0 w-full h-full block cursor-grab active:cursor-grabbing z-0"></canvas>
 
-  <!-- Circular Eyepiece Reticle -->
-  <div class="eyepiece-overlay"></div>
-  <div class="eyepiece-reticle" id="reticle">
-    <div class="reticle-crosshair"></div>
-    <div class="reticle-ring-inner"></div>
-    <span style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">N 000°</span>
-    <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">S 180°</span>
-    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">E 090°</span>
-    <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">W 270°</span>
+  <!-- Circular Eyepiece Reticle (20x Finder vs 150x High Zoom) -->
+  <div class="eyepiece-overlay absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_160px_80px_rgba(0,0,0,0.96)] transition-all duration-500" id="eyepiece-overlay"></div>
+  <div class="eyepiece-circle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/20 shadow-[0_0_0_2500px_rgba(0,0,0,0.72),inset_0_0_60px_rgba(0,0,0,0.92)] pointer-events-none z-10 transition-all duration-500" id="eyepiece-circle">
+    <!-- Reticle Crosshairs & Mil-Dots -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent"></div>
+      <div class="h-full w-[1px] bg-gradient-to-b from-transparent via-white/25 to-transparent absolute"></div>
+      <div class="w-1/3 h-1/3 rounded-full border border-dashed border-white/20 absolute" id="reticle-inner-ring"></div>
+      <div class="w-2/3 h-2/3 rounded-full border border-white/10 absolute" id="reticle-mid-ring"></div>
+      <div class="w-16 h-16 rounded-full border border-white/40 absolute opacity-0 transition-opacity duration-300" id="high-zoom-cross">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-2 h-2 rounded-full border border-white/60"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Compass Bearings -->
+    <span class="absolute top-3 left-1/2 -translate-x-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">N 000°</span>
+    <span class="absolute bottom-3 left-1/2 -translate-x-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">S 180°</span>
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">E 090°</span>
+    <span class="absolute right-3 top-1/2 -translate-y-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">W 270°</span>
   </div>
 
-  <!-- UI Overlay -->
-  <div class="ui-layer">
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="brand-block">
-        <div style="width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.25); border-radius: 9px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
-          </svg>
-        </div>
+  <!-- Directional Target Indicator Arrow (Points to off-screen mystery target in Finder) -->
+  <div id="target-dir-arrow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none z-20 opacity-0 transition-opacity duration-200">
+    <div class="w-full h-full flex items-start justify-center relative">
+      <div class="flex flex-col items-center gap-1 -translate-y-6">
+        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-white animate-bounce"></div>
+        <span class="font-space-mono text-[9px] bg-black/80 px-2 py-0.5 rounded border border-white/20 text-white whitespace-nowrap" id="target-dir-label">TARGET</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Star / Planet Information Popup Card (Astrophysical Telemetry) -->
+  <div id="star-info-card" class="fixed bottom-8 right-8 w-84 bg-black/92 border border-white/25 shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,255,255,0.12)] rounded-2xl backdrop-blur-2xl p-4.5 z-40 opacity-0 pointer-events-none translate-y-3 transition-all duration-300">
+    <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-white/10">
+      <div>
+        <div class="font-orbitron text-sm font-bold text-white tracking-wide" id="sic-title">Jupiter</div>
+        <div class="font-space-mono text-[10px] text-slate-400" id="sic-bayer">Sol V • Gas Giant</div>
+      </div>
+      <span class="text-[9px] font-space-mono px-2 py-0.5 rounded bg-white/10 text-slate-300 border border-white/15" id="sic-badge">PLANET</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 font-space-mono text-[10px] mb-2.5">
+      <div><span class="text-slate-500 block">DISTANCE</span><strong class="text-slate-200" id="sic-dist">628M km</strong></div>
+      <div><span class="text-slate-500 block">DIAMETER / SPEC</span><strong class="text-slate-200" id="sic-spec">142,984 km</strong></div>
+      <div><span class="text-slate-500 block">MAGNITUDE</span><strong class="text-slate-200" id="sic-mag">-2.70</strong></div>
+      <div><span class="text-slate-500 block">MOONS / ROLE</span><strong class="text-slate-200" id="sic-role">4 Galilean Moons</strong></div>
+    </div>
+    <div class="text-[11px] leading-relaxed text-slate-300 font-inter mb-3" id="sic-desc">
+      King of the Solar System. High zoom reveals cloud bands and 4 orbiting moons: Io, Europa, Ganymede, and Callisto.
+    </div>
+    <button type="button" id="sic-close-btn" class="w-full py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-space-mono text-[10px] uppercase tracking-wider border border-white/15 transition">
+      Close Telemetry [✕]
+    </button>
+  </div>
+
+  <!-- Discovery Unlocked Banner (Game Fanfare) -->
+  <div id="discovery-banner" class="fixed top-24 left-1/2 -translate-x-1/2 bg-black/95 border border-white/35 shadow-[0_0_40px_rgba(255,255,255,0.25)] rounded-2xl px-6 py-3.5 z-40 opacity-0 pointer-events-none -translate-y-4 transition-all duration-400 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-xl bg-white text-black font-orbitron font-black text-lg flex items-center justify-center shrink-0">
+      🔭
+    </div>
+    <div>
+      <div class="text-[9px] font-space-mono text-slate-400 uppercase tracking-widest">DISCOVERY VERIFIED IN 150X HIGH ZOOM</div>
+      <div class="font-orbitron font-bold text-sm text-white tracking-wide" id="discovery-title">JUPITER & GALILEAN MOONS</div>
+    </div>
+    <button type="button" id="btn-next-hunt" class="ml-3 px-3 py-1.5 rounded-lg bg-white text-black font-orbitron text-[10px] font-bold uppercase tracking-wider hover:bg-slate-200 transition">
+      Next Hunt →
+    </button>
+  </div>
+
+  <!-- Website Foreground Preview Overlay (Evaluate background readability) -->
+  <div class="absolute inset-0 z-15 flex flex-col items-center justify-center text-center p-6 pointer-events-none transition-all duration-500" id="web-preview">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-md mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+      <span class="text-[11px] font-space-mono text-slate-300 uppercase tracking-widest">
+        Constructor University Astronomical Society
+      </span>
+    </div>
+    <h1 class="font-orbitron font-black text-4xl sm:text-6xl lg:text-7xl text-white tracking-tight leading-[1.08] max-w-4xl mb-5 drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
+      UNVEILING THE COSMOS <br />FROM CAMPUS GREEN
+    </h1>
+    <p class="text-sm sm:text-base text-slate-300 max-w-xl mb-8 leading-relaxed drop-shadow">
+      Join fellow students for clear-sky telescope sessions, astrophysics cinema nights, and deep-space astrophotography in Bremen-Nord.
+    </p>
+    <div class="flex gap-3.5 pointer-events-auto mb-9">
+      <a href="#events" class="px-6 py-3 rounded-xl bg-white text-black font-orbitron font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition shadow-[0_0_25px_rgba(255,255,255,0.4)]">
+        Next Stargazing Session
+      </a>
+      <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-space-mono text-xs border border-white/20 backdrop-blur-md transition">
+        Follow @astronomy.cub
+      </a>
+    </div>
+    <div class="flex flex-wrap gap-3 pointer-events-auto">
+      <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+        <span>COORDINATES</span>
+        <strong class="block text-white font-orbitron text-xs mt-0.5">53.1672° N, 8.6534° E</strong>
+      </div>
+      <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+        <span>SKY QUALITY</span>
+        <strong class="block text-white font-orbitron text-xs mt-0.5">Bortle Class 5</strong>
+      </div>
+      <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+        <span>PRIMARY OPTICS</span>
+        <strong class="block text-white font-orbitron text-xs mt-0.5">8" Dobsonian Reflector</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- UI Control Deck & Telescope Stargazing HUD -->
+  <div class="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-4 sm:p-7">
+    <!-- Top Control Bar -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pointer-events-auto">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-space-mono text-slate-300 hover:text-white transition">
+          ← Main Portal
+        </a>
         <div>
-          <div class="brand-title">C>U ASTRO SOC</div>
-          <div class="brand-sub">Telescope Sky Observatory</div>
+          <div class="flex items-center gap-2">
+            <span class="font-orbitron text-xs font-bold tracking-wider text-white uppercase">CUB TELESCOPE LAB</span>
+            <span class="px-1.5 py-0.5 rounded text-[8px] font-space-mono bg-white/10 text-white border border-white/20">STARGAZING V3</span>
+          </div>
+          <span class="font-space-mono text-[9px] text-slate-400 block">3D Sky Explorer & Telescope Target Finder</span>
         </div>
       </div>
 
-      <!-- Target Selection Deck -->
-      <div class="control-deck interactive">
-        <button class="btn active" id="btn-target-dipper">
-          <span>✨ Big Dipper</span>
+      <!-- Stargazing Mission & Scope Controls -->
+      <div class="flex flex-wrap items-center gap-2 bg-black/90 p-1.5 rounded-2xl border border-white/15 backdrop-blur-2xl">
+        <!-- Two Scope Switcher -->
+        <div class="flex items-center bg-white/5 p-0.5 rounded-xl border border-white/10">
+          <button type="button" id="scope-btn-20x" class="scope-toggle-btn active px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition text-black bg-white shadow-sm flex items-center gap-1.5">
+            <span>🔭 20x Finder</span>
+          </button>
+          <button type="button" id="scope-btn-150x" class="scope-toggle-btn px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition text-slate-300 hover:text-white flex items-center gap-1.5">
+            <span>🔬 150x High Zoom</span>
+          </button>
+        </div>
+
+        <!-- Quick Navigation Dropdown / Buttons -->
+        <button type="button" id="btn-spawn-target" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1.5">
+          <span>🎲 New Mystery Anomaly</span>
         </button>
-        <button class="btn" id="btn-target-andromeda">
-          <span>🌀 Andromeda M31</span>
-        </button>
-        <button class="btn" id="btn-target-warp">
-          <span>🚀 Hyperspace</span>
-        </button>
-        <button class="btn" id="btn-toggle-reticle">
-          <span id="reticle-label">🔭 Reticle: On</span>
-        </button>
-        <button class="btn" id="btn-zoom-level">
-          <span id="zoom-label">🔍 20x Finder</span>
+
+        <!-- Toggle Website Overlay -->
+        <button type="button" id="btn-toggle-preview" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-slate-300 hover:text-white border border-white/15 hover:bg-white/10">
+          <span id="preview-label">👁️ Overlay: ON</span>
         </button>
       </div>
     </div>
 
-    <!-- Bottom HUD -->
-    <div class="bottom-hud">
-      <div class="hud-card interactive">
-        <span>STAR WARS TRAVEL WARP</span>
-        <div class="speed-indicator">
-          <span style="font-size: 10px;">SCROLL TO ACCELERATE</span>
-          <div class="speed-bar"><div class="speed-fill" id="speed-fill"></div></div>
-          <span id="speed-label" style="font-size: 10px; font-weight: bold;">0.2c</span>
+    <!-- Quick Constellation & Galaxy Jump Dock (Center Top) -->
+    <div class="self-center flex flex-wrap items-center justify-center gap-1.5 bg-black/85 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md pointer-events-auto max-w-full overflow-x-auto">
+      <span class="text-[9px] font-space-mono text-slate-500 uppercase mr-1">QUICK JUMP:</span>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition active:bg-white active:text-black" data-target="dipper">✨ Big Dipper</button>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cassiopeia">👑 Cassiopeia</button>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="orion">🏹 Orion</button>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cygnus">🦢 Cygnus</button>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="andromeda">🌀 M31 Andromeda</button>
+      <button type="button" class="nav-target-btn px-2.5 py-1 rounded-full text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="m51">🌪️ M51 Whirlpool</button>
+    </div>
+
+    <!-- Bottom HUD Deck -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto">
+      <!-- Stargazing Viewfinder Game Status -->
+      <div class="p-3.5 rounded-2xl bg-black/90 border border-white/15 backdrop-blur-xl font-space-mono text-xs text-slate-300 max-w-md w-full shadow-2xl">
+        <div class="flex justify-between items-center mb-1.5">
+          <span class="text-[9px] text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+            FINDER MISSION: HUNT UNRESOLVED ANOMALY
+          </span>
+          <span class="text-[9px] text-slate-400" id="hud-catalog-count">CATALOG: 0/5 FOUND</span>
         </div>
-        <span style="color: #64748b; font-size: 9px; margin-top: 2px;">Drag canvas to orbit in 3D • Scroll wheel to warp through stars</span>
+
+        <div class="flex items-center justify-between gap-2 my-1">
+          <div class="font-orbitron text-sm font-bold text-white tracking-wide" id="hud-mission-name">
+            White Dot Signal [Jupiter]
+          </div>
+          <div id="hud-lock-status" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/10 text-slate-300 border border-white/15">
+            SEARCHING
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-400 mt-1" id="hud-mission-hint">
+          Step 1: In 20x Finder, drag to center the pulsing white dot in the crosshairs.
+        </div>
+
+        <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-slate-400">
+          <span>DRAG TO PAN • SCROLL TO WARP • SPACE TO TOGGLE SCOPE</span>
+          <span id="hud-reticle-dist">ALIGNMENT: 0%</span>
+        </div>
       </div>
 
-      <div class="hud-card interactive" style="text-align: right;">
-        <span id="target-header">TARGET: URSA MAJOR (BIG DIPPER)</span>
-        <strong id="target-coords">RA 11h 03m / DEC +55°11' • MAG 1.8</strong>
-        <span style="color: #cbd5e1; font-size: 9px; margin-top: 2px;">Pointer stars Merak & Dubhe lead to Polaris</span>
+      <!-- Coordinates & Active Constellation Telemetry -->
+      <div class="p-3.5 rounded-2xl bg-black/90 border border-white/15 backdrop-blur-xl font-space-mono text-xs text-slate-300 text-right">
+        <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">CURRENT SECTOR: NORTHERN CIRCUMPOLAR</div>
+        <div id="hud-target-coords" class="font-bold text-white font-orbitron text-xs">RA 11h 03m / DEC +55°11' • 5 CONSTELLATIONS</div>
+        <div id="hud-target-desc" class="text-[10px] text-slate-400 mt-0.5">Ursa Major, Ursa Minor, Cassiopeia, Orion, Cygnus & Dual Galaxies</div>
       </div>
     </div>
   </div>
 
   <script>
-    // --- Canvas & Core Setup (Ponytail Minimalist Architecture) ---
     const canvas = document.getElementById("sky-canvas");
-    const ctx = canvas.getContext("2d");
-    const reticle = document.getElementById("reticle");
-    const reticleLabel = document.getElementById("reticle-label");
-    const zoomLabel = document.getElementById("zoom-label");
-    const speedFill = document.getElementById("speed-fill");
-    const speedLabel = document.getElementById("speed-label");
-    const targetHeader = document.getElementById("target-header");
-    const targetCoords = document.getElementById("target-coords");
+    const ctx = canvas?.getContext("2d");
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const eyepieceCircle = document.getElementById("eyepiece-circle");
+    const highZoomCross = document.getElementById("high-zoom-cross");
+    const scopeBtn20x = document.getElementById("scope-btn-20x");
+    const scopeBtn150x = document.getElementById("scope-btn-150x");
+    const btnTogglePreview = document.getElementById("btn-toggle-preview");
+    const previewLabel = document.getElementById("preview-label");
+    const webPreview = document.getElementById("web-preview");
+    const starCard = document.getElementById("star-info-card");
+    const sicCloseBtn = document.getElementById("sic-close-btn");
+    const targetDirArrow = document.getElementById("target-dir-arrow");
+    const targetDirLabel = document.getElementById("target-dir-label");
+    const discoveryBanner = document.getElementById("discovery-banner");
+    const discoveryTitle = document.getElementById("discovery-title");
+    const btnNextHunt = document.getElementById("btn-next-hunt");
+    const btnSpawnTarget = document.getElementById("btn-spawn-target");
 
-    window.addEventListener("resize", () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
+    const hudMissionName = document.getElementById("hud-mission-name");
+    const hudMissionHint = document.getElementById("hud-mission-hint");
+    const hudLockStatus = document.getElementById("hud-lock-status");
+    const hudReticleDist = document.getElementById("hud-reticle-dist");
+    const hudCatalogCount = document.getElementById("hud-catalog-count");
 
-    // --- State Variables ---
-    let currentTarget = "dipper"; // "dipper" | "andromeda" | "warp"
-    let isReticleOn = true;
-    let zoomLevel = 1; // 1 = 20x Wide Finder, 2.5 = High Magnification Eyepiece
-    let targetZoom = 1;
+    if (canvas && ctx) {
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
 
-    // Camera & 3D Celestial Orientation
-    let camYaw = 0;
-    let camPitch = 0;
-    let targetYaw = 0;
-    let targetPitch = 0;
-    let warpSpeed = 1.2; // Base forward speed
-    let targetWarpSpeed = 1.2;
-    let scrollBoost = 0;
-
-    // --- Starfield System (Traveling in Star Wars hyperspace) ---
-    const starCount = 1200;
-    const stars = [];
-    for (let i = 0; i < starCount; i++) {
-      stars.push({
-        x: (Math.random() - 0.5) * 2000,
-        y: (Math.random() - 0.5) * 2000,
-        z: Math.random() * 2000 + 50,
-        pz: 0,
-        size: Math.random() * 1.6 + 0.6,
-        alpha: Math.random() * 0.7 + 0.3
+      window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
       });
-    }
 
-    // --- TARGET 1: The Big Dipper (Ursa Major) from reference.jpg ---
-    // Accurate 7 stars of Ursa Major + Polaris pointer
-    const dipperStars = [
-      { name: "Alkaid", x: 180, y: -150, z: 900, size: 3.5, label: "η UMa" },
-      { name: "Mizar",  x: 100, y: -100, z: 900, size: 3.8, label: "ζ UMa (Double)" },
-      { name: "Alioth", x: 60,  y: -40,  z: 900, size: 3.6, label: "ε UMa" },
-      { name: "Megrez", x: 10,  y: 40,   z: 900, size: 3.0, label: "δ UMa" },
-      { name: "Dubhe",  x: -60, y: 30,   z: 900, size: 4.2, label: "α UMa (Pointer)" },
-      { name: "Merak",  x: -70, y: 120,  z: 900, size: 4.0, label: "β UMa (Pointer)" },
-      { name: "Phecda", x: 0,   y: 130,  z: 900, size: 3.4, label: "γ UMa" },
-      // Polaris (North Star)
-      { name: "Polaris", x: -70, y: -260, z: 900, size: 4.6, label: "North Star α UMi" }
-    ];
+      let isHighZoom = false;
+      let isPreviewVisible = true;
+      let targetZoom = 1.0;
+      let currentZoom = 1.0;
 
-    const dipperLines = [
-      [0, 1], [1, 2], [2, 3], // Handle
-      [3, 4], [4, 5], [5, 6], [6, 3], // Bowl
-      [5, 4], [4, 7] // Pointer line through Dubhe to Polaris!
-    ];
+      let camYaw = 0;
+      let camPitch = 0;
+      let targetYaw = 0;
+      let targetPitch = 0;
 
-    // --- TARGET 2: Andromeda Galaxy (M31) Spiral Particle System ---
-    const andromedaParticleCount = 1400;
-    const andromedaStars = [];
-    const galaxyTilt = 38 * (Math.PI / 180); // Tilted ellipse angle
+      let warpSpeed = 1.0;
+      let targetWarpSpeed = 1.0;
+      let scrollImpulse = 0;
 
-    for (let i = 0; i < andromedaParticleCount; i++) {
-      // Logarithmic spiral distribution
-      const arm = i % 2 === 0 ? 0 : Math.PI;
-      const dist = Math.pow(Math.random(), 2.2) * 260 + 6;
-      const angle = dist * 0.035 + arm + (Math.random() - 0.5) * 0.45;
-      
-      // Elliptical planar coordinates
-      const gx = Math.cos(angle) * dist * 1.8;
-      const gy = Math.sin(angle) * dist * 0.65; // compressed for tilt
-      const gz = (Math.random() - 0.5) * (30 - dist * 0.08); // bulge thickness
+      let isDragging = false;
+      let prevMouseX = 0;
+      let prevMouseY = 0;
+      let mouseX = -1000;
+      let mouseY = -1000;
 
-      // Rotate ellipse by galaxyTilt
-      const rx = gx * Math.cos(galaxyTilt) - gy * Math.sin(galaxyTilt);
-      const ry = gx * Math.sin(galaxyTilt) + gy * Math.cos(galaxyTilt);
-
-      // Core density luminescence
-      const isCore = dist < 45;
-      andromedaStars.push({
-        x: rx - 600, // Located at an offset angle in sky
-        y: ry - 80,
-        z: 900 + gz,
-        dist: dist,
-        isCore: isCore,
-        alpha: isCore ? Math.random() * 0.7 + 0.3 : Math.random() * 0.4 + 0.1,
-        size: isCore ? Math.random() * 2.2 + 1.2 : Math.random() * 1.4 + 0.6
-      });
-    }
-
-    // --- Target Presets & Switching ---
-    function setTarget(t) {
-      currentTarget = t;
-      document.querySelectorAll(".control-deck .btn").forEach(b => b.classList.remove("active"));
-
-      if (t === "dipper") {
-        document.getElementById("btn-target-dipper").classList.add("active");
-        targetYaw = 0;
-        targetPitch = 0;
-        targetWarpSpeed = 1.0;
-        targetHeader.textContent = "TARGET: URSA MAJOR (BIG DIPPER)";
-        targetCoords.textContent = "RA 11h 03m / DEC +55°11' • MAG 1.8";
-      } else if (t === "andromeda") {
-        document.getElementById("btn-target-andromeda").classList.add("active");
-        targetYaw = 0.65; // Pan to Andromeda
-        targetPitch = 0.1;
-        targetWarpSpeed = 1.2;
-        targetHeader.textContent = "TARGET: MESSIER 31 (ANDROMEDA GALAXY)";
-        targetCoords.textContent = "RA 00h 42m / DEC +41°16' • 2.537 Mly DISTANCE";
-      } else if (t === "warp") {
-        document.getElementById("btn-target-warp").classList.add("active");
-        targetWarpSpeed = 18.0; // Hyperdrive warp speed!
-        targetHeader.textContent = "PROPULSION: HYPERSPACE WARP TUNNEL";
-        targetCoords.textContent = "VELOCITY: 0.99c • STAR WARS TRAVEL ENGAGED";
+      // 1. Background Passing Stars (Star Wars Hyperspace Field)
+      const starCount = 1100;
+      const backgroundStars = [];
+      for (let i = 0; i < starCount; i++) {
+        backgroundStars.push({
+          x: (Math.random() - 0.5) * 2600,
+          y: (Math.random() - 0.5) * 2600,
+          z: Math.random() * 2400 + 40,
+          pz: 0,
+          size: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.7 + 0.3
+        });
       }
-    }
 
-    document.getElementById("btn-target-dipper").addEventListener("click", () => setTarget("dipper"));
-    document.getElementById("btn-target-andromeda").addEventListener("click", () => setTarget("andromeda"));
-    document.getElementById("btn-target-warp").addEventListener("click", () => setTarget("warp"));
-
-    // Toggle Reticle
-    document.getElementById("btn-toggle-reticle").addEventListener("click", () => {
-      isReticleOn = !isReticleOn;
-      if (isReticleOn) {
-        reticle.classList.remove("reticle-off");
-        reticleLabel.textContent = "🔭 Reticle: On";
-      } else {
-        reticle.classList.add("reticle-off");
-        reticleLabel.textContent = "🔭 Reticle: Off";
-      }
-    });
-
-    // Toggle Zoom (20x Finder vs High Power Eyepiece)
-    document.getElementById("btn-zoom-level").addEventListener("click", () => {
-      if (targetZoom === 1) {
-        targetZoom = 2.4;
-        zoomLabel.textContent = "🔍 80x Scope";
-      } else {
-        targetZoom = 1;
-        zoomLabel.textContent = "🔍 20x Finder";
-      }
-    });
-
-    // --- Scroll & Wheel Interaction (Star Wars Warp Speed) ---
-    window.addEventListener("wheel", (e) => {
-      scrollBoost += Math.abs(e.deltaY) * 0.025;
-      if (e.deltaY < 0) {
-        // Zoom forward
-        targetZoom = Math.min(3.2, targetZoom + 0.15);
-      } else {
-        targetZoom = Math.max(0.7, targetZoom - 0.15);
-      }
-    }, { passive: true });
-
-    // Page Scroll Boost
-    window.addEventListener("scroll", () => {
-      scrollBoost += 1.5;
-    }, { passive: true });
-
-    // --- Drag to Orbit & Pan Camera ---
-    let isDragging = false;
-    let prevX = 0;
-    let prevY = 0;
-
-    canvas.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      prevX = e.clientX;
-      prevY = e.clientY;
-    });
-    window.addEventListener("mouseup", () => isDragging = false);
-    window.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        const dx = e.clientX - prevX;
-        const dy = e.clientY - prevY;
-        targetYaw -= dx * 0.0035;
-        targetPitch -= dy * 0.0035;
-        prevX = e.clientX;
-        prevY = e.clientY;
-      }
-    });
-
-    // Touch Support
-    canvas.addEventListener("touchstart", (e) => {
-      if (e.touches.length > 0) {
-        isDragging = true;
-        prevX = e.touches[0].clientX;
-        prevY = e.touches[0].clientY;
-      }
-    });
-    window.addEventListener("touchend", () => isDragging = false);
-    canvas.addEventListener("touchmove", (e) => {
-      if (isDragging && e.touches.length > 0) {
-        const dx = e.touches[0].clientX - prevX;
-        const dy = e.touches[0].clientY - prevY;
-        targetYaw -= dx * 0.005;
-        targetPitch -= dy * 0.005;
-        prevX = e.touches[0].clientX;
-        prevY = e.touches[0].clientY;
-      }
-    });
-
-    // --- 3D Perspective Projection Function ---
-    function project(x, y, z, cx, cy) {
-      // Camera Yaw (Y-axis)
-      const cosY = Math.cos(camYaw);
-      const sinY = Math.sin(camYaw);
-      const x1 = x * cosY + z * sinY;
-      const z1 = -x * sinY + z * cosY;
-
-      // Camera Pitch (X-axis)
-      const cosP = Math.cos(camPitch);
-      const sinP = Math.sin(camPitch);
-      const y2 = y * cosP - z1 * sinP;
-      const z2 = y * sinP + z1 * cosP;
-
-      const fov = 650 * zoomLevel;
-      const depth = z2;
-
-      if (depth <= 10) return null;
-      const scale = fov / depth;
-
-      return {
-        sx: cx + x1 * scale,
-        sy: cy + y2 * scale,
-        scale: scale,
-        depth: depth
+      // 2. CONSTELLATIONS DATA
+      const ursaMajor = {
+        name: "Ursa Major (The Big Dipper)",
+        yaw: 0,
+        pitch: 0,
+        stars: [
+          { id: 'alkaid', name: "Alkaid", bayer: "η Ursae Majoris", dist: "103 ly", spec: "B3 V Blue Dwarf", mag: "+1.86", role: "Tip of Handle", desc: "Hot blue-white hydrogen-fusing star (17,000 K).", x: 190, y: -160, z: 920, size: 4.2 },
+          { id: 'mizar', name: "Mizar & Alcor", bayer: "ζ Ursae Majoris", dist: "83 ly", spec: "A2 V + A1 V Binary", mag: "+2.23", role: "Ancient Vision Test Binary", desc: "Telescopic double! In 150x zoom, Mizar splits into Mizar A/B with Alcor beside it.", x: 110, y: -110, z: 860, size: 4.4, isBinary: true },
+          { id: 'alioth', name: "Alioth", bayer: "ε Ursae Majoris", dist: "82.6 ly", spec: "A1p Magnetic Peculiar", mag: "+1.77", role: "Luminosity Leader", desc: "Brightest star in Ursa Major with an intense fluctuating magnetic field.", x: 60, y: -45, z: 850, size: 4.3 },
+          { id: 'megrez', name: "Megrez", bayer: "δ Ursae Majoris", dist: "80.5 ly", spec: "A3 V Main Sequence", mag: "+3.31", role: "Bowl-Handle Junction", desc: "The junction star joining the handle to the quadrangle bowl.", x: 10, y: 35, z: 840, size: 3.5 },
+          { id: 'dubhe', name: "Dubhe", bayer: "α Ursae Majoris", dist: "123 ly", spec: "K0 III Orange Giant", mag: "+1.79", role: "Polaris Pointer Star", desc: "30x larger than our Sun. Merak & Dubhe line points straight to Polaris.", x: -70, y: 25, z: 980, size: 4.6, isPointer: true },
+          { id: 'merak', name: "Merak", bayer: "β Ursae Majoris", dist: "79.7 ly", spec: "A1 V White Star", mag: "+2.37", role: "Polaris Pointer Star", desc: "Surrounded by a circumstellar debris disc. Guides celestial navigation to the North Pole.", x: -80, y: 125, z: 830, size: 4.1, isPointer: true },
+          { id: 'phecda', name: "Phecda", bayer: "γ Ursae Majoris", dist: "83.2 ly", spec: "A0 V Fast Rotator", mag: "+2.44", role: "Bottom Bowl Anchor", desc: "Rapidly rotating at 178 km/s with an equatorial gas envelope.", x: 0, y: 135, z: 850, size: 3.9 },
+          { id: 'polaris', name: "Polaris", bayer: "α Ursae Minoris", dist: "433 ly", spec: "F7 Ib Supergiant", mag: "+1.98", role: "North Celestial Pole", desc: "Current North Star. Celestial pivot around which all northern constellations rotate.", x: -70, y: -290, z: 1200, size: 5.0, isPolaris: true }
+        ],
+        lines: [
+          [0, 1], [1, 2], [2, 3],
+          [3, 4], [4, 5], [5, 6], [6, 3],
+          [5, 4], [4, 7]
+        ]
       };
-    }
 
-    // Helper to draw 5-pointed stars
-    function drawStar(ctx, cx, cy, spikes, rOut, rIn, style) {
-      let rot = Math.PI / 2 * 3;
-      let x = cx;
-      let y = cy;
-      const step = Math.PI / spikes;
+      const cassiopeia = {
+        name: "Cassiopeia",
+        yaw: -0.55,
+        pitch: 0.38,
+        stars: [
+          { id: 'schedar', name: "Schedar", bayer: "α Cassiopeiae", dist: "228 ly", spec: "K0 IIIa Orange Giant", mag: "+2.24", role: "Bottom vertex of W", desc: "Luminous red-orange giant star 42x the Sun's radius.", x: -280, y: -580, z: 960, size: 4.4, color: "#ffc89b" },
+          { id: 'caph', name: "Caph", bayer: "β Cassiopeiae", dist: "54.7 ly", spec: "F2 III Delta Scuti", mag: "+2.28", role: "Western tip of W", desc: "Yellow-white giant pulsating every 2.5 hours. Used as an astronomical right ascension clock.", x: -370, y: -520, z: 940, size: 4.2 },
+          { id: 'navi', name: "Navi (Tsih)", bayer: "γ Cassiopeiae", dist: "550 ly", spec: "B0.5 IVe Variable", mag: "+2.15", role: "Center peak of W", desc: "Violent variable star spinning at 400 km/s. Nicknamed Navi by Apollo 1 astronaut Gus Grissom.", x: -260, y: -460, z: 990, size: 4.6, color: "#d8e8ff" },
+          { id: 'ruchbah', name: "Ruchbah", bayer: "δ Cassiopeiae", dist: "99.4 ly", spec: "A5 V Eclipsing Binary", mag: "+2.68", role: "Eastern vertex of W", desc: "Algol-type eclipsing binary system with periodic dimming.", x: -170, y: -480, z: 950, size: 3.9 },
+          { id: 'segin', name: "Segin", bayer: "ε Cassiopeiae", dist: "460 ly", spec: "B3 V Blue Giant", mag: "+3.35", role: "Eastern tip of W", desc: "Hot blue giant nearing the end of its core hydrogen-fusion stage.", x: -95, y: -510, z: 970, size: 3.6 }
+        ],
+        lines: [
+          [1, 0], [0, 2], [2, 3], [3, 4]
+        ]
+      };
 
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - rOut);
-      for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * rOut;
-        y = cy + Math.sin(rot) * rOut;
-        ctx.lineTo(x, y);
-        rot += step;
-        x = cx + Math.cos(rot) * rIn;
-        y = cy + Math.sin(rot) * rIn;
-        ctx.lineTo(x, y);
-        rot += step;
+      const orion = {
+        name: "Orion",
+        yaw: 0.95,
+        pitch: -0.45,
+        stars: [
+          { id: 'betelgeuse', name: "Betelgeuse", bayer: "α Orionis", dist: "642 ly", spec: "M1-M2 Ia-ab Red Supergiant", mag: "+0.50", role: "Eastern Shoulder", desc: "Gigantic pulsating red supergiant. If placed at our Sun, its surface would extend past Mars!", x: 670, y: 390, z: 890, size: 5.6, color: "#ff8c5a" },
+          { id: 'bellatrix', name: "Bellatrix", bayer: "γ Orionis", dist: "250 ly", spec: "B2 III Blue Giant", mag: "+1.64", role: "Western Shoulder", desc: "Known as the Amazon Star. Luminous blue giant 6x Sun's mass.", x: 505, y: 350, z: 870, size: 4.4, color: "#d8ebff" },
+          { id: 'alnitak', name: "Alnitak", bayer: "ζ Orionis", dist: "1,260 ly", spec: "O9.7 Ib Supergiant", mag: "+1.77", role: "Eastern Belt Star", desc: "Eastern star of Orion's Belt. Ionizes the famous Flame and Horsehead Nebulae.", x: 610, y: 485, z: 890, size: 4.2 },
+          { id: 'alnilam', name: "Alnilam", bayer: "ε Orionis", dist: "2,000 ly", spec: "B0 Ia Blue Supergiant", mag: "+1.69", role: "Center Belt Star", desc: "Central belt jewel. 537,000x more luminous than our Sun!", x: 575, y: 475, z: 895, size: 4.3 },
+          { id: 'mintaka', name: "Mintaka", bayer: "δ Orionis", dist: "1,200 ly", spec: "O9.5 II Multiple System", mag: "+2.23", role: "Western Belt Star", desc: "Western belt star located almost precisely on the celestial equator.", x: 540, y: 465, z: 900, size: 4.0 },
+          { id: 'saiph', name: "Saiph", bayer: "κ Orionis", dist: "650 ly", spec: "B0.5 Ia Supergiant", mag: "+2.07", role: "Eastern Foot", desc: "Massive supergiant destined to explode as a core-collapse supernova.", x: 640, y: 620, z: 920, size: 4.1 },
+          { id: 'rigel', name: "Rigel", bayer: "β Orionis", dist: "860 ly", spec: "B8 Ia Blue Supergiant", mag: "+0.13", role: "Western Foot", desc: "Brightest star in Orion. Shines with the brilliance of 120,000 Suns!", x: 460, y: 600, z: 940, size: 5.4, color: "#b8dcff" },
+          { id: 'meissa', name: "Meissa", bayer: "λ Orionis", dist: "1,100 ly", spec: "O8 III Giant", mag: "+3.39", role: "Head of Orion", desc: "Hot O-type star at the center of the Lambda Orionis molecular ring.", x: 590, y: 295, z: 880, size: 3.5 }
+        ],
+        lines: [
+          [7, 0], [7, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6], [5, 6], [0, 1]
+        ]
+      };
+
+      const cygnus = {
+        name: "Cygnus (The Northern Cross)",
+        yaw: -0.92,
+        pitch: -0.15,
+        stars: [
+          { id: 'deneb', name: "Deneb", bayer: "α Cygni", dist: "2,615 ly", spec: "A2 Ia White Supergiant", mag: "+1.25", role: "Head of Cross (Swan Tail)", desc: "Hyperluminous supergiant and anchor of the Summer Triangle. Over 196,000x solar luminosity.", x: -710, y: -340, z: 910, size: 4.9 },
+          { id: 'sadr', name: "Sadr", bayer: "γ Cygni", dist: "1,800 ly", spec: "F8 Ib Supergiant", mag: "+2.23", role: "Intersection of Cross", desc: "Located at the chest of the Swan, enveloped in rich Milky Way star fields.", x: -620, y: -240, z: 890, size: 4.2 },
+          { id: 'albireo', name: "Albireo", bayer: "β Cygni", dist: "430 ly", spec: "K3 II + B9.5 V Binary", mag: "+3.05", role: "Base of Cross (Swan Head)", desc: "Most famous color contrast double star in astronomy: golden topaz and sapphire blue!", x: -500, y: -110, z: 870, size: 4.0, isBinary: true, color: "#ffd28a" },
+          { id: 'gienah', name: "Gienah", bayer: "ε Cygni", dist: "73 ly", spec: "K0 III Orange Giant", mag: "+2.48", role: "Eastern Wing", desc: "Cool giant with 11x solar radius. Name translates from Arabic as 'the Wing'.", x: -530, y: -310, z: 900, size: 3.9, color: "#ffc98a" },
+          { id: 'deltacyg', name: "Delta Cygni", bayer: "δ Cygni", dist: "165 ly", spec: "B9.5 IV Triple System", mag: "+2.87", role: "Western Wing", desc: "Future North Star around the year 11,250 AD due to axial precession.", x: -720, y: -190, z: 880, size: 3.8 }
+        ],
+        lines: [
+          [0, 1], [1, 2], [4, 1], [1, 3]
+        ]
+      };
+
+      const allConstellations = [ursaMajor, cassiopeia, orion, cygnus];
+
+      // 3. DUAL ROTATING GALAXIES
+      // Andromeda (M31)
+      const andromedaParticles = [];
+      const galaxyTiltX = 35 * (Math.PI / 180);
+      const galaxyTiltY = -25 * (Math.PI / 180);
+      for (let i = 0; i < 1500; i++) {
+        const armOffset = i % 2 === 0 ? 0 : Math.PI;
+        const radius = Math.pow(Math.random(), 2.0) * 270 + 4;
+        const baseAngle = radius * 0.038 + armOffset + (Math.random() - 0.5) * 0.4;
+        const isCore = radius < 38;
+        andromedaParticles.push({
+          radius,
+          angle: baseAngle,
+          angularSpeed: (0.8 / Math.sqrt(radius + 10)) * 0.012,
+          thickness: (Math.random() - 0.5) * Math.max(4, 28 - radius * 0.08),
+          isCore,
+          size: isCore ? Math.random() * 2.2 + 1.2 : Math.random() * 1.5 + 0.6,
+          alpha: isCore ? Math.random() * 0.75 + 0.25 : Math.random() * 0.45 + 0.15,
+          baseX: -620,
+          baseY: -80,
+          baseZ: 950
+        });
       }
-      ctx.lineTo(cx, cy - rOut);
-      ctx.closePath();
-      ctx.fillStyle = style;
-      ctx.fill();
-    }
 
-    // --- Main Render Loop ---
-    function animate() {
-      requestAnimationFrame(animate);
-
-      // Smooth camera interpolation
-      camYaw += (targetYaw - camYaw) * 0.08;
-      camPitch += (targetPitch - camPitch) * 0.08;
-      zoomLevel += (targetZoom - zoomLevel) * 0.08;
-
-      // Warp speed physics (Star Wars acceleration on scroll/button)
-      scrollBoost *= 0.92; // decay scroll boost
-      warpSpeed += (targetWarpSpeed + scrollBoost - warpSpeed) * 0.08;
-
-      // Update HUD speed readout
-      const speedNorm = Math.min(1, warpSpeed / 20);
-      speedFill.style.width = `${Math.round(speedNorm * 100)}%`;
-      speedLabel.textContent = `${(warpSpeed * 0.15).toFixed(2)}c`;
-
-      ctx.fillStyle = "#000000";
-      ctx.fillRect(0, 0, width, height);
-
-      const cx = width * 0.5;
-      const cy = height * 0.5;
-
-      // 1. Render Traveling Starfield (Star Wars Hyperspace motion trails)
-      const isHyperdrive = warpSpeed > 3.0;
-
-      for (let i = 0; i < stars.length; i++) {
-        const s = stars[i];
-        s.pz = s.z; // Previous z for streak trails
-        s.z -= warpSpeed * 3.5;
-
-        // Recycle star when it passes camera
-        if (s.z <= 20) {
-          s.z = 2000;
-          s.pz = 2000;
-          s.x = (Math.random() - 0.5) * 2000;
-          s.y = (Math.random() - 0.5) * 2000;
-        }
-
-        const curr = project(s.x, s.y, s.z, cx, cy);
-        if (!curr) continue;
-
-        if (isHyperdrive) {
-          // Motion trail streak towards viewer
-          const prev = project(s.x, s.y, s.pz, cx, cy);
-          if (prev) {
-            ctx.beginPath();
-            ctx.moveTo(prev.sx, prev.sy);
-            ctx.lineTo(curr.sx, curr.sy);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, s.alpha * (warpSpeed / 12))})`;
-            ctx.lineWidth = Math.max(1, s.size * curr.scale * 0.8);
-            ctx.stroke();
-          }
+      // Whirlpool Galaxy (M51)
+      const m51Particles = [];
+      const m51TiltX = -20 * (Math.PI / 180);
+      const m51TiltY = 40 * (Math.PI / 180);
+      for (let i = 0; i < 900; i++) {
+        const isCompanion = i > 750;
+        if (isCompanion) {
+          const r = Math.random() * 35;
+          const a = Math.random() * Math.PI * 2;
+          m51Particles.push({
+            radius: r,
+            angle: a,
+            angularSpeed: 0.003,
+            thickness: (Math.random() - 0.5) * 12,
+            isCompanion: true,
+            isCore: r < 10,
+            size: Math.random() * 1.6 + 0.6,
+            alpha: Math.random() * 0.6 + 0.2,
+            offsetX: 75,
+            offsetY: -35,
+            baseX: 380,
+            baseY: -280,
+            baseZ: 980
+          });
         } else {
-          // Sharp point star with subtle glow
-          ctx.beginPath();
-          ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
-          ctx.fill();
+          const armOffset = (i % 2) * Math.PI;
+          const radius = Math.pow(Math.random(), 1.8) * 150 + 3;
+          const angle = radius * 0.052 + armOffset + (Math.random() - 0.5) * 0.35;
+          const isCore = radius < 22;
+          m51Particles.push({
+            radius,
+            angle,
+            angularSpeed: (0.7 / Math.sqrt(radius + 8)) * 0.015,
+            thickness: (Math.random() - 0.5) * 14,
+            isCompanion: false,
+            isCore,
+            size: isCore ? Math.random() * 2.0 + 1.0 : Math.random() * 1.4 + 0.5,
+            alpha: isCore ? Math.random() * 0.8 + 0.2 : Math.random() * 0.5 + 0.15,
+            offsetX: 0,
+            offsetY: 0,
+            baseX: 380,
+            baseY: -280,
+            baseZ: 980
+          });
         }
       }
 
-      // 2. Render Target: Andromeda Galaxy (M31) Spiral
-      const andromedaCenter = project(-600, -80, 900, cx, cy);
-      if (andromedaCenter) {
-        // Draw galactic haze / core glow
-        const coreR = 75 * andromedaCenter.scale;
-        const coreGrad = ctx.createRadialGradient(
-          andromedaCenter.sx, andromedaCenter.sy, 0,
-          andromedaCenter.sx, andromedaCenter.sy, coreR
-        );
-        coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.75)");
-        coreGrad.addColorStop(0.25, "rgba(220, 235, 255, 0.45)");
-        coreGrad.addColorStop(0.65, "rgba(180, 205, 240, 0.12)");
-        coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      // 4. STARGAZING FINDER GAME TARGETS
+      const mysteryTargets = [
+        {
+          id: 'target-jupiter',
+          name: "Jupiter & 4 Galilean Moons",
+          bayer: "Sol V • Gas Giant",
+          dist: "628M km",
+          spec: "142,984 km Dia.",
+          mag: "-2.70",
+          role: "King of the Planets",
+          desc: "King of Planets! High zoom reveals swirling atmospheric belts, the Great Red Spot, and 4 orbiting moons: Io, Europa, Ganymede, and Callisto.",
+          x: 420,
+          y: 80,
+          z: 910,
+          type: 'planet_jupiter',
+          discovered: false
+        },
+        {
+          id: 'target-saturn',
+          name: "Saturn & Majestic Ring System",
+          bayer: "Sol VI • Ringed Gas Giant",
+          dist: "1.4B km",
+          spec: "120,536 km Dia.",
+          mag: "+0.55",
+          role: "Jewel of the Solar System",
+          desc: "The Lord of the Rings! High zoom reveals the Cassini division gap, tilted golden rings, and major moon Titan.",
+          x: -440,
+          y: 180,
+          z: 880,
+          type: 'planet_saturn',
+          discovered: false
+        },
+        {
+          id: 'target-mars',
+          name: "Mars (The Red Planet)",
+          bayer: "Sol IV • Terrestrial World",
+          dist: "225M km",
+          spec: "6,779 km Dia.",
+          mag: "-1.50",
+          role: "Target for Human Exploration",
+          desc: "The Red Planet! High zoom reveals basaltic dark plains (Syrtis Major) and the brilliant white carbon-dioxide/water North Polar ice cap.",
+          x: -210,
+          y: 260,
+          z: 930,
+          type: 'planet_mars',
+          discovered: false
+        },
+        {
+          id: 'target-m42',
+          name: "Orion Nebula (Messier 42)",
+          bayer: "NGC 1976 • Stellar Nursery",
+          dist: "1,344 ly",
+          spec: "24 ly across",
+          mag: "+4.00",
+          role: "Active Star Formation Hub",
+          desc: "Nearest massive star factory to Earth! High zoom reveals the glowing turquoise gas curtain illuminated by the brilliant Trapezium 4-star cluster.",
+          x: 550,
+          y: 535,
+          z: 900,
+          type: 'nebula_m42',
+          discovered: false
+        },
+        {
+          id: 'target-m51',
+          name: "Whirlpool Galaxy (Messier 51)",
+          bayer: "NGC 5194 • Interacting Spiral",
+          dist: "23.5 Mly",
+          spec: "76,000 ly across",
+          mag: "+8.40",
+          role: "Grand Design Spiral Pair",
+          desc: "Majestic interacting galaxy! High zoom reveals two grand-design spiral arms gravitationally tethered to companion galaxy NGC 5195.",
+          x: 380,
+          y: -280,
+          z: 980,
+          type: 'galaxy_m51',
+          discovered: false
+        }
+      ];
 
-        ctx.beginPath();
-        ctx.arc(andromedaCenter.sx, andromedaCenter.sy, coreR, 0, Math.PI * 2);
-        ctx.fillStyle = coreGrad;
-        ctx.fill();
+      let currentTargetIndex = 0;
+      let activeMystery = mysteryTargets[currentTargetIndex];
+      let isTargetCentered = false;
 
-        // Draw individual spiral arm particles
-        for (let i = 0; i < andromedaStars.length; i++) {
-          const as = andromedaStars[i];
-          const p = project(as.x, as.y, as.z, cx, cy);
-          if (!p) continue;
-
-          ctx.beginPath();
-          ctx.arc(p.sx, p.sy, Math.max(0.8, as.size * p.scale), 0, Math.PI * 2);
-          ctx.fillStyle = as.isCore ? "rgba(255, 255, 255, 0.85)" : `rgba(210, 228, 255, ${as.alpha})`;
-          ctx.fill();
+      function updateMissionHUD() {
+        if (!activeMystery) return;
+        if (hudMissionName) {
+          hudMissionName.textContent = activeMystery.discovered 
+            ? `Discovered: ${activeMystery.name}` 
+            : `White Dot Signal [${activeMystery.name.split(' ')[0]}]`;
+        }
+        if (hudMissionHint) {
+          hudMissionHint.textContent = isHighZoom
+            ? (isTargetCentered ? "Target Resolved! Examine telemetry card or discover next object." : "Fine-tune pan to keep object in the center crosshairs.")
+            : (isTargetCentered ? "🎯 TARGET CENTERED! Switch to 150x High Zoom (Press Space) to resolve!" : "Step 1: In 20x Finder, drag to center the pulsing white dot in the crosshairs.");
         }
 
-        // Andromeda Label
-        if (zoomLevel > 1.2) {
-          ctx.font = '11px "Space Mono", monospace';
-          ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-          ctx.fillText("M31 • Andromeda Core", andromedaCenter.sx + 40 * andromedaCenter.scale, andromedaCenter.sy - 20 * andromedaCenter.scale);
-        }
+        const discoveredCount = mysteryTargets.filter(t => t.discovered).length;
+        if (hudCatalogCount) hudCatalogCount.textContent = `CATALOG: ${discoveredCount}/${mysteryTargets.length} FOUND`;
       }
 
-      // 3. Render Target: The Big Dipper (Ursa Major) from reference.jpg
-      const projectedDipper = dipperStars.map(ds => project(ds.x, ds.y, ds.z, cx, cy));
-
-      // Draw Constellation Connecting Lines
-      dipperLines.forEach(([idxA, idxB]) => {
-        const pA = projectedDipper[idxA];
-        const pB = projectedDipper[idxB];
-        if (!pA || !pB) return;
-
-        const isPointerLine = (idxA === 4 && idxB === 7) || (idxA === 5 && idxB === 4);
-
-        ctx.beginPath();
-        ctx.moveTo(pA.sx, pA.sy);
-        ctx.lineTo(pB.sx, pB.sy);
-        ctx.strokeStyle = isPointerLine ? "rgba(255, 255, 255, 0.45)" : "rgba(255, 255, 255, 0.28)";
-        ctx.lineWidth = isPointerLine ? 1.5 : 1.2;
-        if (isPointerLine && idxB === 7) {
-          ctx.setLineDash([4, 6]); // Dashed pointer line to Polaris!
+      function spawnNextTarget() {
+        const undiscovered = mysteryTargets.filter(t => !t.discovered);
+        if (undiscovered.length > 0) {
+          activeMystery = undiscovered[0];
         } else {
-          ctx.setLineDash([]);
+          currentTargetIndex = (currentTargetIndex + 1) % mysteryTargets.length;
+          activeMystery = mysteryTargets[currentTargetIndex];
+          activeMystery.x = (Math.random() - 0.5) * 1200;
+          activeMystery.y = (Math.random() - 0.5) * 1000;
+          activeMystery.z = Math.random() * 300 + 800;
+          activeMystery.discovered = false;
         }
-        ctx.stroke();
-        ctx.setLineDash([]); // Reset
+        isTargetCentered = false;
+        discoveryBanner?.classList.add("opacity-0", "-translate-y-4", "pointer-events-none");
+        updateMissionHUD();
+      }
+
+      btnNextHunt?.addEventListener("click", () => {
+        spawnNextTarget();
       });
 
-      // Draw 5-Pointed Stars (Ursa Major)
-      projectedDipper.forEach((p, idx) => {
-        if (!p) return;
-        const ds = dipperStars[idx];
-        const r = ds.size * p.scale;
+      btnSpawnTarget?.addEventListener("click", () => {
+        const types = ['planet_jupiter', 'planet_saturn', 'planet_mars', 'nebula_m42', 'galaxy_m51'];
+        const pick = types[Math.floor(Math.random() * types.length)];
+        const base = mysteryTargets.find(t => t.type === pick);
+        activeMystery = {
+          ...base,
+          id: 'custom-' + Date.now(),
+          name: `Deep-Sky Object [Sector ${Math.floor(Math.random() * 89 + 10)}]`,
+          x: (Math.random() - 0.5) * 1400,
+          y: (Math.random() - 0.5) * 1100,
+          z: Math.random() * 300 + 820,
+          discovered: false
+        };
+        isTargetCentered = false;
+        discoveryBanner?.classList.add("opacity-0", "-translate-y-4", "pointer-events-none");
+        updateMissionHUD();
+      });
 
-        // Halo
-        const halo = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, r * 3.5);
-        halo.addColorStop(0, "rgba(255, 255, 255, 0.8)");
-        halo.addColorStop(0.4, "rgba(255, 255, 255, 0.15)");
-        halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+      // 5. SCOPE TOGGLE CONTROLS
+      function setScopeMode(highZoom) {
+        isHighZoom = highZoom;
+        if (isHighZoom) {
+          targetZoom = 3.2;
+          scopeBtn150x?.classList.add("active", "bg-white", "text-black");
+          scopeBtn150x?.classList.remove("text-slate-300");
+          scopeBtn20x?.classList.remove("active", "bg-white", "text-black");
+          scopeBtn20x?.classList.add("text-slate-300");
+
+          eyepieceCircle?.classList.add("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
+          eyepieceCircle?.classList.remove("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
+          highZoomCross?.classList.remove("opacity-0");
+          highZoomCross?.classList.add("opacity-100");
+        } else {
+          targetZoom = 1.0;
+          scopeBtn20x?.classList.add("active", "bg-white", "text-black");
+          scopeBtn20x?.classList.remove("text-slate-300");
+          scopeBtn150x?.classList.remove("active", "bg-white", "text-black");
+          scopeBtn150x?.classList.add("text-slate-300");
+
+          eyepieceCircle?.classList.remove("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
+          eyepieceCircle?.classList.add("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
+          highZoomCross?.classList.add("opacity-0");
+          highZoomCross?.classList.remove("opacity-100");
+        }
+        updateMissionHUD();
+      }
+
+      scopeBtn20x?.addEventListener("click", () => setScopeMode(false));
+      scopeBtn150x?.addEventListener("click", () => setScopeMode(true));
+
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space" || e.key === "z" || e.key === "Z") {
+          e.preventDefault();
+          setScopeMode(!isHighZoom);
+        }
+      });
+
+      document.querySelectorAll(".nav-target-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.target;
+          if (target === "dipper") { targetYaw = 0; targetPitch = 0; }
+          else if (target === "cassiopeia") { targetYaw = -0.55; targetPitch = 0.38; }
+          else if (target === "orion") { targetYaw = 0.95; targetPitch = -0.45; }
+          else if (target === "cygnus") { targetYaw = -0.92; targetPitch = -0.15; }
+          else if (target === "andromeda") { targetYaw = 0.62; targetPitch = 0.08; }
+          else if (target === "m51") { targetYaw = -0.38; targetPitch = 0.28; }
+        });
+      });
+
+      btnTogglePreview?.addEventListener("click", () => {
+        isPreviewVisible = !isPreviewVisible;
+        if (isPreviewVisible) {
+          webPreview?.classList.remove("opacity-0", "scale-105", "pointer-events-none");
+          if (previewLabel) previewLabel.textContent = "👁️ Overlay: ON";
+        } else {
+          webPreview?.classList.add("opacity-0", "scale-105", "pointer-events-none");
+          if (previewLabel) previewLabel.textContent = "👁️ Overlay: OFF";
+        }
+      });
+
+      sicCloseBtn?.addEventListener("click", () => {
+        starCard?.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
+        starCard?.classList.add("opacity-0", "pointer-events-none", "translate-y-3");
+      });
+
+      window.addEventListener("wheel", (e) => {
+        scrollImpulse += Math.abs(e.deltaY) * 0.035;
+        if (e.deltaY < 0) {
+          targetZoom = Math.min(4.5, targetZoom + 0.15);
+        } else {
+          targetZoom = Math.max(0.65, targetZoom - 0.15);
+        }
+      }, { passive: true });
+
+      canvas.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      window.addEventListener("mouseup", () => isDragging = false);
+
+      window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (isDragging) {
+          const dx = e.clientX - prevMouseX;
+          const dy = e.clientY - prevMouseY;
+          targetYaw -= dx * 0.0032;
+          targetPitch -= dy * 0.0032;
+          prevMouseX = e.clientX;
+          prevMouseY = e.clientY;
+        }
+      });
+
+      canvas.addEventListener("click", (e) => {
+        const cx = width * 0.5;
+        const cy = height * 0.5;
+
+        if (activeMystery) {
+          const p = project3D(activeMystery.x, activeMystery.y, activeMystery.z, cx, cy);
+          if (p) {
+            const d = Math.hypot(e.clientX - p.sx, e.clientY - p.sy);
+            if (d < (isHighZoom ? 45 : 24)) {
+              showTelemetryCard(activeMystery, true);
+              return;
+            }
+          }
+        }
+
+        let foundStar = null;
+        for (const constel of allConstellations) {
+          for (const star of constel.stars) {
+            const p = project3D(star.x, star.y, star.z, cx, cy);
+            if (!p) continue;
+            const dist = Math.hypot(e.clientX - p.sx, e.clientY - p.sy);
+            if (dist < 22) {
+              foundStar = star;
+              break;
+            }
+          }
+          if (foundStar) break;
+        }
+
+        if (foundStar) {
+          showTelemetryCard(foundStar, false);
+        }
+      });
+
+      function showTelemetryCard(item, isPlanet) {
+        const t = document.getElementById("sic-title");
+        const b = document.getElementById("sic-bayer");
+        const d = document.getElementById("sic-dist");
+        const sp = document.getElementById("sic-spec");
+        const m = document.getElementById("sic-mag");
+        const r = document.getElementById("sic-role");
+        const desc = document.getElementById("sic-desc");
+        const badge = document.getElementById("sic-badge");
+
+        if (t) t.textContent = item.name;
+        if (b) b.textContent = item.bayer;
+        if (d) d.textContent = item.dist;
+        if (sp) sp.textContent = item.spec;
+        if (m) m.textContent = item.mag;
+        if (r) r.textContent = item.role;
+        if (desc) desc.textContent = item.desc;
+        if (badge) badge.textContent = isPlanet ? "CELESTIAL BODY" : "STAR";
+
+        starCard?.classList.remove("opacity-0", "pointer-events-none", "translate-y-3");
+        starCard?.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+      }
+
+      // 6. 3D PROJECTION ENGINE
+      function project3D(x, y, z, cx, cy) {
+        const cosY = Math.cos(camYaw);
+        const sinY = Math.sin(camYaw);
+        const x1 = x * cosY + z * sinY;
+        const z1 = -x * sinY + z * cosY;
+
+        const cosP = Math.cos(camPitch);
+        const sinP = Math.sin(camPitch);
+        const y2 = y * cosP - z1 * sinP;
+        const z2 = y * sinP + z1 * cosP;
+
+        const fov = 700 * currentZoom;
+        const depth = z2;
+
+        if (depth <= 10) return null;
+        const scale = fov / depth;
+
+        return {
+          sx: cx + x1 * scale,
+          sy: cy + y2 * scale,
+          scale: scale,
+          depth: depth
+        };
+      }
+
+      function draw5PointStar(ctx, cx, cy, rOut, rIn, fill) {
+        let rot = (Math.PI / 2) * 3;
+        let x = cx;
+        let y = cy;
+        const step = Math.PI / 5;
+
         ctx.beginPath();
-        ctx.arc(p.sx, p.sy, r * 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = halo;
+        ctx.moveTo(cx, cy - rOut);
+        for (let i = 0; i < 5; i++) {
+          x = cx + Math.cos(rot) * rOut;
+          y = cy + Math.sin(rot) * rOut;
+          ctx.lineTo(x, y);
+          rot += step;
+          x = cx + Math.cos(rot) * rIn;
+          y = cy + Math.sin(rot) * rIn;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+        ctx.lineTo(cx, cy - rOut);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+
+      // 7. PLANETARY & DEEP-SKY PROCEDURAL RENDERERS
+      function renderJupiter(ctx, cx, cy, scale) {
+        const r = Math.max(28, 48 * scale);
+
+        const grad = ctx.createRadialGradient(cx - r * 0.25, cy - r * 0.25, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "#f3ebdd");
+        grad.addColorStop(0.5, "#d7be99");
+        grad.addColorStop(0.85, "#a27a52");
+        grad.addColorStop(1, "#180e06");
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.clip();
+
+        const bands = [
+          { y: -0.7, h: 0.18, c: "rgba(164, 118, 82, 0.45)" },
+          { y: -0.42, h: 0.22, c: "rgba(132, 85, 52, 0.6)" },
+          { y: -0.1, h: 0.14, c: "rgba(230, 215, 190, 0.3)" },
+          { y: 0.15, h: 0.25, c: "rgba(150, 95, 60, 0.65)" },
+          { y: 0.55, h: 0.2, c: "rgba(160, 115, 80, 0.4)" }
+        ];
+
+        bands.forEach(b => {
+          ctx.fillStyle = b.c;
+          ctx.fillRect(cx - r, cy + b.y * r, r * 2, b.h * r);
+        });
+
+        const grsX = cx + r * 0.32;
+        const grsY = cy + r * 0.26;
+        ctx.beginPath();
+        ctx.ellipse(grsX, grsY, r * 0.24, r * 0.14, 0.08, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(195, 82, 54, 0.85)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(140, 48, 30, 0.6)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.restore();
+
+        const moons = [
+          { name: "Io", dist: -r * 2.2, size: 2.2, color: "#fff0a0" },
+          { name: "Europa", dist: -r * 1.4, size: 1.8, color: "#ffffff" },
+          { name: "Ganymede", dist: r * 1.8, size: 2.8, color: "#d8dce2" },
+          { name: "Callisto", dist: r * 2.8, size: 2.4, color: "#9ca5b2" }
+        ];
+
+        moons.forEach(m => {
+          const mx = cx + m.dist;
+          const my = cy + m.dist * 0.08;
+          ctx.beginPath();
+          ctx.arc(mx, my, m.size, 0, Math.PI * 2);
+          ctx.fillStyle = m.color;
+          ctx.fill();
+
+          ctx.font = '8px "Space Mono", monospace';
+          ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+          ctx.fillText(m.name, mx - 8, my + 11);
+        });
+      }
+
+      function renderSaturn(ctx, cx, cy, scale) {
+        const r = Math.max(22, 38 * scale);
+        const ringTilt = 0.28;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r * 2.6, r * 0.8, ringTilt, Math.PI, Math.PI * 2);
+        ctx.strokeStyle = "rgba(215, 195, 150, 0.55)";
+        ctx.lineWidth = r * 0.55;
+        ctx.stroke();
+        ctx.restore();
+
+        const grad = ctx.createRadialGradient(cx - r * 0.2, cy - r * 0.2, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "#faeec8");
+        grad.addColorStop(0.6, "#e4ce98");
+        grad.addColorStop(0.9, "#ab925c");
+        grad.addColorStop(1, "#181206");
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
         ctx.fill();
 
-        // 5-Pointed Star Core (Authentic to reference.jpg)
-        drawStar(ctx, p.sx, p.sy, 5, r * 1.6, r * 0.75, "#ffffff");
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r * 2.6, r * 0.8, ringTilt, 0, Math.PI);
+        ctx.strokeStyle = "rgba(230, 210, 165, 0.85)";
+        ctx.lineWidth = r * 0.55;
+        ctx.stroke();
 
-        // Star Name Label
-        if (zoomLevel > 0.8) {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r * 2.6, r * 0.8, ringTilt, 0, Math.PI);
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+
+        const titanX = cx + r * 3.4;
+        const titanY = cy - r * 0.8;
+        ctx.beginPath();
+        ctx.arc(titanX, titanY, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffcc66";
+        ctx.fill();
+        ctx.font = '8px "Space Mono", monospace';
+        ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+        ctx.fillText("Titan", titanX + 5, titanY + 3);
+      }
+
+      function renderMars(ctx, cx, cy, scale) {
+        const r = Math.max(18, 32 * scale);
+
+        const grad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "#f08558");
+        grad.addColorStop(0.6, "#d15632");
+        grad.addColorStop(0.85, "#8a2b16");
+        grad.addColorStop(1, "#150604");
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.clip();
+
+        ctx.beginPath();
+        ctx.ellipse(cx + r * 0.15, cy + r * 0.1, r * 0.45, r * 0.32, 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(65, 30, 20, 0.55)";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(cx - r * 0.05, cy - r * 0.78, r * 0.35, r * 0.14, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function renderM42Nebula(ctx, cx, cy, scale) {
+        const r = 85 * scale;
+        const cloudGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        cloudGrad.addColorStop(0, "rgba(180, 240, 255, 0.85)");
+        cloudGrad.addColorStop(0.25, "rgba(120, 210, 230, 0.45)");
+        cloudGrad.addColorStop(0.55, "rgba(215, 120, 180, 0.2)");
+        cloudGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = cloudGrad;
+        ctx.fill();
+
+        const trap = [
+          { x: -5, y: -4 }, { x: 4, y: -6 }, { x: 5, y: 5 }, { x: -4, y: 4 }
+        ];
+        trap.forEach(t => {
+          draw5PointStar(ctx, cx + t.x * scale, cy + t.y * scale, 3.5 * scale, 1.5 * scale, "#ffffff");
+        });
+        ctx.font = '8px "Space Mono", monospace';
+        ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+        ctx.fillText("Trapezium Cluster", cx + 12 * scale, cy - 8 * scale);
+      }
+
+      // 8. ANIMATION LOOP
+      function render() {
+        requestAnimationFrame(render);
+
+        camYaw += (targetYaw - camYaw) * 0.08;
+        camPitch += (targetPitch - camPitch) * 0.08;
+        currentZoom += (targetZoom - currentZoom) * 0.08;
+
+        scrollImpulse *= 0.92;
+        warpSpeed += (targetWarpSpeed + scrollImpulse - warpSpeed) * 0.08;
+
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, width, height);
+
+        const cx = width * 0.5;
+        const cy = height * 0.5;
+        const isHyperdrive = warpSpeed > 2.5;
+
+        // Background Passing Stars
+        for (let i = 0; i < backgroundStars.length; i++) {
+          const s = backgroundStars[i];
+          s.pz = s.z;
+          s.z -= warpSpeed * 3.8;
+
+          if (s.z <= 20) {
+            s.z = 2400;
+            s.pz = 2400;
+            s.x = (Math.random() - 0.5) * 2600;
+            s.y = (Math.random() - 0.5) * 2600;
+          }
+
+          const curr = project3D(s.x, s.y, s.z, cx, cy);
+          if (!curr) continue;
+
+          if (isHyperdrive) {
+            const prev = project3D(s.x, s.y, s.pz, cx, cy);
+            if (prev) {
+              ctx.beginPath();
+              ctx.moveTo(prev.sx, prev.sy);
+              ctx.lineTo(curr.sx, curr.sy);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(0.9, s.alpha * (warpSpeed / 10))})`;
+              ctx.lineWidth = Math.max(1, s.size * curr.scale * 0.85);
+              ctx.stroke();
+            }
+          } else {
+            ctx.beginPath();
+            ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+            ctx.fill();
+          }
+        }
+
+        // Dual Galaxies
+        // M31 Andromeda
+        const m31Center = project3D(-620, -80, 950, cx, cy);
+        if (m31Center) {
+          const mDist = Math.hypot(mouseX - m31Center.sx, mouseY - m31Center.sy);
+          const mouseGravFactor = Math.max(0, 1 - mDist / 400);
+          const reactiveSpeedBoost = 1 + mouseGravFactor * 3.5;
+
+          const coreRadius = (isHighZoom ? 110 : 70) * m31Center.scale;
+          const coreGrad = ctx.createRadialGradient(m31Center.sx, m31Center.sy, 0, m31Center.sx, m31Center.sy, coreRadius);
+          coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
+          coreGrad.addColorStop(0.2, "rgba(235, 245, 255, 0.55)");
+          coreGrad.addColorStop(0.6, "rgba(180, 210, 255, 0.15)");
+          coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+          ctx.beginPath();
+          ctx.arc(m31Center.sx, m31Center.sy, coreRadius, 0, Math.PI * 2);
+          ctx.fillStyle = coreGrad;
+          ctx.fill();
+
+          for (let i = 0; i < andromedaParticles.length; i++) {
+            const p = andromedaParticles[i];
+            p.angle += p.angularSpeed * reactiveSpeedBoost;
+
+            let gx = Math.cos(p.angle) * p.radius * 1.9;
+            let gy = Math.sin(p.angle) * p.radius * 0.65;
+            let gz = p.thickness;
+
+            if (mouseGravFactor > 0.05) {
+              gx += (mouseX - m31Center.sx) * 0.08 * mouseGravFactor;
+              gy += (mouseY - m31Center.sy) * 0.08 * mouseGravFactor;
+            }
+
+            const cosTX = Math.cos(galaxyTiltX);
+            const sinTX = Math.sin(galaxyTiltX);
+            const cosTY = Math.cos(galaxyTiltY);
+            const sinTY = Math.sin(galaxyTiltY);
+
+            const x3d = p.baseX + (gx * cosTY + gz * sinTY);
+            const y3d = p.baseY + (gy * cosTX - (gx * sinTY - gz * cosTY) * sinTX);
+            const z3d = p.baseZ + (gy * sinTX + (gx * sinTY - gz * cosTY) * cosTX);
+
+            const proj = project3D(x3d, y3d, z3d, cx, cy);
+            if (!proj) continue;
+
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, Math.max(0.7, p.size * proj.scale), 0, Math.PI * 2);
+            ctx.fillStyle = p.isCore ? "rgba(255, 255, 255, 0.9)" : `rgba(215, 232, 255, ${p.alpha})`;
+            ctx.fill();
+          }
+
           ctx.font = '10px "Space Mono", monospace';
           ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-          ctx.fillText(ds.name, p.sx + r + 6, p.sy + 3);
+          ctx.fillText("M31 • Andromeda Galaxy", m31Center.sx + 45 * m31Center.scale, m31Center.sy - 25 * m31Center.scale);
         }
-      });
-    }
 
-    animate();
+        // M51 Whirlpool Galaxy
+        const m51Center = project3D(380, -280, 980, cx, cy);
+        if (m51Center) {
+          const coreR = (isHighZoom ? 65 : 40) * m51Center.scale;
+          const coreGrad = ctx.createRadialGradient(m51Center.sx, m51Center.sy, 0, m51Center.sx, m51Center.sy, coreR);
+          coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+          coreGrad.addColorStop(0.3, "rgba(210, 230, 255, 0.5)");
+          coreGrad.addColorStop(0.7, "rgba(180, 190, 240, 0.12)");
+          coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+          ctx.beginPath();
+          ctx.arc(m51Center.sx, m51Center.sy, coreR, 0, Math.PI * 2);
+          ctx.fillStyle = coreGrad;
+          ctx.fill();
+
+          for (let i = 0; i < m51Particles.length; i++) {
+            const p = m51Particles[i];
+            p.angle += p.angularSpeed;
+
+            let gx = p.offsetX + Math.cos(p.angle) * p.radius * 1.3;
+            let gy = p.offsetY + Math.sin(p.angle) * p.radius * 1.3;
+            let gz = p.thickness;
+
+            const cosTX = Math.cos(m51TiltX);
+            const sinTX = Math.sin(m51TiltX);
+            const cosTY = Math.cos(m51TiltY);
+            const sinTY = Math.sin(m51TiltY);
+
+            const x3d = p.baseX + (gx * cosTY + gz * sinTY);
+            const y3d = p.baseY + (gy * cosTX - (gx * sinTY - gz * cosTY) * sinTX);
+            const z3d = p.baseZ + (gy * sinTX + (gx * sinTY - gz * cosTY) * cosTX);
+
+            const proj = project3D(x3d, y3d, z3d, cx, cy);
+            if (!proj) continue;
+
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, Math.max(0.6, p.size * proj.scale), 0, Math.PI * 2);
+            ctx.fillStyle = p.isCompanion ? `rgba(255, 240, 200, ${p.alpha})` : `rgba(210, 230, 255, ${p.alpha})`;
+            ctx.fill();
+          }
+
+          ctx.font = '10px "Space Mono", monospace';
+          ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+          ctx.fillText("M51 • Whirlpool Galaxy", m51Center.sx + 35 * m51Center.scale, m51Center.sy - 20 * m51Center.scale);
+        }
+
+        // All Constellations in 3D
+        allConstellations.forEach(constel => {
+          const projStars = constel.stars.map(s => project3D(s.x, s.y, s.z, cx, cy));
+
+          constel.lines.forEach(([iA, iB]) => {
+            const pA = projStars[iA];
+            const pB = projStars[iB];
+            if (!pA || !pB) return;
+
+            const isPolarisPointer = (constel.name.includes("Ursa Major") && iA === 4 && iB === 7);
+
+            ctx.beginPath();
+            ctx.moveTo(pA.sx, pA.sy);
+            ctx.lineTo(pB.sx, pB.sy);
+            ctx.strokeStyle = isPolarisPointer ? "rgba(255, 255, 255, 0.55)" : "rgba(255, 255, 255, 0.26)";
+            ctx.lineWidth = isPolarisPointer ? 1.5 : 1.1;
+
+            if (isPolarisPointer) {
+              ctx.setLineDash([5, 6]);
+            } else {
+              ctx.setLineDash([]);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+          });
+
+          projStars.forEach((p, idx) => {
+            if (!p) return;
+            const s = constel.stars[idx];
+            const r = s.size * p.scale;
+
+            const halo = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, r * 3.6);
+            halo.addColorStop(0, s.color || "rgba(255, 255, 255, 0.85)");
+            halo.addColorStop(0.35, "rgba(255, 255, 255, 0.2)");
+            halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+            ctx.beginPath();
+            ctx.arc(p.sx, p.sy, r * 3.6, 0, Math.PI * 2);
+            ctx.fillStyle = halo;
+            ctx.fill();
+
+            draw5PointStar(ctx, p.sx, p.sy, r * 1.6, r * 0.75, s.color || "#ffffff");
+
+            if (s.isBinary && isHighZoom) {
+              const splitOffset = s.id === 'mizar' ? 24 : 18;
+              const compX = p.sx + splitOffset * p.scale;
+              const compY = p.sy - splitOffset * 0.75 * p.scale;
+              const compColor = s.id === 'albireo' ? "#9ac5ff" : "rgba(240, 245, 255, 0.85)";
+              draw5PointStar(ctx, compX, compY, r * 1.0, r * 0.5, compColor);
+
+              ctx.font = '9px "Space Mono", monospace';
+              ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+              ctx.fillText(s.id === 'mizar' ? "Alcor (80 UMa)" : "Albireo B (Blue)", compX + 10, compY + 3);
+              ctx.fillText(s.id === 'mizar' ? "Mizar A & B (Split)" : "Albireo A (Gold)", p.sx + 12, p.sy + 12);
+            } else if (currentZoom > 0.85) {
+              ctx.font = '10px "Space Mono", monospace';
+              ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+              ctx.fillText(s.name, p.sx + r + 6, p.sy + 3);
+            }
+          });
+        });
+
+        // Active Stargazing Mystery Target
+        if (activeMystery) {
+          const proj = project3D(activeMystery.x, activeMystery.y, activeMystery.z, cx, cy);
+
+          if (proj) {
+            const distFromReticle = Math.hypot(proj.sx - cx, proj.sy - cy);
+            const alignPercent = Math.max(0, Math.min(100, Math.round(100 - (distFromReticle / (width * 0.4)) * 100)));
+            if (hudReticleDist) hudReticleDist.textContent = `ALIGNMENT: ${alignPercent}%`;
+
+            const alignThreshold = isHighZoom ? 65 : 42;
+            isTargetCentered = distFromReticle < alignThreshold;
+
+            if (hudLockStatus) {
+              if (isTargetCentered) {
+                hudLockStatus.textContent = isHighZoom ? "DISCOVERY LOCKED" : "CENTER LOCKED";
+                hudLockStatus.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white text-black animate-pulse shadow-sm";
+              } else if (distFromReticle < 220) {
+                hudLockStatus.textContent = "IN VIEWPORT";
+                hudLockStatus.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/20 text-white";
+              } else {
+                hudLockStatus.textContent = "SEARCHING";
+                hudLockStatus.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/10 text-slate-300 border border-white/15";
+              }
+            }
+
+            if (isTargetCentered && isHighZoom && !activeMystery.discovered) {
+              activeMystery.discovered = true;
+              if (discoveryTitle) discoveryTitle.textContent = activeMystery.name.toUpperCase();
+              discoveryBanner?.classList.remove("opacity-0", "-translate-y-4", "pointer-events-none");
+              discoveryBanner?.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+              showTelemetryCard(activeMystery, true);
+              updateMissionHUD();
+            }
+
+            if (!isHighZoom) {
+              const pulse = (Math.sin(Date.now() * 0.006) + 1) * 0.5;
+              const dotR = (activeMystery.discovered ? 3.8 : 3.0) + pulse * 1.5;
+
+              ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.5})`;
+              ctx.lineWidth = 1.2;
+              const bSize = 16;
+              ctx.strokeRect(proj.sx - bSize, proj.sy - bSize, bSize * 2, bSize * 2);
+
+              ctx.beginPath();
+              ctx.arc(proj.sx, proj.sy, dotR, 0, Math.PI * 2);
+              ctx.fillStyle = "#ffffff";
+              ctx.fill();
+
+              ctx.font = '10px "Space Mono", monospace';
+              ctx.fillStyle = activeMystery.discovered ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.75)";
+              ctx.fillText(
+                activeMystery.discovered ? activeMystery.name : `[Mystery Signal: ${activeMystery.id.split('-')[1]?.toUpperCase() || 'ANOMALY'}]`,
+                proj.sx + 20,
+                proj.sy + 4
+              );
+            } else {
+              if (activeMystery.type === 'planet_jupiter') {
+                renderJupiter(ctx, proj.sx, proj.sy, proj.scale);
+              } else if (activeMystery.type === 'planet_saturn') {
+                renderSaturn(ctx, proj.sx, proj.sy, proj.scale);
+              } else if (activeMystery.type === 'planet_mars') {
+                renderMars(ctx, proj.sx, proj.sy, proj.scale);
+              } else if (activeMystery.type === 'nebula_m42') {
+                renderM42Nebula(ctx, proj.sx, proj.sy, proj.scale);
+              }
+
+              ctx.font = '11px "Space Mono", monospace';
+              ctx.fillStyle = "#ffffff";
+              ctx.fillText(activeMystery.name, proj.sx + 45, proj.sy + 4);
+            }
+
+            if (targetDirArrow) {
+              if (distFromReticle > width * 0.38) {
+                const angle = Math.atan2(proj.sy - cy, proj.sx - cx);
+                targetDirArrow.style.transform = `translate(-50%, -50%) rotate(${angle + Math.PI / 2}rad)`;
+                targetDirArrow.classList.remove("opacity-0");
+                targetDirArrow.classList.add("opacity-100");
+                if (targetDirLabel) targetDirLabel.textContent = `TARGET: ${Math.round(distFromReticle * 0.1)}°`;
+              } else {
+                targetDirArrow.classList.add("opacity-0");
+                targetDirArrow.classList.remove("opacity-100");
+              }
+            }
+          }
+        }
+      }
+
+      render();
+      updateMissionHUD();
+    }
   </script>
 </body>
 </html>
