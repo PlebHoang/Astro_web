@@ -1,194 +1,200 @@
 ---
-const newsPosts = [
+interface EventPost {
+  title: string;
+  tag: string;
+  location: string;
+  date: string;
+  recap: string;
+  equipment: string;
+  instagramUrl: string;
+}
+
+const eventPosts: EventPost[] = [
   {
-    title: "Semester Kickoff: Campus Green Telescope Night Announced",
-    date: "Sep 2, 2026",
-    tag: "Observation Alert",
-    summary: "Clear weather predicted this weekend! We will bring out the 8\" Dobsonian to observe Saturn's rings and the Orion constellation starting at 20:45 CET.",
-  },
-  {
-    title: "New Baader Solar Filters Delivered to Club Arsenal",
-    date: "Aug 26, 2026",
-    tag: "Equipment",
-    summary: "We now have certified safe solar observation filters ready for daytime sunspot tracking and solar photography sessions during campus lunch breaks.",
-  },
-  {
-    title: "Teufelsmoor Dark Sky Stargazing Expedition Recap",
+    title: "Perseids Meteor Shower Dark-Sky Camp",
+    tag: "EXPEDITION",
+    location: "Teufelsmoor Bog",
     date: "Aug 14, 2026",
-    tag: "Expedition",
-    summary: "Over 20 students joined our Perseids meteor shower watch trip. Captured 40+ long exposure Milky Way frames under Bortle Class 3 skies.",
-  }
+    recap: "Over 20 students camped under Bortle Class 3 skies. Logged 55+ meteors/hour and captured long-exposure Milky Way core panoramas.",
+    equipment: "🔭 8\" Dobsonian + Canon EOS R",
+    instagramUrl: "https://www.instagram.com/astronomy.cub/",
+  },
+  {
+    title: "Saturn Cassini Rings & Jupiter Galilean Moons",
+    tag: "OBSERVATION",
+    location: "Campus Green",
+    date: "Sep 2, 2026",
+    recap: "Sublime atmospheric seeing near South Hall lawn. Resolved Cassini Division rings and tracked Io, Europa, Ganymede, and Callisto in 150x zoom.",
+    equipment: "🪐 8\" Dobsonian 150x Zoom",
+    instagramUrl: "https://www.instagram.com/astronomy.cub/",
+  },
+  {
+    title: "Daytime Solar Sunspot Tracking Lab",
+    tag: "SOLAR LAB",
+    location: "SAC Terrace",
+    date: "Aug 26, 2026",
+    recap: "Equipped our scopes with Baader Solar Safety filters. Tracked active sunspot region AR3780 and observed photospheric granulation during lunch break.",
+    equipment: "☀️ Baader Solar Filter Film",
+    instagramUrl: "https://www.instagram.com/astronomy.cub/",
+  },
+  {
+    title: "Deep-Sky Astrophotography & Stacking Workshop",
+    tag: "WORKSHOP",
+    location: "Research III Seminar Room",
+    date: "Aug 20, 2026",
+    recap: "Hands-on calibration and stacking tutorial with Siril and DSS. Processed 40 sub-exposures of Whirlpool Galaxy (M51) and Andromeda to pull out spiral arm detail.",
+    equipment: "💻 Siril + DSS • M51 Whirlpool",
+    instagramUrl: "https://www.instagram.com/astronomy.cub/",
+  },
+  {
+    title: "Cosmic Cinema: Gravitational Lensing & Thorne Physics",
+    tag: "CINEMA",
+    location: "SAC Lounge",
+    date: "Aug 8, 2026",
+    recap: "Full screening followed by an active whiteboard discussion dissecting event horizon optics, black hole ergospheres, and accretion disk physics.",
+    equipment: "🎬 4K Projection + Tea & Snacks",
+    instagramUrl: "https://www.instagram.com/astronomy.cub/",
+  },
 ];
 ---
 
-<section id="news-highlights" class="py-20 relative overflow-hidden">
+<section id="events-gallery" class="py-20 relative overflow-hidden">
+  <!-- Anchor Alias for Backward Compatibility -->
+  <div id="news-highlights" class="absolute -top-24"></div>
+  <div id="viewfinder" class="absolute -top-24"></div>
+
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-
-      <!-- Left Column: My Club News & Social Media (Matching University Layout Section 2 Left) -->
-      <div class="lg:col-span-5 space-card p-8 sm:p-10 flex flex-col justify-between reveal">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest">
-              Announcements
-            </div>
-            <span class="text-[10px] font-space-mono text-slate-500">Semester Feed</span>
-          </div>
-
-          <h2 class="text-2xl sm:text-3xl font-bold font-orbitron text-white tracking-tight mb-6 gravitational-warp-target">
-            My Club News
-          </h2>
-
-          <!-- News Items -->
-          <div class="space-y-4 mb-8">
-            {newsPosts.map((post) => (
-              <article class="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/20 transition group">
-                <div class="flex items-center justify-between gap-2 mb-1.5">
-                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-300 font-space-mono border border-white/10">
-                    {post.tag}
-                  </span>
-                  <span class="text-[10px] font-space-mono text-slate-500">{post.date}</span>
-                </div>
-                <h3 class="text-sm font-bold font-orbitron text-white group-hover:text-slate-200 transition mb-1">
-                  {post.title}
-                </h3>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                  {post.summary}
-                </p>
-              </article>
-            ))}
-          </div>
+    <!-- Header with Section Title & Carousel Navigation Arrows -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 pb-4 border-b border-white/10 gap-4 reveal">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest mb-2">
+          Observation Archives
         </div>
-
-        <!-- Social Media Connection Card (From University Screenshot) -->
-        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/10">
-          <h3 class="text-sm font-bold font-orbitron text-white mb-1.5 flex items-center gap-1.5">
-            Connect with Us on Social Media! ☀️
-          </h3>
-          <p class="text-xs text-slate-400 mb-4 font-inter">
-            Live observation alerts, meteor warnings, and photos posted on our Instagram channels.
-          </p>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <a
-              href="https://www.instagram.com/astronomy.cub/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="px-3.5 py-1.5 rounded-lg bg-white text-black font-orbitron text-xs font-bold hover:bg-slate-200 transition shadow-sm"
-            >
-              Join us! 🎏
-            </a>
-            <a
-              href="https://www.instagram.com/astronomy.cub/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-space-mono border border-white/10 transition"
-            >
-              @astronomy.cub
-            </a>
-            <a
-              href="https://www.instagram.com/cubastrosoc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-space-mono border border-white/10 transition"
-            >
-              @cubastrosoc
-            </a>
-          </div>
-        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold font-orbitron text-white tracking-tight gravitational-warp-target">
+          Highlights from our last events
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1 font-inter max-w-xl">
+          Recent deep-sky stargazing sessions, meteor watches, and solar observations linked to society social media channels.
+        </p>
       </div>
 
-      <!-- Right Column: Highlights from our last events / Interactive Viewfinder (Matching University Layout Section 2 Right) -->
-      <div id="viewfinder" class="lg:col-span-7 space-card p-8 sm:p-10 flex flex-col justify-between reveal reveal-delay-1">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest">
-              Interactive Telescope Viewfinder
+      <!-- Carousel Directional Arrows -->
+      <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+        <button
+          type="button"
+          id="btn-gallery-prev"
+          class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-white flex items-center justify-center font-bold transition hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+          aria-label="Previous event slide"
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          id="btn-gallery-next"
+          class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white text-white hover:text-black border border-white/20 flex items-center justify-center font-bold transition hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+          aria-label="Next event slide"
+        >
+          →
+        </button>
+      </div>
+    </div>
+
+    <!-- Scroll-Snap Horizontal Carousel Track -->
+    <div
+      id="gallery-track"
+      class="flex gap-5 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth no-scrollbar"
+      style="scrollbar-width: none; -ms-overflow-style: none;"
+    >
+      {eventPosts.map((post, idx) => (
+        <article
+          class={`snap-start shrink-0 w-[88vw] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-0.85rem)] space-card p-6 sm:p-7 flex flex-col justify-between reveal reveal-delay-${(idx % 3) + 1} border-white/10 hover:border-white/30 bg-black/60 backdrop-blur-xl transition-all duration-300 group`}
+        >
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="text-[10px] font-space-mono px-2.5 py-0.5 rounded-full bg-white/5 text-slate-300 border border-white/10">
+                {post.tag}
+              </span>
+              <span class="text-[10px] font-space-mono text-slate-400">
+                {post.date}
+              </span>
             </div>
-            <span class="text-[10px] font-space-mono text-slate-400">Optics Live</span>
+
+            <h3 class="font-orbitron font-bold text-base text-white mb-2 leading-snug group-hover:text-slate-100 transition">
+              {post.title}
+            </h3>
+
+            <div class="text-[11px] font-space-mono text-slate-400 mb-3 flex items-center gap-1.5">
+              <span>📍</span>
+              <span>{post.location}</span>
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed font-inter mb-4">
+              {post.recap}
+            </p>
+
+            <div class="text-[10px] font-space-mono text-slate-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/5 mb-6">
+              {post.equipment}
+            </div>
           </div>
 
-          <h2 class="text-2xl sm:text-3xl font-bold font-orbitron text-white tracking-tight mb-2 gravitational-warp-target">
-            Highlights from our last events
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 font-inter mb-6">
-            Use the target selector below to switch telescope focal targets observed on Campus Green.
-          </p>
-
-          <!-- Interactive Telescope Eyepiece Viewfinder Showcase -->
-          <div
-            id="viewfinder-trigger-stargaze"
-            class="group relative w-full aspect-video rounded-2xl bg-gradient-to-b from-white/[0.05] to-black border border-white/15 overflow-hidden flex flex-col items-center justify-center p-6 shadow-2xl cursor-pointer hover:border-white/30 transition-all duration-300"
-            role="button"
-            tabindex="0"
-            aria-label="Engage Stargaze Mode"
+          <a
+            href={post.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white text-white hover:text-black border border-white/20 hover:border-white font-orbitron text-xs font-bold transition flex items-center justify-center gap-2 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
-            <!-- Background Radial Glow -->
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_0%,transparent_70%)] group-hover:scale-110 transition-transform duration-500"></div>
+            <span>View Post on Instagram</span>
+            <span class="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+          </a>
+        </article>
+      ))}
+    </div>
 
-            <!-- Simulated Circular Eyepiece Border & Reticle -->
-            <div class="relative w-48 sm:w-60 h-48 sm:h-60 rounded-full border-2 border-white/30 group-hover:border-white/60 shadow-[0_0_50px_rgba(0,0,0,0.9),inset_0_0_30px_rgba(255,255,255,0.05)] flex items-center justify-center transition-all duration-300">
-              <!-- Reticle rings -->
-              <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 group-hover:opacity-70 transition-opacity">
-                <div class="w-full h-[1px] bg-white/40"></div>
-                <div class="h-full w-[1px] bg-white/40 absolute"></div>
-                <div class="w-24 h-24 rounded-full border border-dashed border-white/30 absolute animate-[spin_60s_linear_infinite]"></div>
-                <div class="w-36 h-36 rounded-full border border-white/20 absolute"></div>
-              </div>
-
-              <!-- Eyepiece Center Status -->
-              <div class="text-center z-10 p-4">
-                <span class="block text-2xl mb-1 group-hover:scale-110 transition-transform">🔭</span>
-                <span class="block text-xs font-bold font-orbitron text-white uppercase tracking-wider">Stargaze Mode</span>
-                <span class="block text-[10px] font-space-mono text-slate-400 mt-1">Click or Press [TAB]</span>
-              </div>
-
-              <!-- Optics Specs Stamp -->
-              <div class="absolute bottom-3 inset-x-0 text-center pointer-events-none z-20">
-                <span class="text-[9px] font-space-mono text-slate-300 bg-black/85 border border-white/20 px-2 py-0.5 rounded">
-                  8" Dobsonian Simulation
-                </span>
-              </div>
-            </div>
-
-            <!-- Target Badges -->
-            <div class="mt-4 flex flex-wrap justify-center gap-1.5 z-10">
-              <span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-space-mono text-slate-300">🌀 M51 Whirlpool</span>
-              <span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-space-mono text-slate-300">🦅 M16 Pillars</span>
-              <span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-space-mono text-slate-300">🪐 Jupiter & Saturn</span>
-            </div>
-          </div>
-
-          <!-- Stargazing Simulator Lab Banner CTA -->
-          <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/15 backdrop-blur-md">
-            <div class="text-xs text-slate-300 font-space-mono text-center sm:text-left">
-              <span class="text-white font-bold block sm:inline">Stargazing Viewfinder Game:</span>
-              <span class="text-slate-400 block sm:inline sm:ml-1">Resolve deep-sky anomalies in full-screen.</span>
-            </div>
-            <a
-              href="/telescope-lab"
-              class="px-4 py-2 rounded-lg bg-white text-black font-orbitron text-xs font-bold uppercase tracking-wider hover:bg-slate-200 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] shrink-0 flex items-center gap-2 hover:scale-105"
-            >
-              <span>🚀 Open Fullscreen Lab [1][2] →</span>
-            </a>
-          </div>
+    <!-- Social Media Community Connect Strip -->
+    <div class="mt-8 p-5 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
+      <div class="flex items-center gap-3 text-center sm:text-left">
+        <span class="text-2xl">📸</span>
+        <div>
+          <div class="text-xs font-bold font-orbitron text-white">Follow our official Instagram feeds</div>
+          <div class="text-[11px] text-slate-400 font-inter">Live stories, clear-sky alerts, astrophotography reels, and behind-the-scenes telescope setups.</div>
         </div>
       </div>
-
+      <div class="flex items-center gap-2.5 shrink-0">
+        <a
+          href="https://www.instagram.com/astronomy.cub/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-3.5 py-1.5 rounded-xl bg-white text-black font-orbitron text-xs font-bold hover:bg-slate-200 transition shadow-sm"
+        >
+          @astronomy.cub ↗
+        </a>
+        <a
+          href="https://www.instagram.com/cubastrosoc/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/15 font-space-mono text-xs transition"
+        >
+          @cubastrosoc ↗
+        </a>
+      </div>
     </div>
   </div>
 </section>
 
 <script>
-  const trigger = document.getElementById("viewfinder-trigger-stargaze");
-  trigger?.addEventListener("click", () => {
-    window.dispatchEvent(new CustomEvent("toggle-stargaze"));
+  const track = document.getElementById("gallery-track");
+  const prevBtn = document.getElementById("btn-gallery-prev");
+  const nextBtn = document.getElementById("btn-gallery-next");
+
+  prevBtn?.addEventListener("click", () => {
+    if (track) {
+      track.scrollBy({ left: -track.clientWidth * 0.75, behavior: "smooth" });
+    }
   });
-  trigger?.addEventListener("keydown", (e) => {
-    const keyboardEvent = e as KeyboardEvent;
-    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
-      keyboardEvent.preventDefault();
-      window.dispatchEvent(new CustomEvent("toggle-stargaze"));
+
+  nextBtn?.addEventListener("click", () => {
+    if (track) {
+      track.scrollBy({ left: track.clientWidth * 0.75, behavior: "smooth" });
     }
   });
 </script>

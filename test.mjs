@@ -107,20 +107,40 @@ test('Project Integrity & Deep QA Suite', async (t) => {
     }, 'Client script must not have syntax or declaration errors');
   });
 
-  await t.test('6. Dual-Mode Elements & Overlap Prevention', () => {
+  await t.test('6. Dual-Mode Elements & Navpill Coexistence', () => {
     const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
 
     assert.ok(indexHtml.includes('id="sky-canvas"'), 'Sky canvas must exist for telescope simulation');
     assert.ok(indexHtml.includes('id="web-overlay"'), 'Web overlay container must exist on homepage');
-    assert.ok(indexHtml.includes('id="stargaze-floating-toggle-wrap"'), 'Floating Stargaze toggle wrap must exist');
-    assert.ok(indexHtml.includes('id="btn-stargaze-toggle"'), 'Floating Stargaze toggle button must exist');
+    // Unified Navpill inside Navbar (Redundant floating overlay eliminated)
+    assert.ok(indexHtml.includes('id="nav-stargaze-btn"'), 'Navbar Stargaze button must exist as unified navpill');
+    assert.ok(!indexHtml.includes('id="stargaze-floating-toggle-wrap"'), 'Redundant floating toggle wrap must be eliminated to prevent navpill overlap');
     assert.ok(indexHtml.includes('id="btn-header-return"'), 'In-header non-overlapping Return to Site button must exist');
-    assert.ok(indexHtml.includes('id="nav-stargaze-btn"'), 'Navbar Stargaze button must exist');
-    assert.ok(indexHtml.includes('id="viewfinder-trigger-stargaze"'), 'News viewfinder trigger button must exist');
     assert.ok(indexHtml.includes('Whirlpool') || indexHtml.includes('M51'), 'M51 Whirlpool galaxy must be featured');
   });
 
-  await t.test('7. Standalone Lab & 4 HUD Prototypes', () => {
+  await t.test('7. Events Gallery, News Removal, RSVP Removal & PowerApp Registration', () => {
+    const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+
+    // 1. News removed entirely
+    assert.ok(!indexHtml.includes('My Club News'), 'My Club News section must be removed');
+
+    // 2. Events Gallery Carousel present
+    assert.ok(indexHtml.includes('id="events-gallery"'), 'Events Gallery section must exist');
+    assert.ok(indexHtml.includes('id="gallery-track"'), 'Gallery carousel scroll track must exist');
+    assert.ok(indexHtml.includes('View Post on Instagram'), 'Gallery cards must link to Instagram');
+
+    // 3. RSVP removed from club events
+    assert.ok(!indexHtml.includes('RSVP →'), 'RSVP link must be removed from Club Events');
+    assert.ok(indexHtml.includes('No RSVP'), 'Events calendar must state No RSVP / Drop-in');
+
+    // 4. Microsoft PowerApp registration link
+    assert.ok(indexHtml.includes('apps.powerapps.com'), 'PowerApp registration URL must be present');
+    assert.ok(indexHtml.includes('id="btn-powerapp-register"'), 'PowerApp registration button must exist');
+    assert.ok(!indexHtml.includes('id="membership-form"'), 'Obsolete mockup form must be removed');
+  });
+
+  await t.test('8. Standalone Lab & 4 HUD Prototypes', () => {
     const labHtml = fs.readFileSync(path.join(distDir, 'telescope-lab', 'index.html'), 'utf-8');
 
     assert.ok(labHtml.includes('id="sky-canvas"'), 'Sky canvas must exist in standalone lab');
@@ -138,7 +158,7 @@ test('Project Integrity & Deep QA Suite', async (t) => {
     assert.ok(labHtml.includes('id="hud-card-view"'), 'Prototype 0: Classic Card HUD must exist');
   });
 
-  await t.test('8. Bloat Removal & Over-Engineering Cleanliness', () => {
+  await t.test('9. Bloat Removal & Over-Engineering Cleanliness', () => {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
     const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
     const labHtml = fs.readFileSync(path.join(distDir, 'telescope-lab', 'index.html'), 'utf-8');

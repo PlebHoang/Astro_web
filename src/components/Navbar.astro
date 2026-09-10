@@ -2,8 +2,7 @@
 const navLinks = [
   { name: "About Us", href: "#about-leadership" },
   { name: "Leaders", href: "#leaders" },
-  { name: "Club News", href: "#news-highlights" },
-  { name: "Telescope Viewfinder", href: "#viewfinder" },
+  { name: "Event Highlights", href: "#events-gallery" },
   { name: "Events Calendar", href: "#events" },
   { name: "Join Us", href: "#register" },
 ];
@@ -52,15 +51,17 @@ const navLinks = [
 
     <!-- Right: Stargaze Action + Instagram Link -->
     <div class="flex items-center gap-2.5">
-      <!-- Direct Launch Telescope Lab -->
-      <a
-        href="/telescope-lab"
+      <!-- Stargaze Mode Toggle Button (Unified Navpill, Non-Colliding) -->
+      <button
+        type="button"
         id="nav-stargaze-btn"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 rounded-lg shadow-sm transition hover:scale-105 font-orbitron cursor-pointer"
-        title="Launch 3D Telescope Lab or Toggle Stargaze (Hotkey: TAB)"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white hover:text-black border border-white/25 hover:border-white rounded-xl shadow-[0_0_15px_rgba(255,255,255,0.15)] transition hover:scale-105 active:scale-95 font-orbitron cursor-pointer group"
+        title="Toggle between Stargaze Cockpit and Website Reading (Hotkey: TAB)"
       >
-        <span>🔭 Stargaze</span>
-      </a>
+        <span class="text-xs transition-transform group-hover:rotate-12">🔭</span>
+        <span>Stargaze Mode</span>
+        <kbd class="hidden sm:inline-block text-[9px] font-space-mono bg-black/40 group-hover:bg-black/10 px-1.5 py-0.5 rounded text-slate-300 group-hover:text-black border border-white/20">TAB</kbd>
+      </button>
 
       <!-- Instagram Join (Monochrome) -->
       <a
@@ -132,6 +133,8 @@ const navLinks = [
     if (document.getElementById("web-overlay")) {
       e.preventDefault();
       window.dispatchEvent(new CustomEvent("toggle-stargaze"));
+    } else {
+      window.location.href = "/telescope-lab";
     }
   });
 </script>

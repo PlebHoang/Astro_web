@@ -8,21 +8,7 @@ const isBackground = mode === 'background';
 ---
 
 <div class="telescope-container relative w-full min-h-screen overflow-x-hidden bg-black font-sans select-none" data-mode={mode}>
-  <!-- Floating Mode Switcher Button (Accessible on Homepage reading mode) -->
-  {isBackground && (
-    <div class="fixed top-3.5 right-4 sm:right-6 z-50 flex items-center gap-2" id="stargaze-floating-toggle-wrap">
-      <button
-        type="button"
-        id="btn-stargaze-toggle"
-        class="px-3.5 py-1.5 sm:py-2 rounded-xl bg-black/85 hover:bg-black text-white border border-white/25 hover:border-white shadow-[0_4px_25px_rgba(0,0,0,0.8)] backdrop-blur-xl font-orbitron text-xs font-bold transition flex items-center gap-2 cursor-pointer group hover:scale-105 active:scale-95"
-        title="Toggle between Stargaze Cockpit and Website Reading (Hotkey: TAB)"
-      >
-        <span class="text-sm transition-transform group-hover:rotate-12" id="stargaze-toggle-icon">🔭</span>
-        <span id="stargaze-toggle-text">Stargaze Mode</span>
-        <kbd class="hidden sm:inline-block text-[9px] font-space-mono bg-white/15 px-1.5 py-0.5 rounded text-slate-300 border border-white/20">TAB</kbd>
-      </button>
-    </div>
-  )}
+
 
     <!-- Fullscreen Telescope Canvas -->
     <canvas id="sky-canvas" class={`fixed inset-0 w-screen h-screen block cursor-grab active:cursor-grabbing z-0 ${isBackground ? 'pointer-events-none' : 'pointer-events-auto'}`}></canvas>
@@ -413,7 +399,6 @@ interface StarNode {
   const tickerCatalog = document.getElementById("ticker-catalog");
 
   const cardView = document.getElementById("hud-card-view");
-  const floatingToggleWrap = document.getElementById("stargaze-floating-toggle-wrap");
   const btnHeaderReturn = document.getElementById("btn-header-return");
 
   if (canvas && ctx) {
@@ -422,10 +407,7 @@ interface StarNode {
     const isBackgroundMode = container?.dataset.mode === "background";
     const webOverlay = document.getElementById("web-overlay");
     const cockpitUI = document.getElementById("cockpit-ui");
-    const btnStargazeToggle = document.getElementById("btn-stargaze-toggle");
     const btnCockpitExit = document.getElementById("btn-cockpit-exit");
-    const toggleIcon = document.getElementById("stargaze-toggle-icon");
-    const toggleText = document.getElementById("stargaze-toggle-text");
 
     const eyepieceOverlay = document.getElementById("eyepiece-overlay");
     const eyepieceCircle = document.getElementById("eyepiece-circle");
@@ -497,8 +479,6 @@ interface StarNode {
           eyepieceCircle.classList.add("opacity-100");
         }
         canvas.style.pointerEvents = "auto";
-        // Hide the floating mode button so it NEVER overlays the cockpit header controls
-        floatingToggleWrap?.classList.add("hidden");
       } else {
         if (webOverlay) {
           webOverlay.classList.remove("opacity-0", "pointer-events-none");
@@ -518,14 +498,12 @@ interface StarNode {
         }
         if (isBackgroundMode) {
           canvas.style.pointerEvents = "none";
-          floatingToggleWrap?.classList.remove("hidden");
         }
       }
     }
 
     if (isBackgroundMode) {
       setStargazeMode(false);
-      btnStargazeToggle?.addEventListener("click", () => setStargazeMode(!isStargazeActive));
       btnCockpitExit?.addEventListener("click", () => setStargazeMode(false));
       btnHeaderReturn?.addEventListener("click", () => setStargazeMode(false));
       window.addEventListener("keydown", (e) => {
