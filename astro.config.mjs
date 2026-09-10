@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  redirects: {
+    '/telescope-cluster': '/telescope-lab'
+  },
   vite: {
     plugins: [tailwindcss()]
   }

@@ -50,24 +50,8 @@ const navLinks = [
       ))}
     </nav>
 
-    <!-- Right: Audio Synthesizer Toggle + Instagram Link -->
+    <!-- Right: Stargaze Action + Instagram Link -->
     <div class="flex items-center gap-2.5">
-      <!-- Audio FX Toggle -->
-      <button
-        type="button"
-        id="audio-toggle-btn"
-        class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-space-mono text-slate-300 hover:text-white transition"
-        title="Toggle Cosmic Soundscape"
-        aria-label="Toggle Cosmic Soundscape"
-      >
-        <div class="flex items-end gap-[2px] h-3 w-3" id="audio-wave-bars">
-          <span class="w-[2px] h-1.5 bg-slate-400 rounded-full"></span>
-          <span class="w-[2px] h-3 bg-slate-400 rounded-full"></span>
-          <span class="w-[2px] h-1 bg-slate-400 rounded-full"></span>
-        </div>
-        <span class="text-[10px] hidden sm:inline" id="audio-label">Sound FX</span>
-      </button>
-
       <!-- Direct Launch Telescope Lab -->
       <a
         href="/telescope-lab"
@@ -142,30 +126,12 @@ const navLinks = [
     });
   });
 
-  const audioBtn = document.getElementById("audio-toggle-btn");
-  const audioLabel = document.getElementById("audio-label");
-  const audioBars = document.getElementById("audio-wave-bars");
   const navStargazeBtn = document.getElementById("nav-stargaze-btn");
 
   navStargazeBtn?.addEventListener("click", (e) => {
     if (document.getElementById("web-overlay")) {
       e.preventDefault();
       window.dispatchEvent(new CustomEvent("toggle-stargaze"));
-    }
-  });
-
-  audioBtn?.addEventListener("click", () => {
-    window.dispatchEvent(new CustomEvent("cosmic-toggle-sound"));
-  });
-
-  window.addEventListener("cosmic-sound-state", (e: any) => {
-    const isMuted = e.detail?.isMuted;
-    if (audioLabel) audioLabel.textContent = isMuted ? "Sound FX" : "Active";
-    if (audioBars) {
-      audioBars.querySelectorAll("span").forEach(s => {
-        if (isMuted) s.classList.remove("animate-pulse", "bg-white");
-        else s.classList.add("animate-pulse", "bg-white");
-      });
     }
   });
 </script>

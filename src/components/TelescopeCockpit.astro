@@ -168,10 +168,6 @@ const isBackground = mode === 'background';
             <span>🎲 New Anomaly</span>
           </button>
 
-          <!-- Toggle Website Overlay -->
-          <button type="button" id="btn-toggle-preview" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-slate-300 hover:text-white border border-white/15 hover:bg-white/10">
-            <span id="preview-label">👁️ Overlay: OFF</span>
-          </button>
         </div>
       </header>
 
@@ -282,9 +278,6 @@ interface StarNode {
   const led1 = document.getElementById("led-1");
   const led2 = document.getElementById("led-2");
 
-  const btnTogglePreview = document.getElementById("btn-toggle-preview");
-  const previewLabel = document.getElementById("preview-label");
-  const webPreview = document.getElementById("web-preview");
   const starCard = document.getElementById("star-info-card");
   const sicCloseBtn = document.getElementById("sic-close-btn");
   const targetDirArrow = document.getElementById("target-dir-arrow");
@@ -316,6 +309,8 @@ interface StarNode {
 
     const eyepieceOverlay = document.getElementById("eyepiece-overlay");
     const eyepieceCircle = document.getElementById("eyepiece-circle");
+
+    let isStargazeActive = false;
 
     function setStargazeMode(active: boolean) {
       isStargazeActive = active;
@@ -388,7 +383,6 @@ interface StarNode {
     });
 
     let isHighZoom = false;
-    let isPreviewVisible = false; // Hidden by default for clean astronomy view!
     let targetZoom = 1.0;
     let currentZoom = 1.0;
 
@@ -848,18 +842,6 @@ interface StarNode {
 
     window.addEventListener("keydown", handleScopeKeyDown, { capture: true });
     document.addEventListener("keydown", handleScopeKeyDown, { capture: true });
-
-    // Toggle Preview
-    btnTogglePreview?.addEventListener("click", () => {
-      isPreviewVisible = !isPreviewVisible;
-      if (isPreviewVisible) {
-        webPreview?.classList.remove("opacity-0", "pointer-events-none");
-        if (previewLabel) previewLabel.textContent = "👁️ Overlay: ON";
-      } else {
-        webPreview?.classList.add("opacity-0", "pointer-events-none");
-        if (previewLabel) previewLabel.textContent = "👁️ Overlay: OFF";
-      }
-    });
 
     // Star card close button
     sicCloseBtn?.addEventListener("click", () => {
