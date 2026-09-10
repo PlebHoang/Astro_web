@@ -145,18 +145,6 @@ import Layout from "../layouts/Layout.astro";
           </div>
         </div>
 
-        <!-- Integrated Sector Jump Dock (Inline at Top Edge, Never Over Stars) -->
-        <nav class="hidden xl:flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-xl border border-white/10">
-          <span class="text-[9px] font-space-mono text-slate-500 uppercase mr-1">SECTOR:</span>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="dipper">✨ Big Dipper</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cassiopeia">👑 Cassiopeia</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="orion">🏹 Orion</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cygnus">🦢 Cygnus</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="andromeda">🌀 Andromeda</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="pillars">🦅 Pillars M16</button>
-          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="m51">🌪️ Whirlpool M51</button>
-        </nav>
-
         <!-- Stargazing Controls & High-Contrast Animated Scope Keys [ 1 ] & [ 2 ] -->
         <div class="flex items-center gap-2">
           <!-- Tactile Dual Scope Keys [1] and [2] -->
@@ -233,7 +221,7 @@ import Layout from "../layouts/Layout.astro";
 
         <!-- Coordinates & Active Constellation Telemetry (Strictly Bottom Right) -->
         <div class="p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 text-right shadow-2xl">
-          <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">CURRENT SECTOR: NORTHERN CIRCUMPOLAR</div>
+          <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">CURRENT FIELD: NORTHERN CIRCUMPOLAR</div>
           <div id="hud-target-coords" class="font-bold text-white font-orbitron text-xs">RA 11h 03m / DEC +55°11' • 5 CONSTELLATIONS</div>
           <div id="hud-target-desc" class="text-[10px] text-slate-400 mt-0.5">Ursa Major, Cassiopeia, Orion, Cygnus & Deep Sky Curiosities</div>
         </div>
@@ -461,6 +449,55 @@ import Layout from "../layouts/Layout.astro";
       });
     }
 
+    // 3B. WHIRLPOOL GALAXY (M51 / NGC 5194 & NGC 5195) PARTICLES
+    const whirlpoolParticles: any[] = [];
+    const m51BaseX = -380, m51BaseY = 280, m51BaseZ = 920;
+    for (let i = 0; i < 1200; i++) {
+      const isCompanion = i > 980;
+      if (isCompanion) {
+        // Companion dwarf galaxy NGC 5195
+        const rComp = Math.pow(Math.random(), 1.5) * 55 + 2;
+        const angComp = Math.random() * Math.PI * 2;
+        whirlpoolParticles.push({
+          isCompanion: true,
+          radius: rComp,
+          angle: angComp,
+          angularSpeed: 0.0035,
+          isCore: rComp < 14,
+          size: rComp < 14 ? Math.random() * 2.2 + 1.1 : Math.random() * 1.5 + 0.6,
+          alpha: rComp < 14 ? Math.random() * 0.85 + 0.25 : Math.random() * 0.5 + 0.15,
+          color: rComp < 14 ? "#fff5e0" : "#ffd493",
+          offsetX: 68,
+          offsetY: -44,
+          baseX: m51BaseX,
+          baseY: m51BaseY,
+          baseZ: m51BaseZ
+        });
+      } else {
+        // Main Grand Design Spiral M51
+        const armOffset = i % 2 === 0 ? 0 : Math.PI;
+        const radius = Math.pow(Math.random(), 1.7) * 210 + 3;
+        const baseAngle = radius * 0.052 + armOffset + (Math.random() - 0.5) * 0.35;
+        const isCore = radius < 28;
+        const reachesCompanion = (i % 2 === 0) && radius > 140;
+        whirlpoolParticles.push({
+          isCompanion: false,
+          radius,
+          angle: baseAngle,
+          angularSpeed: (0.75 / Math.sqrt(radius + 8)) * 0.015,
+          isCore,
+          size: isCore ? Math.random() * 2.5 + 1.4 : Math.random() * 1.8 + 0.7,
+          alpha: isCore ? Math.random() * 0.9 + 0.3 : Math.random() * 0.65 + 0.2,
+          color: isCore ? "#ffffff" : reachesCompanion ? "#ffdca8" : (i % 5 === 0 ? "#7be5ff" : (i % 9 === 0 ? "#ff9ee2" : "#e4f2ff")),
+          offsetX: reachesCompanion ? (radius - 140) * 0.45 : 0,
+          offsetY: reachesCompanion ? -(radius - 140) * 0.32 : 0,
+          baseX: m51BaseX,
+          baseY: m51BaseY,
+          baseZ: m51BaseZ
+        });
+      }
+    }
+
     // 4. PERMANENT MYSTERY CELESTIAL OBJECTS (WITH INTENSE PRESENCE)
     const allMysteryTargets: MysteryTarget[] = [
       {
@@ -551,10 +588,10 @@ import Layout from "../layouts/Layout.astro";
         spec: "76,000 ly across",
         mag: "+8.40",
         role: "Grand Design Spiral Pair",
-        desc: "Majestic interacting galaxy! High zoom reveals two grand-design spiral arms gravitationally tethered to companion galaxy NGC 5195.",
-        x: 340,
-        y: -310,
-        z: 980,
+        desc: "Majestic face-on grand-design spiral galaxy interacting with companion NGC 5195! Visible near the handle of the Big Dipper.",
+        x: -380,
+        y: 280,
+        z: 920,
         type: 'galaxy_m51',
         discovered: false,
         beaconColor: "#a3c8ff"
@@ -745,20 +782,6 @@ import Layout from "../layouts/Layout.astro";
 
     window.addEventListener("keydown", handleScopeKeyDown, { capture: true });
     document.addEventListener("keydown", handleScopeKeyDown, { capture: true });
-
-    // Quick Target Jump Navigation Dock
-    document.querySelectorAll(".nav-target-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const target = (btn as HTMLElement).dataset.target;
-        if (target === "dipper") { targetYaw = 0; targetPitch = 0; }
-        else if (target === "cassiopeia") { targetYaw = -0.55; targetPitch = 0.38; }
-        else if (target === "orion") { targetYaw = 0.95; targetPitch = -0.45; }
-        else if (target === "cygnus") { targetYaw = -0.92; targetPitch = -0.15; }
-        else if (target === "andromeda") { targetYaw = 0.62; targetPitch = 0.08; }
-        else if (target === "pillars") { targetYaw = -0.38; targetPitch = 0.25; }
-        else if (target === "m51") { targetYaw = -0.34; targetPitch = 0.31; }
-      });
-    });
 
     // Toggle Preview
     btnTogglePreview?.addEventListener("click", () => {
@@ -1156,33 +1179,6 @@ import Layout from "../layouts/Layout.astro";
       ctx.fillText("Trapezium Cluster", cx + 12 * scale, cy - 8 * scale);
     }
 
-    function renderM51Whirlpool(ctx: CanvasRenderingContext2D, cx: number, cy: number, scale: number) {
-      const r = 70 * scale;
-      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-      coreGrad.addColorStop(0.25, "rgba(195, 220, 255, 0.6)");
-      coreGrad.addColorStop(0.65, "rgba(140, 175, 230, 0.15)");
-      coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = coreGrad;
-      ctx.fill();
-
-      // Companion NGC 5195
-      const compX = cx + 48 * scale;
-      const compY = cy - 24 * scale;
-      const compGrad = ctx.createRadialGradient(compX, compY, 0, compX, compY, 24 * scale);
-      compGrad.addColorStop(0, "rgba(255, 240, 200, 0.85)");
-      compGrad.addColorStop(0.5, "rgba(220, 190, 140, 0.25)");
-      compGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-      ctx.beginPath();
-      ctx.arc(compX, compY, 24 * scale, 0, Math.PI * 2);
-      ctx.fillStyle = compGrad;
-      ctx.fill();
-    }
-
     // 8. ANIMATION LOOP
     function render() {
       requestAnimationFrame(render);
@@ -1288,6 +1284,85 @@ import Layout from "../layouts/Layout.astro";
         ctx.font = '10px "Space Mono", monospace';
         ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
         ctx.fillText("M31 • Andromeda Galaxy", m31Center.sx + 45 * m31Center.scale, m31Center.sy - 25 * m31Center.scale);
+      }
+
+      // B2. Whirlpool Galaxy (M51 & NGC 5195) with Grand Design Spiral Rotation
+      const m51Center = project3D(m51BaseX, m51BaseY, m51BaseZ, cx, cy);
+      if (m51Center) {
+        const mDist51 = Math.hypot(mouseX - m51Center.sx, mouseY - m51Center.sy);
+        const mouseFactor51 = Math.max(0, 1 - mDist51 / 400);
+        const speedBoost51 = 1 + mouseFactor51 * 3.0;
+
+        // 1. Luminous Main Core (M51 / NGC 5194)
+        const coreR51 = (isHighZoom ? 95 : 55) * m51Center.scale;
+        const coreGrad51 = ctx.createRadialGradient(m51Center.sx, m51Center.sy, 0, m51Center.sx, m51Center.sy, coreR51);
+        coreGrad51.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+        coreGrad51.addColorStop(0.22, "rgba(210, 235, 255, 0.65)");
+        coreGrad51.addColorStop(0.6, "rgba(130, 175, 245, 0.2)");
+        coreGrad51.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.beginPath();
+        ctx.arc(m51Center.sx, m51Center.sy, coreR51, 0, Math.PI * 2);
+        ctx.fillStyle = coreGrad51;
+        ctx.fill();
+
+        // 2. Companion Galaxy NGC 5195 Core
+        const compProj = project3D(m51BaseX + 68, m51BaseY - 44, m51BaseZ, cx, cy);
+        if (compProj) {
+          const compR = (isHighZoom ? 45 : 26) * compProj.scale;
+          const compGrad = ctx.createRadialGradient(compProj.sx, compProj.sy, 0, compProj.sx, compProj.sy, compR);
+          compGrad.addColorStop(0, "rgba(255, 245, 215, 0.9)");
+          compGrad.addColorStop(0.35, "rgba(255, 210, 140, 0.45)");
+          compGrad.addColorStop(0.7, "rgba(210, 160, 90, 0.12)");
+          compGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+          ctx.beginPath();
+          ctx.arc(compProj.sx, compProj.sy, compR, 0, Math.PI * 2);
+          ctx.fillStyle = compGrad;
+          ctx.fill();
+        }
+
+        // 3. Render Whirlpool Particles (Spiral arms, starburst knots, and tidal bridge)
+        for (let i = 0; i < whirlpoolParticles.length; i++) {
+          const p = whirlpoolParticles[i];
+          p.angle += p.angularSpeed * speedBoost51;
+
+          let gx = p.isCompanion
+            ? p.offsetX + Math.cos(p.angle) * p.radius
+            : Math.cos(p.angle) * p.radius + p.offsetX;
+          let gy = p.isCompanion
+            ? p.offsetY + Math.sin(p.angle) * p.radius * 0.8
+            : Math.sin(p.angle) * p.radius + p.offsetY;
+          let gz = (Math.sin(p.angle * 2) * 8);
+
+          if (mouseFactor51 > 0.05) {
+            gx += (mouseX - m51Center.sx) * 0.06 * mouseFactor51;
+            gy += (mouseY - m51Center.sy) * 0.06 * mouseFactor51;
+          }
+
+          const tiltX = 18 * (Math.PI / 180);
+          const tiltY = 12 * (Math.PI / 180);
+          const cosTX = Math.cos(tiltX), sinTX = Math.sin(tiltX);
+          const cosTY = Math.cos(tiltY), sinTY = Math.sin(tiltY);
+
+          const x3d = p.baseX + (gx * cosTY + gz * sinTY);
+          const y3d = p.baseY + (gy * cosTX - (gx * sinTY - gz * cosTY) * sinTX);
+          const z3d = p.baseZ + (gy * sinTX + (gx * sinTY - gz * cosTY) * cosTX);
+
+          const proj = project3D(x3d, y3d, z3d, cx, cy);
+          if (!proj) continue;
+
+          ctx.beginPath();
+          ctx.arc(proj.sx, proj.sy, Math.max(0.65, p.size * proj.scale), 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        if (!isHighZoom) {
+          ctx.font = '10px "Space Mono", monospace';
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          ctx.fillText("M51 • Whirlpool Galaxy & NGC 5195", m51Center.sx + 40 * m51Center.scale, m51Center.sy - 30 * m51Center.scale);
+        }
       }
 
       // C. Render All Constellations in 3D
@@ -1437,7 +1512,7 @@ import Layout from "../layouts/Layout.astro";
           } else if (m.type === 'nebula_m42') {
             renderM42Nebula(ctx, proj.sx, proj.sy, proj.scale);
           } else if (m.type === 'galaxy_m51') {
-            renderM51Whirlpool(ctx, proj.sx, proj.sy, proj.scale);
+            // Rendered with 1,200 particle grand design spiral in Section B2
           }
 
           ctx.font = '11px "Space Mono", monospace';

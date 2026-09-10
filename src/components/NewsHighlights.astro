@@ -19,69 +19,6 @@ const newsPosts = [
     summary: "Over 20 students joined our Perseids meteor shower watch trip. Captured 40+ long exposure Milky Way frames under Bortle Class 3 skies.",
   }
 ];
-
-const targets = [
-  {
-    id: "pillars",
-    name: "Pillars of Creation (M16)",
-    optics: '8" Dobsonian @ 150x',
-    description: "Interstellar gas dust columns inside Eagle Nebula, glowing ionized hydrogen edges.",
-    symbol: "🦅",
-    yaw: -0.38,
-    pitch: 0.25,
-    zoom: 3.2
-  },
-  {
-    id: "jupiter",
-    name: "Jupiter & Galilean Moons",
-    optics: "Motorized Tracking Scope @ 150x",
-    description: "Atmospheric cloud belts, Great Red Spot, and Io, Europa, Ganymede, Callisto.",
-    symbol: "🪐",
-    yaw: -0.15,
-    pitch: 0.12,
-    zoom: 3.2
-  },
-  {
-    id: "saturn",
-    name: "Saturn's Ring System (Cassini)",
-    optics: '8" Dobsonian @ 150x',
-    description: "Breathtaking ring plane with Cassini Division and golden gas giant sphere.",
-    symbol: "🪐",
-    yaw: 0.42,
-    pitch: -0.22,
-    zoom: 3.2
-  },
-  {
-    id: "orion",
-    name: "Orion Nebula (M42)",
-    optics: "Wide Nebula Aperture @ 150x",
-    description: "Diffuse starburst emission nebula and Trapezium four-star cluster 1,344 ly away.",
-    symbol: "🏹",
-    yaw: 0.95,
-    pitch: -0.45,
-    zoom: 3.2
-  },
-  {
-    id: "andromeda",
-    name: "Andromeda Galaxy (M31)",
-    optics: "20x Widefield Eyepiece",
-    description: "Nearest major spiral galaxy containing over 1 trillion starlight beacons.",
-    symbol: "🌀",
-    yaw: 0.62,
-    pitch: 0.08,
-    zoom: 2.0
-  },
-  {
-    id: "dipper",
-    name: "Big Dipper (Ursa Major)",
-    optics: "20x Constellation Finder",
-    description: "Seven bright starlight beacons with Pointer Stars Merak and Dubhe leading to Polaris.",
-    symbol: "✨",
-    yaw: 0.0,
-    pitch: 0.0,
-    zoom: 1.0
-  }
-];
 ---
 
 <section id="news-highlights" class="py-20 relative overflow-hidden">
@@ -226,45 +163,6 @@ const targets = [
               <span>🚀 Open Fullscreen Lab [1][2] →</span>
             </a>
           </div>
-
-          <!-- Target Selector Buttons -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
-            {targets.map((tgt, i) => (
-              <button
-                type="button"
-                class={`viewfinder-btn text-left p-2.5 rounded-xl border transition text-xs font-space-mono ${i === 0 ? 'bg-white/10 border-white text-white' : 'bg-white/[0.02] border-white/10 text-slate-400 hover:text-white hover:border-white/30'}`}
-                data-id={tgt.id}
-                data-name={tgt.name}
-                data-optics={tgt.optics}
-                data-desc={tgt.description}
-                data-symbol={tgt.symbol}
-                data-yaw={tgt.yaw}
-                data-pitch={tgt.pitch}
-                data-zoom={tgt.zoom}
-              >
-                <div class="text-base mb-1">{tgt.symbol}</div>
-                <div class="font-bold text-[11px] truncate text-slate-200">{tgt.name}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <!-- Target Details Output -->
-        <div class="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div id="viewfinder-title" class="text-sm font-bold font-orbitron text-white">
-              Pillars of Creation (M16)
-            </div>
-            <div id="viewfinder-desc" class="text-xs text-slate-400 font-inter mt-0.5">
-              Interstellar gas dust columns inside Eagle Nebula, glowing ionized hydrogen edges.
-            </div>
-          </div>
-          <a
-            href="/telescope-lab"
-            class="text-xs text-white hover:text-slate-300 font-orbitron font-bold shrink-0 transition underline flex items-center gap-1"
-          >
-            Explore in 3D Lab →
-          </a>
         </div>
       </div>
 
@@ -278,9 +176,6 @@ const targets = [
   const canvas = document.getElementById("mini-sky-canvas") as HTMLCanvasElement;
   const ctx = canvas?.getContext("2d");
   const stamp = document.getElementById("viewfinder-optics-stamp");
-  const title = document.getElementById("viewfinder-title");
-  const desc = document.getElementById("viewfinder-desc");
-  const btns = document.querySelectorAll(".viewfinder-btn");
   const miniBtn20x = document.getElementById("mini-btn-20x");
   const miniBtn150x = document.getElementById("mini-btn-150x");
 
@@ -364,14 +259,15 @@ const targets = [
 
     // Galaxies
     const andromeda = { x: 500, y: 60, z: 860, rx: 75, ry: 28, angle: 0.65 };
-    const whirlpool = { x: -270, y: 245, z: 870, rx: 42, ry: 36, angle: 0.2 };
+    const whirlpool = { x: -380, y: 280, z: 920, rx: 45, ry: 38, angle: 0.2 };
 
     // Celestial Targets
     const mysteries = [
       { id: 'pillars', type: 'pillars_m16', name: "Pillars of Creation (M16)", x: 300, y: -190, z: 840, color: "#ffd59e" },
       { id: 'jupiter', type: 'planet_jupiter', name: "Jupiter", x: 120, y: -90, z: 880, color: "#eed9b9" },
       { id: 'saturn', type: 'planet_saturn', name: "Saturn", x: -330, y: 170, z: 850, color: "#ffecb3" },
-      { id: 'orion', type: 'nebula_m42', name: "Orion Nebula M42", x: -680, y: -430, z: 750, color: "#f0abfc" }
+      { id: 'orion', type: 'nebula_m42', name: "Orion Nebula M42", x: -680, y: -430, z: 750, color: "#f0abfc" },
+      { id: 'm51', type: 'galaxy_m51', name: "Whirlpool Galaxy (M51)", x: -380, y: 280, z: 920, color: "#a3c8ff" }
     ];
 
     function project3D(x: number, y: number, z: number, cx: number, cy: number) {
@@ -504,6 +400,50 @@ const targets = [
       cx.restore();
     }
 
+    function drawWhirlpool(cx: CanvasRenderingContext2D, sx: number, sy: number, scale: number) {
+      cx.save();
+      const s = scale;
+      // Core glow
+      const gCore = cx.createRadialGradient(sx, sy, 0, sx, sy, 32 * s);
+      gCore.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+      gCore.addColorStop(0.3, "rgba(180, 220, 255, 0.6)");
+      gCore.addColorStop(0.7, "rgba(100, 160, 240, 0.15)");
+      gCore.addColorStop(1, "rgba(0, 0, 0, 0)");
+      cx.fillStyle = gCore;
+      cx.beginPath();
+      cx.arc(sx, sy, 32 * s, 0, Math.PI * 2);
+      cx.fill();
+
+      // Companion NGC 5195
+      const compX = sx + 25 * s;
+      const compY = sy - 16 * s;
+      const gComp = cx.createRadialGradient(compX, compY, 0, compX, compY, 15 * s);
+      gComp.addColorStop(0, "rgba(255, 240, 210, 0.9)");
+      gComp.addColorStop(0.5, "rgba(230, 180, 110, 0.35)");
+      gComp.addColorStop(1, "rgba(0, 0, 0, 0)");
+      cx.fillStyle = gComp;
+      cx.beginPath();
+      cx.arc(compX, compY, 15 * s, 0, Math.PI * 2);
+      cx.fill();
+
+      // Spiral arms representation
+      cx.strokeStyle = "rgba(160, 210, 255, 0.4)";
+      cx.lineWidth = 1.8 * s;
+      for (let arm = 0; arm < 2; arm++) {
+        cx.beginPath();
+        const baseAng = arm * Math.PI;
+        for (let r = 5; r < 42; r += 2) {
+          const theta = baseAng + r * 0.12;
+          const px = sx + Math.cos(theta) * r * s;
+          const py = sy + Math.sin(theta) * r * s * 0.85;
+          if (r === 5) cx.moveTo(px, py);
+          else cx.lineTo(px, py);
+        }
+        cx.stroke();
+      }
+      cx.restore();
+    }
+
     // Main Render Loop
     function render() {
       // Interpolate smooth motion
@@ -573,6 +513,33 @@ const targets = [
         ctx.restore();
       }
 
+      // Whirlpool Galaxy (M51)
+      const pM51 = project3D(whirlpool.x, whirlpool.y, whirlpool.z, cx, cy);
+      if (pM51) {
+        ctx.save();
+        ctx.translate(pM51.sx, pM51.sy);
+        const gM51 = ctx.createRadialGradient(0, 0, 0, 0, 0, whirlpool.rx * pM51.scale);
+        gM51.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+        gM51.addColorStop(0.3, "rgba(180, 220, 255, 0.55)");
+        gM51.addColorStop(0.7, "rgba(100, 160, 240, 0.15)");
+        gM51.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = gM51;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, whirlpool.rx * pM51.scale, whirlpool.ry * pM51.scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Companion NGC 5195
+        const gComp = ctx.createRadialGradient(25 * pM51.scale, -16 * pM51.scale, 0, 25 * pM51.scale, -16 * pM51.scale, 14 * pM51.scale);
+        gComp.addColorStop(0, "rgba(255, 240, 210, 0.9)");
+        gComp.addColorStop(0.5, "rgba(230, 180, 110, 0.3)");
+        gComp.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = gComp;
+        ctx.beginPath();
+        ctx.arc(25 * pM51.scale, -16 * pM51.scale, 14 * pM51.scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       // Mysteries / Resolved Views
       mysteries.forEach(m => {
         const p = project3D(m.x, m.y, m.z, cx, cy);
@@ -605,6 +572,7 @@ const targets = [
           else if (m.type === 'planet_jupiter') drawJupiter(ctx, p.sx, p.sy, p.scale);
           else if (m.type === 'planet_saturn') drawSaturn(ctx, p.sx, p.sy, p.scale);
           else if (m.type === 'nebula_m42') drawOrionNebula(ctx, p.sx, p.sy, p.scale);
+          else if (m.type === 'galaxy_m51') drawWhirlpool(ctx, p.sx, p.sy, p.scale);
         }
       });
     }
@@ -651,36 +619,6 @@ const targets = [
 
     miniBtn20x?.addEventListener("click", () => setMiniZoom(false));
     miniBtn150x?.addEventListener("click", () => setMiniZoom(true));
-
-    // Target buttons
-    btns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        btns.forEach((b) => {
-          b.classList.remove("bg-white/10", "border-white", "text-white");
-          b.classList.add("bg-white/[0.02]", "border-white/10", "text-slate-400");
-        });
-        btn.classList.add("bg-white/10", "border-white", "text-white");
-        btn.classList.remove("bg-white/[0.02]", "border-white/10", "text-slate-400");
-
-        const name = btn.getAttribute("data-name");
-        const optics = btn.getAttribute("data-optics");
-        const d = btn.getAttribute("data-desc");
-        const yaw = parseFloat(btn.getAttribute("data-yaw") || "0");
-        const pitch = parseFloat(btn.getAttribute("data-pitch") || "0");
-        const zoom = parseFloat(btn.getAttribute("data-zoom") || "1.0");
-
-        targetYaw = yaw;
-        targetPitch = pitch;
-        targetZoom = zoom;
-        setMiniZoom(zoom > 2.0);
-
-        if (stamp) stamp.textContent = optics || "";
-        if (title) title.textContent = name || "";
-        if (desc) desc.textContent = d || "";
-
-        window.dispatchEvent(new CustomEvent("cosmic-click"));
-      });
-    });
 
     // Drag to pan in 3D
     canvas.addEventListener("mousedown", (e) => {
