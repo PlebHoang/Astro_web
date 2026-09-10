@@ -9,6 +9,12 @@ export default defineConfig({
     '/telescope-cluster': '/telescope-lab'
   },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      watch: {
+        // ponytail: ignore build artifacts, dev lock/logs, and tests to stop HMR multi-tab reload storms
+        ignored: ['**/dist/**', '**/.astro/**', '**/test.mjs', '**/reference/**']
+      }
+    }
   }
 });
