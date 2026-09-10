@@ -25,11 +25,11 @@ const isBackground = mode === 'background';
   )}
 
     <!-- Fullscreen Telescope Canvas -->
-    <canvas id="sky-canvas" class="absolute inset-0 w-full h-full block cursor-grab active:cursor-grabbing z-0"></canvas>
+    <canvas id="sky-canvas" class="fixed inset-0 w-screen h-screen block cursor-grab active:cursor-grabbing z-0 pointer-events-none"></canvas>
 
     <!-- Circular Eyepiece Reticle (20x Finder vs 150x High Zoom) -->
-    <div class="eyepiece-overlay absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_160px_80px_rgba(0,0,0,0.96)] transition-all duration-500" id="eyepiece-overlay"></div>
-    <div class="eyepiece-circle absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/20 shadow-[0_0_0_2500px_rgba(0,0,0,0.72),inset_0_0_60px_rgba(0,0,0,0.92)] pointer-events-none z-10 transition-all duration-500" id="eyepiece-circle">
+    <div class={`eyepiece-overlay fixed inset-0 pointer-events-none z-10 shadow-[inset_0_0_160px_80px_rgba(0,0,0,0.96)] transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`} id="eyepiece-overlay"></div>
+    <div class={`eyepiece-circle fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/20 shadow-[0_0_0_2500px_rgba(0,0,0,0.72),inset_0_0_60px_rgba(0,0,0,0.92)] pointer-events-none z-10 transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`} id="eyepiece-circle">
       <!-- Reticle Crosshairs & Mil-Dots -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent"></div>
@@ -314,7 +314,8 @@ interface StarNode {
     const toggleIcon = document.getElementById("stargaze-toggle-icon");
     const toggleText = document.getElementById("stargaze-toggle-text");
 
-    let isStargazeActive = !isBackgroundMode;
+    const eyepieceOverlay = document.getElementById("eyepiece-overlay");
+    const eyepieceCircle = document.getElementById("eyepiece-circle");
 
     function setStargazeMode(active: boolean) {
       isStargazeActive = active;
@@ -327,6 +328,14 @@ interface StarNode {
           cockpitUI.classList.remove("opacity-0", "pointer-events-none");
           cockpitUI.classList.add("opacity-100");
         }
+        if (eyepieceOverlay) {
+          eyepieceOverlay.classList.remove("opacity-0");
+          eyepieceOverlay.classList.add("opacity-100");
+        }
+        if (eyepieceCircle) {
+          eyepieceCircle.classList.remove("opacity-0");
+          eyepieceCircle.classList.add("opacity-100");
+        }
         canvas.style.pointerEvents = "auto";
         if (toggleText) toggleText.textContent = "Return to Site";
         if (toggleIcon) toggleIcon.textContent = "📄";
@@ -338,6 +347,14 @@ interface StarNode {
         if (cockpitUI) {
           cockpitUI.classList.remove("opacity-100");
           cockpitUI.classList.add("opacity-0", "pointer-events-none");
+        }
+        if (eyepieceOverlay && isBackgroundMode) {
+          eyepieceOverlay.classList.remove("opacity-100");
+          eyepieceOverlay.classList.add("opacity-0");
+        }
+        if (eyepieceCircle && isBackgroundMode) {
+          eyepieceCircle.classList.remove("opacity-100");
+          eyepieceCircle.classList.add("opacity-0");
         }
         canvas.style.pointerEvents = "none";
         if (toggleText) toggleText.textContent = "Stargaze Mode";
@@ -379,10 +396,6 @@ interface StarNode {
     let camPitch = 0;
     let targetYaw = 0;
     let targetPitch = 0;
-
-    let warpSpeed = 1.0;
-    let targetWarpSpeed = 1.0;
-    let scrollImpulse = 0;
 
     let isDragging = false;
     let prevMouseX = 0;
@@ -854,9 +867,9 @@ interface StarNode {
       starCard?.classList.add("opacity-0", "pointer-events-none", "translate-y-3");
     });
 
-    // Scroll & Wheel
+    // Telescope Zoom via Wheel (Active ONLY in Stargaze Mode)
     window.addEventListener("wheel", (e) => {
-      scrollImpulse += Math.abs(e.deltaY) * 0.035;
+      if (!isStargazeActive) return;
       if (e.deltaY < 0) {
         targetZoom = Math.min(4.5, targetZoom + 0.15);
       } else {
@@ -1240,25 +1253,19 @@ interface StarNode {
       camPitch += (targetPitch - camPitch) * 0.08;
       currentZoom += (targetZoom - currentZoom) * 0.08;
 
-      scrollImpulse *= 0.92;
-      warpSpeed += (targetWarpSpeed + scrollImpulse - warpSpeed) * 0.08;
-
       ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, width, height);
 
       const cx = width * 0.5;
       const cy = height * 0.5;
-      const isHyperdrive = warpSpeed > 2.5;
 
-      // A. Background Passing Stars (Hyperspace travel)
+      // A. Background Passing Stars (Calm Ambient Cosmic Drift)
       for (let i = 0; i < backgroundStars.length; i++) {
         const s = backgroundStars[i];
-        s.pz = s.z;
-        s.z -= warpSpeed * 3.8;
+        s.z -= 0.65;
 
         if (s.z <= 20) {
           s.z = 2400;
-          s.pz = 2400;
           s.x = (Math.random() - 0.5) * 2600;
           s.y = (Math.random() - 0.5) * 2600;
         }
@@ -1266,22 +1273,10 @@ interface StarNode {
         const curr = project3D(s.x, s.y, s.z, cx, cy);
         if (!curr) continue;
 
-        if (isHyperdrive) {
-          const prev = project3D(s.x, s.y, s.pz, cx, cy);
-          if (prev) {
-            ctx.beginPath();
-            ctx.moveTo(prev.sx, prev.sy);
-            ctx.lineTo(curr.sx, curr.sy);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(0.9, s.alpha * (warpSpeed / 10))})`;
-            ctx.lineWidth = Math.max(1, s.size * curr.scale * 0.85);
-            ctx.stroke();
-          }
-        } else {
-          ctx.beginPath();
-          ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
-          ctx.fill();
-        }
+        ctx.beginPath();
+        ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+        ctx.fill();
       }
 
       // B. Andromeda Galaxy (M31) with Keplerian Rotation & Mouse Reactivity

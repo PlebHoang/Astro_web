@@ -280,7 +280,50 @@ const hudLockStatus = document.getElementById("hud-lock-status");
 const hudReticleDist = document.getElementById("hud-reticle-dist");
 const hudCatalogCount = document.getElementById("hud-catalog-count");
 if (canvas && ctx) {
-  let updateMissionHUD2 = function() {
+  let setStargazeMode2 = function(active) {
+    isStargazeActive = active;
+    if (active) {
+      if (webOverlay) {
+        webOverlay.classList.remove("opacity-100", "pointer-events-auto");
+        webOverlay.classList.add("opacity-0", "pointer-events-none");
+      }
+      if (cockpitUI) {
+        cockpitUI.classList.remove("opacity-0", "pointer-events-none");
+        cockpitUI.classList.add("opacity-100");
+      }
+      if (eyepieceOverlay) {
+        eyepieceOverlay.classList.remove("opacity-0");
+        eyepieceOverlay.classList.add("opacity-100");
+      }
+      if (eyepieceCircle2) {
+        eyepieceCircle2.classList.remove("opacity-0");
+        eyepieceCircle2.classList.add("opacity-100");
+      }
+      canvas.style.pointerEvents = "auto";
+      if (toggleText) toggleText.textContent = "Return to Site";
+      if (toggleIcon) toggleIcon.textContent = "\u{1F4C4}";
+    } else {
+      if (webOverlay) {
+        webOverlay.classList.remove("opacity-0", "pointer-events-none");
+        webOverlay.classList.add("opacity-100", "pointer-events-auto");
+      }
+      if (cockpitUI) {
+        cockpitUI.classList.remove("opacity-100");
+        cockpitUI.classList.add("opacity-0", "pointer-events-none");
+      }
+      if (eyepieceOverlay && isBackgroundMode) {
+        eyepieceOverlay.classList.remove("opacity-100");
+        eyepieceOverlay.classList.add("opacity-0");
+      }
+      if (eyepieceCircle2 && isBackgroundMode) {
+        eyepieceCircle2.classList.remove("opacity-100");
+        eyepieceCircle2.classList.add("opacity-0");
+      }
+      canvas.style.pointerEvents = "none";
+      if (toggleText) toggleText.textContent = "Stargaze Mode";
+      if (toggleIcon) toggleIcon.textContent = "\u{1F52D}";
+    }
+  }, updateMissionHUD2 = function() {
     if (!activeMystery) return;
     if (hudMissionName) {
       hudMissionName.textContent = activeMystery.discovered ? `Discovered: ${activeMystery.name}` : `Signal [${activeMystery.name.split(" ")[0]}]`;
@@ -342,8 +385,8 @@ if (canvas && ctx) {
       keyCap1?.classList.add("bg-white/15", "border-white/25");
       led1?.classList.remove("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
       led1?.classList.add("bg-white/20");
-      eyepieceCircle?.classList.add("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
-      eyepieceCircle?.classList.remove("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
+      eyepieceCircle2?.classList.add("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
+      eyepieceCircle2?.classList.remove("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
       highZoomCross?.classList.remove("opacity-0");
       highZoomCross?.classList.add("opacity-100");
     } else {
@@ -360,8 +403,8 @@ if (canvas && ctx) {
       keyCap2?.classList.add("bg-white/15", "border-white/25");
       led2?.classList.remove("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
       led2?.classList.add("bg-white/20");
-      eyepieceCircle?.classList.remove("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
-      eyepieceCircle?.classList.add("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
+      eyepieceCircle2?.classList.remove("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
+      eyepieceCircle2?.classList.add("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
       highZoomCross?.classList.add("opacity-0");
       highZoomCross?.classList.remove("opacity-100");
     }
@@ -648,41 +691,24 @@ if (canvas && ctx) {
     camYaw += (targetYaw - camYaw) * 0.08;
     camPitch += (targetPitch - camPitch) * 0.08;
     currentZoom += (targetZoom - currentZoom) * 0.08;
-    scrollImpulse *= 0.92;
-    warpSpeed += (targetWarpSpeed + scrollImpulse - warpSpeed) * 0.08;
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, width, height);
     const cx = width * 0.5;
     const cy = height * 0.5;
-    const isHyperdrive = warpSpeed > 2.5;
     for (let i = 0; i < backgroundStars.length; i++) {
       const s = backgroundStars[i];
-      s.pz = s.z;
-      s.z -= warpSpeed * 3.8;
+      s.z -= 0.65;
       if (s.z <= 20) {
         s.z = 2400;
-        s.pz = 2400;
         s.x = (Math.random() - 0.5) * 2600;
         s.y = (Math.random() - 0.5) * 2600;
       }
       const curr = project3D2(s.x, s.y, s.z, cx, cy);
       if (!curr) continue;
-      if (isHyperdrive) {
-        const prev = project3D2(s.x, s.y, s.pz, cx, cy);
-        if (prev) {
-          ctx.beginPath();
-          ctx.moveTo(prev.sx, prev.sy);
-          ctx.lineTo(curr.sx, curr.sy);
-          ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(0.9, s.alpha * (warpSpeed / 10))})`;
-          ctx.lineWidth = Math.max(1, s.size * curr.scale * 0.85);
-          ctx.stroke();
-        }
-      } else {
-        ctx.beginPath();
-        ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
-        ctx.fill();
-      }
+      ctx.beginPath();
+      ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+      ctx.fill();
     }
     const m31Center = project3D2(-620, -80, 950, cx, cy);
     if (m31Center) {
@@ -960,7 +986,33 @@ if (canvas && ctx) {
       }
     }
   };
-  var updateMissionHUD = updateMissionHUD2, spawnNextTarget = spawnNextTarget2, animateKeyCap = animateKeyCap2, showZoomModeToast = showZoomModeToast2, setScopeMode = setScopeMode2, onScope20x = onScope20x2, onScope150x = onScope150x2, handleScopeKeyDown = handleScopeKeyDown2, showTelemetryCard = showTelemetryCard2, project3D = project3D2, draw5PointStar = draw5PointStar2, renderPillarsOfCreation = renderPillarsOfCreation2, renderJupiter = renderJupiter2, renderSaturn = renderSaturn2, renderMars = renderMars2, renderM42Nebula = renderM42Nebula2, render = render2;
+  var setStargazeMode = setStargazeMode2, updateMissionHUD = updateMissionHUD2, spawnNextTarget = spawnNextTarget2, animateKeyCap = animateKeyCap2, showZoomModeToast = showZoomModeToast2, setScopeMode = setScopeMode2, onScope20x = onScope20x2, onScope150x = onScope150x2, handleScopeKeyDown = handleScopeKeyDown2, showTelemetryCard = showTelemetryCard2, project3D = project3D2, draw5PointStar = draw5PointStar2, renderPillarsOfCreation = renderPillarsOfCreation2, renderJupiter = renderJupiter2, renderSaturn = renderSaturn2, renderMars = renderMars2, renderM42Nebula = renderM42Nebula2, render = render2;
+  const container = document.querySelector(".telescope-container");
+  const isBackgroundMode = container?.dataset.mode === "background";
+  const webOverlay = document.getElementById("web-overlay");
+  const cockpitUI = document.getElementById("cockpit-ui");
+  const btnStargazeToggle = document.getElementById("btn-stargaze-toggle");
+  const btnCockpitExit = document.getElementById("btn-cockpit-exit");
+  const toggleIcon = document.getElementById("stargaze-toggle-icon");
+  const toggleText = document.getElementById("stargaze-toggle-text");
+  const eyepieceOverlay = document.getElementById("eyepiece-overlay");
+  const eyepieceCircle2 = document.getElementById("eyepiece-circle");
+  if (isBackgroundMode) {
+    setStargazeMode2(false);
+    btnStargazeToggle?.addEventListener("click", () => setStargazeMode2(!isStargazeActive));
+    btnCockpitExit?.addEventListener("click", () => setStargazeMode2(false));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        setStargazeMode2(!isStargazeActive);
+      } else if (e.key === "Escape" && isStargazeActive) {
+        setStargazeMode2(false);
+      }
+    });
+    window.addEventListener("toggle-stargaze", () => setStargazeMode2(!isStargazeActive));
+  } else {
+    setStargazeMode2(true);
+  }
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
   window.addEventListener("resize", () => {
@@ -975,9 +1027,6 @@ if (canvas && ctx) {
   let camPitch = 0;
   let targetYaw = 0;
   let targetPitch = 0;
-  let warpSpeed = 1;
-  let targetWarpSpeed = 1;
-  let scrollImpulse = 0;
   let isDragging = false;
   let prevMouseX = 0;
   let prevMouseY = 0;
@@ -1297,7 +1346,7 @@ if (canvas && ctx) {
     starCard?.classList.add("opacity-0", "pointer-events-none", "translate-y-3");
   });
   window.addEventListener("wheel", (e) => {
-    scrollImpulse += Math.abs(e.deltaY) * 0.035;
+    if (!isStargazeActive) return;
     if (e.deltaY < 0) {
       targetZoom = Math.min(4.5, targetZoom + 0.15);
     } else {
