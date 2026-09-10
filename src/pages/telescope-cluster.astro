@@ -66,7 +66,7 @@ import Layout from "../layouts/Layout.astro";
     </div>
 
     <!-- Discovery Unlocked Fanfare Banner -->
-    <div id="discovery-banner" class="fixed top-28 left-1/2 -translate-x-1/2 bg-black/95 border border-white/35 shadow-[0_0_40px_rgba(255,255,255,0.25)] rounded-2xl px-6 py-3.5 z-40 opacity-0 pointer-events-none -translate-y-4 transition-all duration-400 flex items-center gap-4">
+    <div id="discovery-banner" class="fixed top-24 left-1/2 -translate-x-1/2 bg-black/95 border border-white/35 shadow-[0_0_40px_rgba(255,255,255,0.25)] rounded-2xl px-6 py-3.5 z-40 opacity-0 pointer-events-none -translate-y-4 transition-all duration-400 flex items-center gap-4">
       <div class="w-10 h-10 rounded-xl bg-white text-black font-orbitron font-black text-lg flex items-center justify-center shrink-0">
         🔭
       </div>
@@ -79,116 +79,131 @@ import Layout from "../layouts/Layout.astro";
       </button>
     </div>
 
-    <!-- Website Foreground Preview Overlay (Toggleable) -->
-    <div class="absolute inset-0 z-15 flex flex-col items-center justify-center text-center p-6 pointer-events-none transition-all duration-500" id="web-preview">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-md mb-5">
-        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-        <span class="text-[11px] font-space-mono text-slate-300 uppercase tracking-widest">
-          Constructor University Astronomical Society
-        </span>
+    <!-- Website Foreground Preview Overlay (Hidden by Default; No Location Bar in the Middle) -->
+    <div class="absolute inset-0 z-15 flex flex-col items-center justify-between text-center p-8 pointer-events-none opacity-0 transition-all duration-500" id="web-preview">
+      <div class="pt-16 max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-md mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <span class="text-[11px] font-space-mono text-slate-300 uppercase tracking-widest">
+            Constructor University Astronomical Society
+          </span>
+        </div>
+        <h1 class="font-orbitron font-black text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08] mb-4 drop-shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+          UNVEILING THE COSMOS <br />FROM CAMPUS GREEN
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto mb-6 leading-relaxed drop-shadow">
+          Join fellow students for clear-sky telescope sessions, astrophysics cinema nights, and deep-space astrophotography in Bremen-Nord.
+        </p>
+        <div class="flex justify-center gap-3.5 pointer-events-auto">
+          <a href="#events" class="px-5 py-2.5 rounded-xl bg-white text-black font-orbitron font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+            Next Stargazing Session
+          </a>
+          <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-space-mono text-xs border border-white/20 backdrop-blur-md transition">
+            @astronomy.cub
+          </a>
+        </div>
       </div>
-      <h1 class="font-orbitron font-black text-4xl sm:text-6xl lg:text-7xl text-white tracking-tight leading-[1.08] max-w-4xl mb-5 drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
-        UNVEILING THE COSMOS <br />FROM CAMPUS GREEN
-      </h1>
-      <p class="text-sm sm:text-base text-slate-300 max-w-xl mb-8 leading-relaxed drop-shadow">
-        Join fellow students for clear-sky telescope sessions, astrophysics cinema nights, and deep-space astrophotography in Bremen-Nord.
-      </p>
-      <div class="flex gap-3.5 pointer-events-auto mb-9">
-        <a href="#events" class="px-6 py-3 rounded-xl bg-white text-black font-orbitron font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition shadow-[0_0_25px_rgba(255,255,255,0.4)]">
-          Next Stargazing Session
-        </a>
-        <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-space-mono text-xs border border-white/20 backdrop-blur-md transition">
-          Follow @astronomy.cub
-        </a>
-      </div>
-      <div class="flex flex-wrap gap-3 pointer-events-auto">
-        <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+
+      <!-- Docked at the bottom perimeter (NEVER IN THE MIDDLE OF THE STARS) -->
+      <div class="flex flex-wrap justify-center gap-3 pointer-events-auto pb-4">
+        <div class="bg-black/80 border border-white/15 rounded-xl px-3 py-2 backdrop-blur-md text-left font-space-mono text-[9px] text-slate-400">
           <span>COORDINATES</span>
-          <strong class="block text-white font-orbitron text-xs mt-0.5">53.1672° N, 8.6534° E</strong>
+          <strong class="block text-white font-orbitron text-[11px] mt-0.5">53.1672° N, 8.6534° E</strong>
         </div>
-        <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+        <div class="bg-black/80 border border-white/15 rounded-xl px-3 py-2 backdrop-blur-md text-left font-space-mono text-[9px] text-slate-400">
           <span>SKY QUALITY</span>
-          <strong class="block text-white font-orbitron text-xs mt-0.5">Bortle Class 5</strong>
+          <strong class="block text-white font-orbitron text-[11px] mt-0.5">Bortle Class 5</strong>
         </div>
-        <div class="bg-black/75 border border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md text-left font-space-mono text-[10px] text-slate-400">
+        <div class="bg-black/80 border border-white/15 rounded-xl px-3 py-2 backdrop-blur-md text-left font-space-mono text-[9px] text-slate-400">
           <span>PRIMARY OPTICS</span>
-          <strong class="block text-white font-orbitron text-xs mt-0.5">8" Dobsonian Reflector</strong>
+          <strong class="block text-white font-orbitron text-[11px] mt-0.5">8" Dobsonian Reflector</strong>
         </div>
       </div>
     </div>
 
-    <!-- UI Control Deck (Pinned Strictly to Top & Bottom - NEVER IN THE MIDDLE) -->
-    <div class="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-4 sm:p-6">
+    <!-- UI Control Deck (PINNED STRICTLY TO PERIMETER EDGES - ZERO CENTER INTERFERENCE) -->
+    <div class="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-3 sm:p-5">
       
-      <!-- TOP REGION: Header Bar & Clean Location Bar -->
-      <div class="flex flex-col gap-2.5 w-full">
-        <!-- Row 1: Main Control Bar -->
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pointer-events-auto">
-          <!-- Logo & Title -->
-          <div class="flex items-center gap-3">
-            <a href="/" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-space-mono text-slate-300 hover:text-white transition">
-              ← Main Portal
-            </a>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="font-orbitron text-xs font-bold tracking-wider text-white uppercase">CUB TELESCOPE LAB</span>
-                <span class="px-1.5 py-0.5 rounded text-[8px] font-space-mono bg-white/10 text-white border border-white/20">STARGAZING V3.2</span>
-              </div>
-              <span class="font-space-mono text-[9px] text-slate-400 block">3D Sky Explorer & Finder Game</span>
+      <!-- TOP CONTROL DECK: Slim Single-Row Cockpit Header -->
+      <header class="flex flex-wrap items-center justify-between gap-3 w-full bg-black/85 px-4 py-2 rounded-2xl border border-white/15 backdrop-blur-2xl pointer-events-auto shadow-2xl">
+        <!-- Brand & Main Portal Link -->
+        <div class="flex items-center gap-3">
+          <a href="/" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-space-mono text-slate-300 hover:text-white transition">
+            ← Main Portal
+          </a>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-orbitron text-xs font-black tracking-wider text-white uppercase">CUB TELESCOPE LAB</span>
+              <span class="px-1.5 py-0.2 rounded text-[8px] font-space-mono bg-white/10 text-slate-300 border border-white/15">V3.3</span>
             </div>
-          </div>
-
-          <!-- Stargazing Controls & Scope Toggle -->
-          <div class="flex flex-wrap items-center gap-2 bg-black/90 p-1.5 rounded-2xl border border-white/15 backdrop-blur-2xl">
-            <!-- Two Scope Switcher with Animated Key Badges [1] and [2] -->
-            <div class="flex items-center bg-white/5 p-0.5 rounded-xl border border-white/10">
-              <button type="button" id="scope-btn-20x" class="scope-toggle-btn active px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-200 text-black bg-white shadow-sm flex items-center gap-2">
-                <span>🔭 20x Finder</span>
-                <kbd id="key-badge-1" class="key-badge px-1.5 py-0.5 rounded text-[9px] font-space-mono bg-black/15 text-black border border-black/20 transition-transform">1</kbd>
-              </button>
-              <button type="button" id="scope-btn-150x" class="scope-toggle-btn px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-200 text-slate-300 hover:text-white flex items-center gap-2">
-                <span>🔬 150x High Zoom</span>
-                <kbd id="key-badge-2" class="key-badge px-1.5 py-0.5 rounded text-[9px] font-space-mono bg-white/10 text-slate-300 border border-white/20 transition-transform">2</kbd>
-              </button>
-            </div>
-
-            <!-- New Mystery Anomaly Spawner -->
-            <button type="button" id="btn-spawn-target" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1.5">
-              <span>🎲 New Anomaly</span>
-            </button>
-
-            <!-- Toggle Website Overlay -->
-            <button type="button" id="btn-toggle-preview" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-slate-300 hover:text-white border border-white/15 hover:bg-white/10">
-              <span id="preview-label">👁️ Overlay: ON</span>
-            </button>
           </div>
         </div>
 
-        <!-- Row 2: Location Jump Bar (DPI Clustered at TOP, Never in Middle of the Stars!) -->
-        <div class="flex flex-wrap items-center gap-1.5 bg-black/85 px-3.5 py-1.5 rounded-xl border border-white/10 backdrop-blur-md pointer-events-auto self-start shadow-xl">
-          <span class="text-[9px] font-space-mono text-slate-500 uppercase mr-1 flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            SECTOR JUMP:
-          </span>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition active:bg-white active:text-black" data-target="dipper">✨ Big Dipper</button>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cassiopeia">👑 Cassiopeia</button>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="orion">🏹 Orion</button>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cygnus">🦢 Cygnus</button>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="andromeda">🌀 Andromeda (M31)</button>
-          <button type="button" class="nav-target-btn px-2.5 py-1 rounded-lg text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="pillars">🦅 Pillars of Creation (M16)</button>
-        </div>
-      </div>
+        <!-- Integrated Sector Jump Dock (Inline at Top Edge, Never Over Stars) -->
+        <nav class="hidden xl:flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-xl border border-white/10">
+          <span class="text-[9px] font-space-mono text-slate-500 uppercase mr-1">SECTOR:</span>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="dipper">✨ Big Dipper</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cassiopeia">👑 Cassiopeia</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="orion">🏹 Orion</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="cygnus">🦢 Cygnus</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="andromeda">🌀 Andromeda</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="pillars">🦅 Pillars M16</button>
+          <button type="button" class="nav-target-btn px-2 py-0.5 rounded text-[10px] font-space-mono text-slate-300 hover:text-white hover:bg-white/10 transition" data-target="m51">🌪️ Whirlpool M51</button>
+        </nav>
 
-      <!-- BOTTOM REGION: HUD Deck & Telemetry -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto">
+        <!-- Stargazing Controls & High-Contrast Animated Scope Keys [ 1 ] & [ 2 ] -->
+        <div class="flex items-center gap-2">
+          <!-- Tactile Dual Scope Keys [1] and [2] -->
+          <div class="flex items-center bg-[#070707] p-1 rounded-xl border border-white/30 shadow-[0_0_15px_rgba(0,0,0,0.8)]">
+            <!-- Key 1: 20x Finder -->
+            <button
+              type="button"
+              id="scope-btn-20x"
+              class="scope-key-btn active px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 bg-white text-black shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+            >
+              <kbd id="key-cap-1" class="flex items-center justify-center w-5 h-5 rounded bg-black text-white border border-black font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.3)] transition-all">
+                1
+              </kbd>
+              <span class="font-orbitron text-[10px] font-bold tracking-wider">20x FINDER</span>
+              <span id="led-1" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse"></span>
+            </button>
+
+            <!-- Key 2: 150x High Zoom -->
+            <button
+              type="button"
+              id="scope-btn-150x"
+              class="scope-key-btn px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5"
+            >
+              <kbd id="key-cap-2" class="flex items-center justify-center w-5 h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.15)] transition-all">
+                2
+              </kbd>
+              <span class="font-orbitron text-[10px] font-bold tracking-wider">150x ZOOM</span>
+              <span id="led-2" class="w-2 h-2 rounded-full bg-white/20 transition-all"></span>
+            </button>
+          </div>
+
+          <!-- New Anomaly Spawner -->
+          <button type="button" id="btn-spawn-target" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1.5">
+            <span>🎲 New Anomaly</span>
+          </button>
+
+          <!-- Toggle Website Overlay -->
+          <button type="button" id="btn-toggle-preview" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-slate-300 hover:text-white border border-white/15 hover:bg-white/10">
+            <span id="preview-label">👁️ Overlay: OFF</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- BOTTOM REGION: Telemetry & Finder Mission HUD -->
+      <footer class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 pointer-events-auto">
         <!-- Stargazing Viewfinder Game Status -->
-        <div class="p-3.5 rounded-2xl bg-black/90 border border-white/15 backdrop-blur-xl font-space-mono text-xs text-slate-300 max-w-md w-full shadow-2xl">
-          <div class="flex justify-between items-center mb-1.5">
+        <div class="p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 max-w-md w-full shadow-2xl">
+          <div class="flex justify-between items-center mb-1">
             <span class="text-[9px] text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
               FINDER MISSION: HUNT UNRESOLVED ANOMALIES
             </span>
-            <span class="text-[9px] text-slate-400" id="hud-catalog-count">CATALOG: 0/5 FOUND</span>
+            <span class="text-[9px] text-slate-400" id="hud-catalog-count">CATALOG: 0/6 FOUND</span>
           </div>
 
           <div class="flex items-center justify-between gap-2 my-1">
@@ -200,23 +215,23 @@ import Layout from "../layouts/Layout.astro";
             </div>
           </div>
 
-          <div class="text-[10px] text-slate-400 mt-1" id="hud-mission-hint">
+          <div class="text-[10px] text-slate-400 mt-0.5" id="hud-mission-hint">
             Press [1] for 20x Finder to locate the beacon. Press [2] for 150x Zoom to resolve!
           </div>
 
-          <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-slate-400">
+          <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-slate-400">
             <span>PRESS [1] / [2] TO SWITCH SCOPE • DRAG TO PAN</span>
             <span id="hud-reticle-dist">ALIGNMENT: 0%</span>
           </div>
         </div>
 
-        <!-- Coordinates & Active Constellation Telemetry -->
-        <div class="p-3.5 rounded-2xl bg-black/90 border border-white/15 backdrop-blur-xl font-space-mono text-xs text-slate-300 text-right">
-          <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">ACTIVE SECTOR: EAGLE NEBULA & SERPENS</div>
-          <div id="hud-target-coords" class="font-bold text-white font-orbitron text-xs">RA 18h 18m / DEC -13°47' • 6,500 LY</div>
-          <div id="hud-target-desc" class="text-[10px] text-slate-400 mt-0.5">Pillars of Creation • Star Nursery Sculpted by UV Radiation</div>
+        <!-- Coordinates & Active Constellation Telemetry (Strictly Bottom Right) -->
+        <div class="p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 text-right shadow-2xl">
+          <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">CURRENT SECTOR: NORTHERN CIRCUMPOLAR</div>
+          <div id="hud-target-coords" class="font-bold text-white font-orbitron text-xs">RA 11h 03m / DEC +55°11' • 5 CONSTELLATIONS</div>
+          <div id="hud-target-desc" class="text-[10px] text-slate-400 mt-0.5">Ursa Major, Cassiopeia, Orion, Cygnus & Deep Sky Curiosities</div>
         </div>
-      </div>
+      </footer>
     </div>
   </div>
 </Layout>
@@ -261,7 +276,7 @@ import Layout from "../layouts/Layout.astro";
     x: number;
     y: number;
     z: number;
-    type: 'planet_jupiter' | 'planet_saturn' | 'planet_mars' | 'nebula_m42' | 'pillars_m16';
+    type: 'pillars_m16' | 'planet_jupiter' | 'planet_saturn' | 'planet_mars' | 'nebula_m42' | 'galaxy_m51';
     discovered: boolean;
     beaconColor: string;
   }
@@ -273,8 +288,11 @@ import Layout from "../layouts/Layout.astro";
   const highZoomCross = document.getElementById("high-zoom-cross");
   const scopeBtn20x = document.getElementById("scope-btn-20x");
   const scopeBtn150x = document.getElementById("scope-btn-150x");
-  const keyBadge1 = document.getElementById("key-badge-1");
-  const keyBadge2 = document.getElementById("key-badge-2");
+  const keyCap1 = document.getElementById("key-cap-1");
+  const keyCap2 = document.getElementById("key-cap-2");
+  const led1 = document.getElementById("led-1");
+  const led2 = document.getElementById("led-2");
+
   const btnTogglePreview = document.getElementById("btn-toggle-preview");
   const previewLabel = document.getElementById("preview-label");
   const webPreview = document.getElementById("web-preview");
@@ -303,7 +321,7 @@ import Layout from "../layouts/Layout.astro";
     });
 
     let isHighZoom = false;
-    let isPreviewVisible = true;
+    let isPreviewVisible = false; // Hidden by default for clean astronomy view!
     let targetZoom = 1.0;
     let currentZoom = 1.0;
 
@@ -411,7 +429,7 @@ import Layout from "../layouts/Layout.astro";
 
     const allConstellations = [ursaMajor, cassiopeia, orion, cygnus];
 
-    // 3. ANDROMEDA GALAXY (M31)
+    // 3. ANDROMEDA GALAXY (M31) PARTICLES
     const andromedaParticles: any[] = [];
     const galaxyTiltX = 35 * (Math.PI / 180);
     const galaxyTiltY = -25 * (Math.PI / 180);
@@ -434,7 +452,7 @@ import Layout from "../layouts/Layout.astro";
       });
     }
 
-    // 4. PERMANENT MYSTERY CELESTIAL OBJECTS (Always present in the sky!)
+    // 4. PERMANENT MYSTERY CELESTIAL OBJECTS (WITH INTENSE PRESENCE)
     const allMysteryTargets: MysteryTarget[] = [
       {
         id: 'target-pillars',
@@ -515,6 +533,22 @@ import Layout from "../layouts/Layout.astro";
         type: 'nebula_m42',
         discovered: false,
         beaconColor: "#7fe7ff"
+      },
+      {
+        id: 'target-m51',
+        name: "Whirlpool Galaxy (Messier 51)",
+        bayer: "NGC 5194 • Interacting Spiral",
+        dist: "23.5 Mly",
+        spec: "76,000 ly across",
+        mag: "+8.40",
+        role: "Grand Design Spiral Pair",
+        desc: "Majestic interacting galaxy! High zoom reveals two grand-design spiral arms gravitationally tethered to companion galaxy NGC 5195.",
+        x: 340,
+        y: -310,
+        z: 980,
+        type: 'galaxy_m51',
+        discovered: false,
+        beaconColor: "#a3c8ff"
       }
     ];
 
@@ -531,8 +565,8 @@ import Layout from "../layouts/Layout.astro";
       }
       if (hudMissionHint) {
         hudMissionHint.textContent = isHighZoom
-          ? (isTargetCentered ? "Target Resolved! Examine telemetry or hunt the next anomaly." : "Center the object in the micro-grid crosshairs.")
-          : (isTargetCentered ? "🎯 TARGET CENTERED! Press [2] for 150x High Zoom to resolve!" : "Press [1] for 20x Finder. Drag to align the pulsing beacon into crosshairs.");
+          ? (isTargetCentered ? "Target Resolved! Examine telemetry card or discover next object." : "Fine-tune pan to keep object in the center crosshairs.")
+          : (isTargetCentered ? "🎯 TARGET CENTERED! Switch to 150x High Zoom (Press [2]) to resolve!" : "Press [1] for 20x Finder to locate the beacon. Press [2] for 150x Zoom to resolve!");
       }
 
       const discoveredCount = allMysteryTargets.filter(t => t.discovered).length;
@@ -546,7 +580,7 @@ import Layout from "../layouts/Layout.astro";
       } else {
         currentTargetIndex = (currentTargetIndex + 1) % allMysteryTargets.length;
         activeMystery = allMysteryTargets[currentTargetIndex];
-        activeMystery.x = (Math.random() - 0.5) * 1300;
+        activeMystery.x = (Math.random() - 0.5) * 1400;
         activeMystery.y = (Math.random() - 0.5) * 1100;
         activeMystery.z = Math.random() * 300 + 820;
         activeMystery.discovered = false;
@@ -561,7 +595,7 @@ import Layout from "../layouts/Layout.astro";
     });
 
     btnSpawnTarget?.addEventListener("click", () => {
-      const types: MysteryTarget['type'][] = ['pillars_m16', 'planet_jupiter', 'planet_saturn', 'planet_mars', 'nebula_m42'];
+      const types: MysteryTarget['type'][] = ['pillars_m16', 'planet_jupiter', 'planet_saturn', 'planet_mars', 'nebula_m42', 'galaxy_m51'];
       const pick = types[Math.floor(Math.random() * types.length)];
       const base = allMysteryTargets.find(t => t.type === pick)!;
       const custom: MysteryTarget = {
@@ -582,26 +616,38 @@ import Layout from "../layouts/Layout.astro";
     });
 
     // 5. SCOPE TOGGLE CONTROLS & ANIMATED KEYS [1] and [2]
-    function triggerKeyAnim(keyNum: 1 | 2) {
-      const badge = keyNum === 1 ? keyBadge1 : keyBadge2;
-      if (badge) {
-        badge.classList.add("scale-125", "bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.9)]");
+    function animateKeyCap(keyNum: 1 | 2) {
+      const cap = keyNum === 1 ? keyCap1 : keyCap2;
+      if (cap) {
+        cap.classList.add("scale-90", "translate-y-0.5", "shadow-none");
         setTimeout(() => {
-          badge.classList.remove("scale-125", "bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.9)]");
-        }, 180);
+          cap.classList.remove("scale-90", "translate-y-0.5", "shadow-none");
+        }, 140);
       }
     }
 
     function setScopeMode(highZoom: boolean) {
       isHighZoom = highZoom;
-      triggerKeyAnim(highZoom ? 2 : 1);
+      animateKeyCap(highZoom ? 2 : 1);
 
       if (isHighZoom) {
         targetZoom = 3.2;
-        scopeBtn150x?.classList.add("active", "bg-white", "text-black");
-        scopeBtn150x?.classList.remove("text-slate-300");
-        scopeBtn20x?.classList.remove("active", "bg-white", "text-black");
-        scopeBtn20x?.classList.add("text-slate-300");
+
+        // Button 2 (150x) Active High Contrast State
+        scopeBtn150x?.classList.add("bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.4)]");
+        scopeBtn150x?.classList.remove("text-slate-300", "hover:bg-white/5");
+        keyCap2?.classList.add("bg-black", "text-white", "border-black");
+        keyCap2?.classList.remove("bg-white/15", "border-white/25");
+        led2?.classList.add("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
+        led2?.classList.remove("bg-white/20");
+
+        // Button 1 (20x) Inactive State
+        scopeBtn20x?.classList.remove("bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.4)]");
+        scopeBtn20x?.classList.add("text-slate-300", "hover:bg-white/5");
+        keyCap1?.classList.remove("bg-black", "text-white", "border-black");
+        keyCap1?.classList.add("bg-white/15", "border-white/25");
+        led1?.classList.remove("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
+        led1?.classList.add("bg-white/20");
 
         eyepieceCircle?.classList.add("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
         eyepieceCircle?.classList.remove("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
@@ -609,10 +655,22 @@ import Layout from "../layouts/Layout.astro";
         highZoomCross?.classList.add("opacity-100");
       } else {
         targetZoom = 1.0;
-        scopeBtn20x?.classList.add("active", "bg-white", "text-black");
-        scopeBtn20x?.classList.remove("text-slate-300");
-        scopeBtn150x?.classList.remove("active", "bg-white", "text-black");
-        scopeBtn150x?.classList.add("text-slate-300");
+
+        // Button 1 (20x) Active High Contrast State
+        scopeBtn20x?.classList.add("bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.4)]");
+        scopeBtn20x?.classList.remove("text-slate-300", "hover:bg-white/5");
+        keyCap1?.classList.add("bg-black", "text-white", "border-black");
+        keyCap1?.classList.remove("bg-white/15", "border-white/25");
+        led1?.classList.add("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
+        led1?.classList.remove("bg-white/20");
+
+        // Button 2 (150x) Inactive State
+        scopeBtn150x?.classList.remove("bg-white", "text-black", "shadow-[0_0_12px_rgba(255,255,255,0.4)]");
+        scopeBtn150x?.classList.add("text-slate-300", "hover:bg-white/5");
+        keyCap2?.classList.remove("bg-black", "text-white", "border-black");
+        keyCap2?.classList.add("bg-white/15", "border-white/25");
+        led2?.classList.remove("bg-emerald-400", "shadow-[0_0_6px_#34d399]", "animate-pulse");
+        led2?.classList.add("bg-white/20");
 
         eyepieceCircle?.classList.remove("w-[min(70vh,70vw)]", "h-[min(70vh,70vw)]", "border-white/40");
         eyepieceCircle?.classList.add("w-[min(84vh,84vw)]", "h-[min(84vh,84vw)]", "border-white/20");
@@ -649,6 +707,7 @@ import Layout from "../layouts/Layout.astro";
         else if (target === "cygnus") { targetYaw = -0.92; targetPitch = -0.15; }
         else if (target === "andromeda") { targetYaw = 0.62; targetPitch = 0.08; }
         else if (target === "pillars") { targetYaw = -0.38; targetPitch = 0.25; }
+        else if (target === "m51") { targetYaw = -0.34; targetPitch = 0.31; }
       });
     });
 
@@ -656,10 +715,10 @@ import Layout from "../layouts/Layout.astro";
     btnTogglePreview?.addEventListener("click", () => {
       isPreviewVisible = !isPreviewVisible;
       if (isPreviewVisible) {
-        webPreview?.classList.remove("opacity-0", "scale-105", "pointer-events-none");
+        webPreview?.classList.remove("opacity-0", "pointer-events-none");
         if (previewLabel) previewLabel.textContent = "👁️ Overlay: ON";
       } else {
-        webPreview?.classList.add("opacity-0", "scale-105", "pointer-events-none");
+        webPreview?.classList.add("opacity-0", "pointer-events-none");
         if (previewLabel) previewLabel.textContent = "👁️ Overlay: OFF";
       }
     });
@@ -713,14 +772,14 @@ import Layout from "../layouts/Layout.astro";
         const p = project3D(m.x, m.y, m.z, cx, cy);
         if (p) {
           const d = Math.hypot(e.clientX - p.sx, e.clientY - p.sy);
-          if (d < (isHighZoom ? 55 : 28)) {
+          if (d < (isHighZoom ? 55 : 32)) {
             showTelemetryCard(m, true);
             return;
           }
         }
       }
 
-      // Check constellation stars
+      // Check stars
       let foundStar: any = null;
       for (const constel of allConstellations) {
         for (const star of constel.stars) {
@@ -740,7 +799,7 @@ import Layout from "../layouts/Layout.astro";
       }
     });
 
-    function showTelemetryCard(item: any, isPlanet: boolean) {
+    function showTelemetryCard(item: any, isPlanetOrNebula: boolean) {
       const t = document.getElementById("sic-title");
       const b = document.getElementById("sic-bayer");
       const d = document.getElementById("sic-dist");
@@ -757,7 +816,7 @@ import Layout from "../layouts/Layout.astro";
       if (m) m.textContent = item.mag;
       if (r) r.textContent = item.role;
       if (desc) desc.textContent = item.desc;
-      if (badge) badge.textContent = isPlanet ? "DEEP SKY" : "STAR";
+      if (badge) badge.textContent = isPlanetOrNebula ? "CELESTIAL ANOMALY" : "STAR";
 
       starCard?.classList.remove("opacity-0", "pointer-events-none", "translate-y-3");
       starCard?.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
@@ -813,93 +872,73 @@ import Layout from "../layouts/Layout.astro";
       ctx.fill();
     }
 
-    // 7. CELESTIAL PROCEDURAL RENDERERS (PILLARS OF CREATION, JUPITER, SATURN, MARS, M42)
+    // 7. HIGH-ZOOM PROCEDURAL CELESTIAL RENDERERS
     function renderPillarsOfCreation(ctx: CanvasRenderingContext2D, cx: number, cy: number, scale: number) {
+      const s = Math.max(0.6, scale);
       ctx.save();
 
-      // Ambient ionized gas glow (Hubble Palette: Teal oxygen [O III] + Amber hydrogen/sulfur [H-α/S II])
-      const nebulaR = 120 * scale;
-      const nebGrad = ctx.createRadialGradient(cx, cy - 20 * scale, 0, cx, cy, nebulaR);
-      nebGrad.addColorStop(0, "rgba(85, 185, 205, 0.45)");
-      nebGrad.addColorStop(0.35, "rgba(215, 145, 65, 0.28)");
-      nebGrad.addColorStop(0.7, "rgba(65, 30, 20, 0.12)");
-      nebGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      // Ambient background ionization glow (Hydrogen-alpha red-orange & Oxygen-III teal)
+      const glowGrad = ctx.createRadialGradient(cx, cy, 10 * s, cx, cy, 120 * s);
+      glowGrad.addColorStop(0, "rgba(230, 160, 100, 0.45)");
+      glowGrad.addColorStop(0.35, "rgba(180, 100, 70, 0.28)");
+      glowGrad.addColorStop(0.7, "rgba(80, 140, 160, 0.15)");
+      glowGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
 
       ctx.beginPath();
-      ctx.arc(cx, cy, nebulaR, 0, Math.PI * 2);
-      ctx.fillStyle = nebGrad;
+      ctx.arc(cx, cy, 120 * s, 0, Math.PI * 2);
+      ctx.fillStyle = glowGrad;
       ctx.fill();
 
-      // PILLAR 1: Left & Tallest Elephant Trunk (approx 105px high)
+      // Left Pillar (Largest Column)
       ctx.beginPath();
-      ctx.moveTo(cx - 28 * scale, cy + 50 * scale);
-      ctx.bezierCurveTo(cx - 24 * scale, cy + 10 * scale, cx - 32 * scale, cy - 35 * scale, cx - 20 * scale, cy - 65 * scale);
-      // Evaporating Gaseous Globules (EGG) fingertip
-      ctx.bezierCurveTo(cx - 16 * scale, cy - 72 * scale, cx - 8 * scale, cy - 68 * scale, cx - 10 * scale, cy - 60 * scale);
-      ctx.bezierCurveTo(cx - 12 * scale, cy - 30 * scale, cx - 6 * scale, cy + 10 * scale, cx - 4 * scale, cy + 50 * scale);
+      ctx.moveTo(cx - 38 * s, cy + 90 * s);
+      ctx.quadraticCurveTo(cx - 42 * s, cy + 20 * s, cx - 32 * s, cy - 30 * s);
+      ctx.bezierCurveTo(cx - 30 * s, cy - 65 * s, cx - 18 * s, cy - 75 * s, cx - 10 * s, cy - 65 * s);
+      ctx.quadraticCurveTo(cx - 8 * s, cy - 40 * s, cx - 14 * s, cy + 10 * s);
+      ctx.quadraticCurveTo(cx - 16 * s, cy + 60 * s, cx - 12 * s, cy + 90 * s);
       ctx.closePath();
-      ctx.fillStyle = "#1e1109";
+      ctx.fillStyle = "#1e130b";
       ctx.fill();
-
-      // Backlit golden rim on Left Pillar
-      ctx.strokeStyle = "rgba(235, 195, 140, 0.65)";
-      ctx.lineWidth = Math.max(1, 1.8 * scale);
+      ctx.strokeStyle = "rgba(240, 185, 125, 0.75)";
+      ctx.lineWidth = 1.8 * s;
       ctx.stroke();
 
-      // PILLAR 2: Middle Column (approx 70px high)
+      // Center Pillar (Intermediate Column)
       ctx.beginPath();
-      ctx.moveTo(cx + 2 * scale, cy + 50 * scale);
-      ctx.bezierCurveTo(cx + 4 * scale, cy + 15 * scale, cx - 2 * scale, cy - 20 * scale, cx + 8 * scale, cy - 42 * scale);
-      ctx.bezierCurveTo(cx + 14 * scale, cy - 46 * scale, cx + 18 * scale, cy - 40 * scale, cx + 16 * scale, cy - 32 * scale);
-      ctx.bezierCurveTo(cx + 12 * scale, cy - 10 * scale, cx + 18 * scale, cy + 20 * scale, cx + 22 * scale, cy + 50 * scale);
+      ctx.moveTo(cx - 6 * s, cy + 90 * s);
+      ctx.quadraticCurveTo(cx - 4 * s, cy + 40 * s, cx + 5 * s, cy - 10 * s);
+      ctx.bezierCurveTo(cx + 8 * s, cy - 35 * s, cx + 18 * s, cy - 38 * s, cx + 22 * s, cy - 25 * s);
+      ctx.quadraticCurveTo(cx + 20 * s, cy + 10 * s, cx + 18 * s, cy + 90 * s);
       ctx.closePath();
-      ctx.fillStyle = "#28160c";
+      ctx.fillStyle = "#180f08";
       ctx.fill();
-
-      ctx.strokeStyle = "rgba(220, 180, 125, 0.55)";
-      ctx.lineWidth = Math.max(1, 1.5 * scale);
+      ctx.strokeStyle = "rgba(240, 185, 125, 0.65)";
+      ctx.lineWidth = 1.5 * s;
       ctx.stroke();
 
-      // PILLAR 3: Right Spire (approx 48px high)
+      // Right Pillar (Finger / Spire Column)
       ctx.beginPath();
-      ctx.moveTo(cx + 26 * scale, cy + 50 * scale);
-      ctx.bezierCurveTo(cx + 28 * scale, cy + 25 * scale, cx + 24 * scale, cy + 5 * scale, cx + 32 * scale, cy - 18 * scale);
-      ctx.bezierCurveTo(cx + 38 * scale, cy - 22 * scale, cx + 42 * scale, cy - 16 * scale, cx + 38 * scale, cy - 8 * scale);
-      ctx.bezierCurveTo(cx + 34 * scale, cy + 8 * scale, cx + 40 * scale, cy + 30 * scale, cx + 44 * scale, cy + 50 * scale);
+      ctx.moveTo(cx + 26 * s, cy + 90 * s);
+      ctx.quadraticCurveTo(cx + 28 * s, cy + 50 * s, cx + 38 * s, cy + 15 * s);
+      ctx.bezierCurveTo(cx + 42 * s, cy - 2 * s, cx + 52 * s, cy - 5 * s, cx + 52 * s, cy + 12 * s);
+      ctx.quadraticCurveTo(cx + 46 * s, cy + 45 * s, cx + 44 * s, cy + 90 * s);
       ctx.closePath();
-      ctx.fillStyle = "#1a0f08";
+      ctx.fillStyle = "#150d07";
       ctx.fill();
-
-      ctx.strokeStyle = "rgba(210, 175, 115, 0.5)";
-      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.strokeStyle = "rgba(240, 185, 125, 0.6)";
+      ctx.lineWidth = 1.4 * s;
       ctx.stroke();
 
       // Young massive stars of cluster NGC 6611 sculpting the pillars
-      const stars = [
-        { x: -20, y: -74, r: 2.2, c: "#ffffff" },
-        { x: 10, y: -48, r: 1.8, c: "#aee6ff" },
-        { x: 34, y: -24, r: 1.5, c: "#ffffff" },
-        { x: -50, y: -40, r: 2.8, c: "#b8eeff" },
-        { x: 45, y: -65, r: 3.2, c: "#ffffff" }
+      const clusterStars = [
+        { x: -18, y: -80, r: 2.2, c: "#ffffff" },
+        { x: 15, y: -45, r: 1.8, c: "#d8eeff" },
+        { x: 45, y: -15, r: 1.6, c: "#fff2db" },
+        { x: -35, y: -10, r: 1.4, c: "#ffffff" },
+        { x: 5, y: -85, r: 2.5, c: "#badeff" }
       ];
-
-      stars.forEach(s => {
-        const sx = cx + s.x * scale;
-        const sy = cy + s.y * scale;
-        // Diffraction cross
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(sx - 8 * scale, sy);
-        ctx.lineTo(sx + 8 * scale, sy);
-        ctx.moveTo(sx, sy - 8 * scale);
-        ctx.lineTo(sx, sy + 8 * scale);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(sx, sy, s.r * scale, 0, Math.PI * 2);
-        ctx.fillStyle = s.c;
-        ctx.fill();
+      clusterStars.forEach(cs => {
+        draw5PointStar(ctx, cx + cs.x * s, cy + cs.y * s, cs.r * 2.2 * s, cs.r * 0.9 * s, cs.c);
       });
 
       ctx.restore();
@@ -1068,7 +1107,34 @@ import Layout from "../layouts/Layout.astro";
       ctx.fillText("Trapezium Cluster", cx + 12 * scale, cy - 8 * scale);
     }
 
-    // 8. MAIN ANIMATION LOOP
+    function renderM51Whirlpool(ctx: CanvasRenderingContext2D, cx: number, cy: number, scale: number) {
+      const r = 70 * scale;
+      const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      coreGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+      coreGrad.addColorStop(0.25, "rgba(195, 220, 255, 0.6)");
+      coreGrad.addColorStop(0.65, "rgba(140, 175, 230, 0.15)");
+      coreGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = coreGrad;
+      ctx.fill();
+
+      // Companion NGC 5195
+      const compX = cx + 48 * scale;
+      const compY = cy - 24 * scale;
+      const compGrad = ctx.createRadialGradient(compX, compY, 0, compX, compY, 24 * scale);
+      compGrad.addColorStop(0, "rgba(255, 240, 200, 0.85)");
+      compGrad.addColorStop(0.5, "rgba(220, 190, 140, 0.25)");
+      compGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      ctx.beginPath();
+      ctx.arc(compX, compY, 24 * scale, 0, Math.PI * 2);
+      ctx.fillStyle = compGrad;
+      ctx.fill();
+    }
+
+    // 8. ANIMATION LOOP
     function render() {
       requestAnimationFrame(render);
 
@@ -1120,7 +1186,7 @@ import Layout from "../layouts/Layout.astro";
         }
       }
 
-      // B. Andromeda Galaxy (M31) with Keplerian Rotation & Mouse Gravitation
+      // B. Andromeda Galaxy (M31) with Keplerian Rotation & Mouse Reactivity
       const m31Center = project3D(-620, -80, 950, cx, cy);
       if (m31Center) {
         const mDist = Math.hypot(mouseX - m31Center.sx, mouseY - m31Center.sy);
@@ -1237,54 +1303,79 @@ import Layout from "../layouts/Layout.astro";
         });
       });
 
-      // D. RENDER ALL MYSTERY CELESTIAL OBJECTS (Always visible with presence!)
+      // D. RENDER ALL MYSTERY CELESTIAL OBJECTS (WITH INTENSE PRESENCE)
       allMysteryTargets.forEach(m => {
         const proj = project3D(m.x, m.y, m.z, cx, cy);
         if (!proj) return;
 
         const isCurrentActive = activeMystery && activeMystery.id === m.id;
-        const distFromReticle = Math.hypot(proj.sx - cx, proj.sy - cy);
+        const pulse = (Math.sin(Date.now() * 0.005 + m.x) + 1) * 0.5;
 
-        // In 20x Finder Mode: Every mystery object has an attractive, intriguing visual presence
+        // IN 20x FINDER MODE: Every mystery object has unmistakable presence
         if (!isHighZoom) {
-          const pulse = (Math.sin(Date.now() * 0.005 + m.x) + 1) * 0.5;
-          const baseR = m.discovered ? 4.0 : 3.2;
-
-          // Atmospheric beacon aura
-          const auraGrad = ctx.createRadialGradient(proj.sx, proj.sy, 0, proj.sx, proj.sy, 18);
+          // 1. Broad Volumetric Nebular / Atmospheric Cloud
+          const auraRadius = (m.type === 'pillars_m16' || m.type === 'nebula_m42' || m.type === 'galaxy_m51') ? 36 : 24;
+          const auraGrad = ctx.createRadialGradient(proj.sx, proj.sy, 0, proj.sx, proj.sy, auraRadius);
           auraGrad.addColorStop(0, m.beaconColor);
-          auraGrad.addColorStop(0.35, `rgba(255, 255, 255, ${0.25 + pulse * 0.25})`);
+          auraGrad.addColorStop(0.35, `rgba(255, 255, 255, ${0.35 + pulse * 0.3})`);
+          auraGrad.addColorStop(0.7, `rgba(200, 225, 255, ${0.12 + pulse * 0.1})`);
           auraGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
 
           ctx.beginPath();
-          ctx.arc(proj.sx, proj.sy, 18, 0, Math.PI * 2);
+          ctx.arc(proj.sx, proj.sy, auraRadius, 0, Math.PI * 2);
           ctx.fillStyle = auraGrad;
           ctx.fill();
 
-          // Center bright optical point of light
+          // 2. Optical Diffraction Needle Spikes (4-point cross for celestial objects)
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.4})`;
+          ctx.lineWidth = 1.0;
+          const spikeLen = 14 + pulse * 6;
           ctx.beginPath();
-          ctx.arc(proj.sx, proj.sy, baseR + pulse * 1.2, 0, Math.PI * 2);
+          ctx.moveTo(proj.sx - spikeLen, proj.sy);
+          ctx.lineTo(proj.sx + spikeLen, proj.sy);
+          ctx.moveTo(proj.sx, proj.sy - spikeLen);
+          ctx.lineTo(proj.sx, proj.sy + spikeLen);
+          ctx.stroke();
+
+          // 3. Central bright nucleus
+          ctx.beginPath();
+          ctx.arc(proj.sx, proj.sy, (m.discovered ? 4.2 : 3.4) + pulse * 1.2, 0, Math.PI * 2);
           ctx.fillStyle = "#ffffff";
           ctx.fill();
 
-          // If active target, draw targeting bracket
+          // 4. Optical targeting bracket & radar sweep ring for active target
           if (isCurrentActive) {
-            ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 0.4})`;
-            ctx.lineWidth = 1.2;
-            const bSize = 16;
-            ctx.strokeRect(proj.sx - bSize, proj.sy - bSize, bSize * 2, bSize * 2);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.6 + pulse * 0.4})`;
+            ctx.lineWidth = 1.3;
+            const b = 18;
+            // 4 corner brackets
+            ctx.beginPath();
+            ctx.moveTo(proj.sx - b, proj.sy - b + 6); ctx.lineTo(proj.sx - b, proj.sy - b); ctx.lineTo(proj.sx - b + 6, proj.sy - b);
+            ctx.moveTo(proj.sx + b - 6, proj.sy - b); ctx.lineTo(proj.sx + b, proj.sy - b); ctx.lineTo(proj.sx + b, proj.sy - b + 6);
+            ctx.moveTo(proj.sx - b, proj.sy + b - 6); ctx.lineTo(proj.sx - b, proj.sy + b); ctx.lineTo(proj.sx - b + 6, proj.sy + b);
+            ctx.moveTo(proj.sx + b - 6, proj.sy + b); ctx.lineTo(proj.sx + b, proj.sy + b); ctx.lineTo(proj.sx + b, proj.sy + b - 6);
+            ctx.stroke();
+
+            // Expanding telemetry radar circle
+            const radarR = 12 + (Date.now() % 1600) * 0.015;
+            const radarAlpha = Math.max(0, 1 - radarR / 36);
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, radarR, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${radarAlpha * 0.6})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
           }
 
-          // Optical tag
+          // 5. Scientific Tag Label
           ctx.font = '10px "Space Mono", monospace';
           ctx.fillStyle = m.discovered ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.75)";
           ctx.fillText(
-            m.discovered ? m.name : `[Signal: ${m.name.split(' ')[0]}]`,
-            proj.sx + 20,
+            m.discovered ? m.name : `[Anomaly: ${m.name.split(' ')[0]}]`,
+            proj.sx + 24,
             proj.sy + 4
           );
         }
-        // In 150x High Zoom Mode: All objects resolve into procedural wonders!
+        // IN 150x HIGH ZOOM MODE: Fully resolved procedural rendering
         else {
           if (m.type === 'pillars_m16') {
             renderPillarsOfCreation(ctx, proj.sx, proj.sy, proj.scale);
@@ -1296,6 +1387,8 @@ import Layout from "../layouts/Layout.astro";
             renderMars(ctx, proj.sx, proj.sy, proj.scale);
           } else if (m.type === 'nebula_m42') {
             renderM42Nebula(ctx, proj.sx, proj.sy, proj.scale);
+          } else if (m.type === 'galaxy_m51') {
+            renderM51Whirlpool(ctx, proj.sx, proj.sy, proj.scale);
           }
 
           ctx.font = '11px "Space Mono", monospace';
@@ -1338,14 +1431,14 @@ import Layout from "../layouts/Layout.astro";
             updateMissionHUD();
           }
 
-          // Direction Arrow Indicator: only when target is off-screen
+          // Direction Arrow HUD: hide when in viewport
           if (targetDirArrow) {
             if (distFromReticle > width * 0.38) {
               const angle = Math.atan2(proj.sy - cy, proj.sx - cx);
               targetDirArrow.style.transform = `translate(-50%, -50%) rotate(${angle + Math.PI / 2}rad)`;
               targetDirArrow.classList.remove("opacity-0");
               targetDirArrow.classList.add("opacity-100");
-              if (targetDirLabel) targetDirLabel.textContent = `TARGET: ${Math.round(distFromReticle * 0.1)}°`;
+              if (targetDirLabel) targetDirLabel.textContent = `ANOMALY: ${Math.round(distFromReticle * 0.1)}°`;
             } else {
               targetDirArrow.classList.add("opacity-0");
               targetDirArrow.classList.remove("opacity-100");
@@ -1355,6 +1448,7 @@ import Layout from "../layouts/Layout.astro";
       }
     }
 
+    // Launch render loop
     render();
     updateMissionHUD();
   }
