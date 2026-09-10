@@ -79,6 +79,12 @@ import Layout from "../layouts/Layout.astro";
       </button>
     </div>
 
+    <!-- Optical Mode HUD Toast (Instant Feedback on [1] and [2] switch) -->
+    <div id="zoom-mode-toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-black/95 border border-white/40 shadow-[0_0_25px_rgba(255,255,255,0.3)] rounded-full px-5 py-2 z-40 opacity-0 pointer-events-none -translate-y-2 transition-all duration-200 flex items-center gap-2.5 font-space-mono text-xs font-bold text-white tracking-wider">
+      <span id="toast-icon">🔭</span>
+      <span id="toast-text">20x FINDER ENGAGED</span>
+    </div>
+
     <!-- Website Foreground Preview Overlay (Hidden by Default; No Location Bar in the Middle) -->
     <div class="absolute inset-0 z-15 flex flex-col items-center justify-between text-center p-8 pointer-events-none opacity-0 transition-all duration-500" id="web-preview">
       <div class="pt-16 max-w-3xl">
@@ -159,26 +165,26 @@ import Layout from "../layouts/Layout.astro";
             <button
               type="button"
               id="scope-btn-20x"
-              class="scope-key-btn active px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 bg-white text-black shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+              class="scope-key-btn active px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 bg-white text-black shadow-[0_0_12px_rgba(255,255,255,0.4)] cursor-pointer select-none"
             >
-              <kbd id="key-cap-1" class="flex items-center justify-center w-5 h-5 rounded bg-black text-white border border-black font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.3)] transition-all">
+              <kbd id="key-cap-1" class="flex items-center justify-center w-5 h-5 rounded bg-black text-white border border-black font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.3)] transition-all pointer-events-none">
                 1
               </kbd>
-              <span class="font-orbitron text-[10px] font-bold tracking-wider">20x FINDER</span>
-              <span id="led-1" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse"></span>
+              <span class="font-orbitron text-[10px] font-bold tracking-wider pointer-events-none">20x FINDER</span>
+              <span id="led-1" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse pointer-events-none"></span>
             </button>
 
             <!-- Key 2: 150x High Zoom -->
             <button
               type="button"
               id="scope-btn-150x"
-              class="scope-key-btn px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5"
+              class="scope-key-btn px-3 py-1.5 rounded-lg font-space-mono text-xs font-bold transition-all duration-150 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer select-none"
             >
-              <kbd id="key-cap-2" class="flex items-center justify-center w-5 h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.15)] transition-all">
+              <kbd id="key-cap-2" class="flex items-center justify-center w-5 h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.15)] transition-all pointer-events-none">
                 2
               </kbd>
-              <span class="font-orbitron text-[10px] font-bold tracking-wider">150x ZOOM</span>
-              <span id="led-2" class="w-2 h-2 rounded-full bg-white/20 transition-all"></span>
+              <span class="font-orbitron text-[10px] font-bold tracking-wider pointer-events-none">150x ZOOM</span>
+              <span id="led-2" class="w-2 h-2 rounded-full bg-white/20 transition-all pointer-events-none"></span>
             </button>
           </div>
 
@@ -302,6 +308,9 @@ import Layout from "../layouts/Layout.astro";
   const targetDirLabel = document.getElementById("target-dir-label");
   const discoveryBanner = document.getElementById("discovery-banner");
   const discoveryTitle = document.getElementById("discovery-title");
+  const zoomModeToast = document.getElementById("zoom-mode-toast");
+  const toastIcon = document.getElementById("toast-icon");
+  const toastText = document.getElementById("toast-text");
   const btnNextHunt = document.getElementById("btn-next-hunt");
   const btnSpawnTarget = document.getElementById("btn-spawn-target");
 
@@ -619,16 +628,31 @@ import Layout from "../layouts/Layout.astro";
     function animateKeyCap(keyNum: 1 | 2) {
       const cap = keyNum === 1 ? keyCap1 : keyCap2;
       if (cap) {
-        cap.classList.add("scale-90", "translate-y-0.5", "shadow-none");
+        cap.classList.add("scale-75", "translate-y-1", "ring-2", "ring-white");
         setTimeout(() => {
-          cap.classList.remove("scale-90", "translate-y-0.5", "shadow-none");
-        }, 140);
+          cap.classList.remove("scale-75", "translate-y-1", "ring-2", "ring-white");
+        }, 180);
       }
+    }
+
+    let toastTimeout: any = null;
+    function showZoomModeToast(is150x: boolean) {
+      if (!zoomModeToast || !toastText) return;
+      if (toastTimeout) clearTimeout(toastTimeout);
+      if (toastIcon) toastIcon.textContent = is150x ? "🔬" : "🔭";
+      toastText.textContent = is150x ? "150x HIGH ZOOM RESOLVED" : "20x WIDE FINDER ENGAGED";
+      zoomModeToast.classList.remove("opacity-0", "-translate-y-2");
+      zoomModeToast.classList.add("opacity-100", "translate-y-0");
+      toastTimeout = setTimeout(() => {
+        zoomModeToast?.classList.add("opacity-0", "-translate-y-2");
+        zoomModeToast?.classList.remove("opacity-100", "translate-y-0");
+      }, 1400);
     }
 
     function setScopeMode(highZoom: boolean) {
       isHighZoom = highZoom;
       animateKeyCap(highZoom ? 2 : 1);
+      showZoomModeToast(highZoom);
 
       if (isHighZoom) {
         targetZoom = 3.2;
@@ -680,22 +704,47 @@ import Layout from "../layouts/Layout.astro";
       updateMissionHUD();
     }
 
-    scopeBtn20x?.addEventListener("click", () => setScopeMode(false));
-    scopeBtn150x?.addEventListener("click", () => setScopeMode(true));
+    function onScope20x(e: Event) {
+      e.preventDefault();
+      e.stopPropagation();
+      setScopeMode(false);
+    }
 
-    // KEYBOARD LISTENER: Key [1] for 20x, Key [2] for 150x
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "1") {
+    function onScope150x(e: Event) {
+      e.preventDefault();
+      e.stopPropagation();
+      setScopeMode(true);
+    }
+
+    scopeBtn20x?.addEventListener("click", onScope20x);
+    scopeBtn20x?.addEventListener("pointerdown", onScope20x);
+
+    scopeBtn150x?.addEventListener("click", onScope150x);
+    scopeBtn150x?.addEventListener("pointerdown", onScope150x);
+
+    // KEYBOARD LISTENER: Key [1] for 20x Finder, Key [2] for 150x Zoom, Space/Z to toggle
+    function handleScopeKeyDown(e: KeyboardEvent) {
+      const isKey1 = e.key === "1" || e.code === "Digit1" || e.code === "Numpad1" || e.keyCode === 49 || e.keyCode === 97;
+      const isKey2 = e.key === "2" || e.code === "Digit2" || e.code === "Numpad2" || e.keyCode === 50 || e.keyCode === 98;
+      const isToggle = e.code === "Space" || e.key === " " || e.key === "z" || e.key === "Z" || e.code === "KeyZ";
+
+      if (isKey1) {
         e.preventDefault();
+        e.stopPropagation();
         setScopeMode(false);
-      } else if (e.key === "2") {
+      } else if (isKey2) {
         e.preventDefault();
+        e.stopPropagation();
         setScopeMode(true);
-      } else if (e.code === "Space" || e.key === "z" || e.key === "Z") {
+      } else if (isToggle) {
         e.preventDefault();
+        e.stopPropagation();
         setScopeMode(!isHighZoom);
       }
-    });
+    }
+
+    window.addEventListener("keydown", handleScopeKeyDown, { capture: true });
+    document.addEventListener("keydown", handleScopeKeyDown, { capture: true });
 
     // Quick Target Jump Navigation Dock
     document.querySelectorAll(".nav-target-btn").forEach(btn => {
