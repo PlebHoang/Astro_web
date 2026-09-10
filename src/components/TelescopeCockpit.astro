@@ -8,9 +8,9 @@ const isBackground = mode === 'background';
 ---
 
 <div class="telescope-container relative w-full min-h-screen overflow-x-hidden bg-black font-sans select-none" data-mode={mode}>
-  <!-- Floating Mode Switcher Button (Always accessible on Homepage) -->
+  <!-- Floating Mode Switcher Button (Accessible on Homepage reading mode) -->
   {isBackground && (
-    <div class="fixed top-3.5 right-4 sm:right-6 z-50 flex items-center gap-2">
+    <div class="fixed top-3.5 right-4 sm:right-6 z-50 flex items-center gap-2" id="stargaze-floating-toggle-wrap">
       <button
         type="button"
         id="btn-stargaze-toggle"
@@ -25,7 +25,7 @@ const isBackground = mode === 'background';
   )}
 
     <!-- Fullscreen Telescope Canvas -->
-    <canvas id="sky-canvas" class="fixed inset-0 w-screen h-screen block cursor-grab active:cursor-grabbing z-0 pointer-events-none"></canvas>
+    <canvas id="sky-canvas" class={`fixed inset-0 w-screen h-screen block cursor-grab active:cursor-grabbing z-0 ${isBackground ? 'pointer-events-none' : 'pointer-events-auto'}`}></canvas>
 
     <!-- Circular Eyepiece Reticle (20x Finder vs 150x High Zoom) -->
     <div class={`eyepiece-overlay fixed inset-0 pointer-events-none z-10 shadow-[inset_0_0_160px_80px_rgba(0,0,0,0.96)] transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`} id="eyepiece-overlay"></div>
@@ -163,16 +163,109 @@ const isBackground = mode === 'background';
             </button>
           </div>
 
-          <!-- New Anomaly Spawner -->
-          <button type="button" id="btn-spawn-target" class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1.5">
-            <span>🎲 New Anomaly</span>
+          <!-- New Anomaly Spawner (Hotkey: R) -->
+          <button
+            type="button"
+            id="btn-spawn-target"
+            class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95"
+            title="Spawn a new random deep-sky anomaly (Hotkey: R)"
+          >
+            <kbd id="key-cap-r" class="flex items-center justify-center w-5 h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.15)] transition-all pointer-events-none">
+              R
+            </kbd>
+            <span>🎲 Random</span>
           </button>
+
+          <!-- HUD Layout Switcher (Prototypes: Pill / Reticle / Ticker / Card) -->
+          <button
+            type="button"
+            id="btn-cycle-hud"
+            class="px-2.5 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-slate-300 hover:text-white bg-white/5 border border-white/15 hover:bg-white/15 flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95"
+            title="Cycle Finder Mission HUD layout: Pill, Reticle, Ticker, Card (Hotkey: H)"
+          >
+            <kbd class="flex items-center justify-center w-5 h-5 rounded bg-white/10 text-slate-300 border border-white/20 font-mono text-[10px] font-black pointer-events-none">
+              H
+            </kbd>
+            <span id="hud-cycle-label">HUD: Pill</span>
+          </button>
+
+          <!-- Return to Site Button (inside header on homepage stargaze mode, zero overlay collision) -->
+          {isBackground && (
+            <button
+              type="button"
+              id="btn-header-return"
+              class="px-3 py-1.5 rounded-xl font-space-mono text-xs font-bold transition text-black bg-white hover:bg-slate-200 shadow-sm flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 ml-1"
+              title="Return to Website (Hotkey: TAB or ESC)"
+            >
+              <span>← Return to Site</span>
+              <kbd class="bg-black/15 text-black px-1 rounded text-[9px] font-mono font-bold pointer-events-none">TAB</kbd>
+            </button>
+          )}
 
         </div>
       </header>
 
-      <!-- BOTTOM REGION: Telemetry & Finder Mission HUD -->
-      <footer class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 pointer-events-auto">
+      <!-- PROTOTYPE 1: FLOATING PILL (Single-line Monospace Capsule - Default Minimal) -->
+      <div id="hud-pill-view" class="fixed bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto z-30 transition-all duration-300 flex items-center gap-2.5 px-4 py-2 rounded-full bg-black/85 border border-white/25 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] font-space-mono text-xs">
+        <span id="pill-status-dot" class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse shrink-0"></span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-400 text-[10px] uppercase tracking-wider">HUNT:</span>
+          <strong class="text-white font-orbitron text-xs tracking-wide" id="pill-mission-name">M16 PILLARS</strong>
+        </div>
+        <div class="h-3 w-[1px] bg-white/20"></div>
+        <div class="flex items-center gap-1 text-[10px]">
+          <span class="text-slate-400">ALIGN:</span>
+          <span id="pill-alignment" class="text-white font-bold">0%</span>
+        </div>
+        <div class="h-3 w-[1px] bg-white/20"></div>
+        <span id="pill-action-hint" class="px-2 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-bold uppercase tracking-wider">
+          PRESS [2] 150x
+        </span>
+        <div class="h-3 w-[1px] bg-white/20"></div>
+        <span class="text-[10px] text-slate-400 font-bold" id="pill-catalog">0/6</span>
+      </div>
+
+      <!-- PROTOTYPE 2: OPTICAL RETICLE HUD (Directly anchored under the eyepiece reticle) -->
+      <div id="hud-reticle-view" class="hidden fixed top-[calc(50%+min(42vh,42vw)+14px)] left-1/2 -translate-x-1/2 pointer-events-auto z-25 transition-all duration-300">
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/85 border border-white/20 backdrop-blur-xl shadow-2xl font-space-mono text-[10px] text-slate-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+          <span class="text-white font-bold font-orbitron" id="reticle-mission-name">M16 PILLARS</span>
+          <span class="text-white/30">•</span>
+          <span id="reticle-alignment" class="text-amber-300 font-bold">ALIGN 0%</span>
+          <span class="text-white/30">•</span>
+          <span id="reticle-action-hint" class="text-slate-300 uppercase tracking-wide">PRESS [2] TO RESOLVE</span>
+          <span class="text-white/30">•</span>
+          <span id="reticle-catalog" class="text-slate-400 font-bold">0/6 FOUND</span>
+        </div>
+      </div>
+
+      <!-- PROTOTYPE 3: EDGE TICKER (Ultra-minimal 28px bottom dock rail) -->
+      <div id="hud-ticker-view" class="hidden fixed bottom-0 inset-x-0 h-9 pointer-events-auto z-30 transition-all duration-300 bg-black/90 border-t border-white/15 backdrop-blur-2xl px-4 sm:px-6 flex items-center justify-between font-space-mono text-[10px] text-slate-300">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0"></span>
+          <span class="text-slate-400 uppercase">HUNT:</span>
+          <span id="ticker-mission-name" class="font-orbitron font-bold text-white">M16 PILLARS</span>
+          <span class="text-white/30">•</span>
+          <span id="ticker-alignment" class="text-slate-200">ALIGNMENT: 0%</span>
+          <span class="text-white/30">•</span>
+          <span id="ticker-status-badge" class="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px] font-bold">SEARCHING</span>
+        </div>
+        <div class="hidden md:flex items-center gap-3 text-slate-400 text-[9px]">
+          <span>[1] FINDER</span>
+          <span>[2] ZOOM</span>
+          <span>[R] RANDOM</span>
+          <span>[H] HUD STYLE</span>
+          <span>[DRAG / WASD] PAN</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="ticker-catalog" class="text-slate-400 font-bold">CATALOG: 0/6</span>
+          <span class="text-white/30">•</span>
+          <span id="ticker-coords" class="text-slate-300 font-orbitron text-[9px]">RA 11h / DEC +55°</span>
+        </div>
+      </div>
+
+      <!-- PROTOTYPE 0: CLASSIC CARD (Original multi-row card for comparison) -->
+      <footer id="hud-card-view" class="hidden flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 pointer-events-auto w-full">
         <!-- Stargazing Viewfinder Game Status -->
         <div class="p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 max-w-md w-full shadow-2xl">
           <div class="flex justify-between items-center mb-1">
@@ -296,6 +389,33 @@ interface StarNode {
   const hudReticleDist = document.getElementById("hud-reticle-dist");
   const hudCatalogCount = document.getElementById("hud-catalog-count");
 
+  // Prototype HUD elements
+  const btnCycleHUD = document.getElementById("btn-cycle-hud");
+  const hudCycleLabel = document.getElementById("hud-cycle-label");
+
+  const pillView = document.getElementById("hud-pill-view");
+  const pillStatusDot = document.getElementById("pill-status-dot");
+  const pillMissionName = document.getElementById("pill-mission-name");
+  const pillAlignment = document.getElementById("pill-alignment");
+  const pillActionHint = document.getElementById("pill-action-hint");
+  const pillCatalog = document.getElementById("pill-catalog");
+
+  const reticleView = document.getElementById("hud-reticle-view");
+  const reticleMissionName = document.getElementById("reticle-mission-name");
+  const reticleAlignment = document.getElementById("reticle-alignment");
+  const reticleActionHint = document.getElementById("reticle-action-hint");
+  const reticleCatalog = document.getElementById("reticle-catalog");
+
+  const tickerView = document.getElementById("hud-ticker-view");
+  const tickerMissionName = document.getElementById("ticker-mission-name");
+  const tickerAlignment = document.getElementById("ticker-alignment");
+  const tickerStatusBadge = document.getElementById("ticker-status-badge");
+  const tickerCatalog = document.getElementById("ticker-catalog");
+
+  const cardView = document.getElementById("hud-card-view");
+  const floatingToggleWrap = document.getElementById("stargaze-floating-toggle-wrap");
+  const btnHeaderReturn = document.getElementById("btn-header-return");
+
   if (canvas && ctx) {
     // Dual-Mode Overlay Controller
     const container = document.querySelector(".telescope-container") as HTMLElement;
@@ -311,6 +431,51 @@ interface StarNode {
     const eyepieceCircle = document.getElementById("eyepiece-circle");
 
     let isStargazeActive = false;
+
+    // HUD Variant Switcher (Pill | Reticle | Ticker | Card)
+    type HUDVariant = "pill" | "reticle" | "ticker" | "card";
+    const hudVariants: HUDVariant[] = ["pill", "reticle", "ticker", "card"];
+    let activeHUDVariant: HUDVariant = "pill";
+
+    function applyHUDVariant(variant: HUDVariant) {
+      activeHUDVariant = variant;
+      try {
+        localStorage.setItem("cub_hud_variant", variant);
+      } catch {}
+
+      cardView?.classList.toggle("hidden", variant !== "card");
+      pillView?.classList.toggle("hidden", variant !== "pill");
+      reticleView?.classList.toggle("hidden", variant !== "reticle");
+      tickerView?.classList.toggle("hidden", variant !== "ticker");
+
+      const labelMap: Record<HUDVariant, string> = {
+        pill: "Pill",
+        reticle: "Reticle",
+        ticker: "Ticker",
+        card: "Card"
+      };
+      if (hudCycleLabel) hudCycleLabel.textContent = `HUD: ${labelMap[variant]}`;
+    }
+
+    function cycleHUDVariant() {
+      const idx = (hudVariants.indexOf(activeHUDVariant) + 1) % hudVariants.length;
+      applyHUDVariant(hudVariants[idx]);
+      const name = hudVariants[idx].toUpperCase();
+      showToast(`HUD STYLE: ${name}`, "📐");
+    }
+
+    btnCycleHUD?.addEventListener("click", cycleHUDVariant);
+
+    try {
+      const saved = localStorage.getItem("cub_hud_variant") as HUDVariant;
+      if (saved && hudVariants.includes(saved)) {
+        applyHUDVariant(saved);
+      } else {
+        applyHUDVariant("pill");
+      }
+    } catch {
+      applyHUDVariant("pill");
+    }
 
     function setStargazeMode(active: boolean) {
       isStargazeActive = active;
@@ -332,8 +497,8 @@ interface StarNode {
           eyepieceCircle.classList.add("opacity-100");
         }
         canvas.style.pointerEvents = "auto";
-        if (toggleText) toggleText.textContent = "Return to Site";
-        if (toggleIcon) toggleIcon.textContent = "📄";
+        // Hide the floating mode button so it NEVER overlays the cockpit header controls
+        floatingToggleWrap?.classList.add("hidden");
       } else {
         if (webOverlay) {
           webOverlay.classList.remove("opacity-0", "pointer-events-none");
@@ -351,9 +516,10 @@ interface StarNode {
           eyepieceCircle.classList.remove("opacity-100");
           eyepieceCircle.classList.add("opacity-0");
         }
-        canvas.style.pointerEvents = "none";
-        if (toggleText) toggleText.textContent = "Stargaze Mode";
-        if (toggleIcon) toggleIcon.textContent = "🔭";
+        if (isBackgroundMode) {
+          canvas.style.pointerEvents = "none";
+          floatingToggleWrap?.classList.remove("hidden");
+        }
       }
     }
 
@@ -361,6 +527,7 @@ interface StarNode {
       setStargazeMode(false);
       btnStargazeToggle?.addEventListener("click", () => setStargazeMode(!isStargazeActive));
       btnCockpitExit?.addEventListener("click", () => setStargazeMode(false));
+      btnHeaderReturn?.addEventListener("click", () => setStargazeMode(false));
       window.addEventListener("keydown", (e) => {
         if (e.key === "Tab") {
           e.preventDefault();
@@ -662,8 +829,39 @@ interface StarNode {
     let activeMystery = allMysteryTargets[currentTargetIndex];
     let isTargetCentered = false;
 
+    let toastTimeout: any = null;
+    function showToast(text: string, icon = "🔭") {
+      if (!zoomModeToast || !toastText) return;
+      if (toastTimeout) clearTimeout(toastTimeout);
+      if (toastIcon) toastIcon.textContent = icon;
+      toastText.textContent = text;
+      zoomModeToast.classList.remove("opacity-0", "-translate-y-2");
+      zoomModeToast.classList.add("opacity-100", "translate-y-0");
+      toastTimeout = setTimeout(() => {
+        zoomModeToast?.classList.add("opacity-0", "-translate-y-2");
+        zoomModeToast?.classList.remove("opacity-100", "translate-y-0");
+      }, 1400);
+    }
+
     function updateMissionHUD() {
       if (!activeMystery) return;
+      const baseName = activeMystery.name.toUpperCase();
+      const discoveredCount = allMysteryTargets.filter(t => t.discovered).length;
+      const catCount = `${discoveredCount}/${allMysteryTargets.length}`;
+
+      // 1. Pill
+      if (pillMissionName) pillMissionName.textContent = baseName;
+      if (pillCatalog) pillCatalog.textContent = catCount;
+
+      // 2. Reticle
+      if (reticleMissionName) reticleMissionName.textContent = baseName;
+      if (reticleCatalog) reticleCatalog.textContent = `${catCount} FOUND`;
+
+      // 3. Ticker
+      if (tickerMissionName) tickerMissionName.textContent = baseName;
+      if (tickerCatalog) tickerCatalog.textContent = `CATALOG: ${catCount}`;
+
+      // 4. Card
       if (hudMissionName) {
         hudMissionName.textContent = activeMystery.discovered 
           ? `Discovered: ${activeMystery.name}` 
@@ -674,8 +872,6 @@ interface StarNode {
           ? (isTargetCentered ? "Target Resolved! Examine telemetry card or discover next object." : "Fine-tune pan to keep object in the center crosshairs.")
           : (isTargetCentered ? "🎯 TARGET CENTERED! Switch to 150x High Zoom (Press [2]) to resolve!" : "Press [1] for 20x Finder to locate the beacon. Press [2] for 150x Zoom to resolve!");
       }
-
-      const discoveredCount = allMysteryTargets.filter(t => t.discovered).length;
       if (hudCatalogCount) hudCatalogCount.textContent = `CATALOG: ${discoveredCount}/${allMysteryTargets.length} FOUND`;
     }
 
@@ -700,10 +896,20 @@ interface StarNode {
       spawnNextTarget();
     });
 
-    btnSpawnTarget?.addEventListener("click", () => {
+    function animateRKey() {
+      const cap = document.getElementById("key-cap-r");
+      if (cap) {
+        cap.classList.add("scale-75", "translate-y-1", "ring-2", "ring-white");
+        setTimeout(() => {
+          cap.classList.remove("scale-75", "translate-y-1", "ring-2", "ring-white");
+        }, 180);
+      }
+    }
+
+    function spawnRandomAnomaly() {
       const types: MysteryTarget['type'][] = ['pillars_m16', 'planet_jupiter', 'planet_saturn', 'planet_mars', 'nebula_m42', 'galaxy_m51'];
       const pick = types[Math.floor(Math.random() * types.length)];
-      const base = allMysteryTargets.find(t => t.type === pick)!;
+      const base = allMysteryTargets.find(t => t.type === pick) || allMysteryTargets[0];
       const custom: MysteryTarget = {
         ...base,
         id: 'custom-' + Date.now(),
@@ -719,6 +925,12 @@ interface StarNode {
       isTargetCentered = false;
       discoveryBanner?.classList.add("opacity-0", "-translate-y-4", "pointer-events-none");
       updateMissionHUD();
+      showToast("🎲 RANDOM ANOMALY DETECTED", "🎲");
+    }
+
+    btnSpawnTarget?.addEventListener("click", () => {
+      animateRKey();
+      spawnRandomAnomaly();
     });
 
     // 5. SCOPE TOGGLE CONTROLS & ANIMATED KEYS [1] and [2]
@@ -732,18 +944,8 @@ interface StarNode {
       }
     }
 
-    let toastTimeout: any = null;
     function showZoomModeToast(is150x: boolean) {
-      if (!zoomModeToast || !toastText) return;
-      if (toastTimeout) clearTimeout(toastTimeout);
-      if (toastIcon) toastIcon.textContent = is150x ? "🔬" : "🔭";
-      toastText.textContent = is150x ? "150x HIGH ZOOM RESOLVED" : "20x WIDE FINDER ENGAGED";
-      zoomModeToast.classList.remove("opacity-0", "-translate-y-2");
-      zoomModeToast.classList.add("opacity-100", "translate-y-0");
-      toastTimeout = setTimeout(() => {
-        zoomModeToast?.classList.add("opacity-0", "-translate-y-2");
-        zoomModeToast?.classList.remove("opacity-100", "translate-y-0");
-      }, 1400);
+      showToast(is150x ? "150x HIGH ZOOM RESOLVED" : "20x WIDE FINDER ENGAGED", is150x ? "🔬" : "🔭");
     }
 
     function setScopeMode(highZoom: boolean) {
@@ -819,29 +1021,47 @@ interface StarNode {
     scopeBtn150x?.addEventListener("click", onScope150x);
     scopeBtn150x?.addEventListener("pointerdown", onScope150x);
 
-    // KEYBOARD LISTENER: Key [1] for 20x Finder, Key [2] for 150x Zoom, Space/Z to toggle
+    // KEYBOARD LISTENER: [1] 20x Finder, [2] 150x Zoom, [R] Random, [H] HUD Variant, [WASD/Arrows] Pan
     function handleScopeKeyDown(e: KeyboardEvent) {
-      const isKey1 = e.key === "1" || e.code === "Digit1" || e.code === "Numpad1" || e.keyCode === 49 || e.keyCode === 97;
-      const isKey2 = e.key === "2" || e.code === "Digit2" || e.code === "Numpad2" || e.keyCode === 50 || e.keyCode === 98;
-      const isToggle = e.code === "Space" || e.key === " " || e.key === "z" || e.key === "Z" || e.code === "KeyZ";
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA")) {
+        return;
+      }
+
+      const isKey1 = e.key === "1" || e.code === "Digit1" || e.code === "Numpad1";
+      const isKey2 = e.key === "2" || e.code === "Digit2" || e.code === "Numpad2";
+      const isToggle = e.key === "z" || e.key === "Z" || e.code === "KeyZ";
+      const isKeyR = e.key === "r" || e.key === "R" || e.code === "KeyR";
+      const isKeyH = e.key === "h" || e.key === "H" || e.code === "KeyH";
 
       if (isKey1) {
         e.preventDefault();
-        e.stopPropagation();
         setScopeMode(false);
       } else if (isKey2) {
         e.preventDefault();
-        e.stopPropagation();
         setScopeMode(true);
       } else if (isToggle) {
         e.preventDefault();
-        e.stopPropagation();
         setScopeMode(!isHighZoom);
+      } else if (isKeyR) {
+        e.preventDefault();
+        animateRKey();
+        spawnRandomAnomaly();
+      } else if (isKeyH) {
+        e.preventDefault();
+        cycleHUDVariant();
+      } else if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        targetYaw += 0.08;
+      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+        targetYaw -= 0.08;
+      } else if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        targetPitch -= 0.06;
+      } else if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
+        targetPitch += 0.06;
       }
     }
 
     window.addEventListener("keydown", handleScopeKeyDown, { capture: true });
-    document.addEventListener("keydown", handleScopeKeyDown, { capture: true });
 
     // Star card close button
     sicCloseBtn?.addEventListener("click", () => {
@@ -859,14 +1079,26 @@ interface StarNode {
       }
     }, { passive: true });
 
-    // Drag to orbit / pan telescope in 3D
-    canvas.addEventListener("mousedown", (e) => {
+    // Drag to orbit / pan telescope in 3D (Window-level listener for 100% reliable click capture)
+    window.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, select, textarea, kbd, #star-info-card, [role='button'], header, footer")) {
+        return;
+      }
+      if (isBackgroundMode && !isStargazeActive) {
+        return;
+      }
       isDragging = true;
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
+      document.body.classList.add("cursor-grabbing");
     });
 
-    window.addEventListener("mouseup", () => isDragging = false);
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+      document.body.classList.remove("cursor-grabbing");
+    });
 
     window.addEventListener("mousemove", (e) => {
       mouseX = e.clientX;
@@ -875,15 +1107,51 @@ interface StarNode {
       if (isDragging) {
         const dx = e.clientX - prevMouseX;
         const dy = e.clientY - prevMouseY;
-        targetYaw -= dx * 0.0032;
-        targetPitch -= dy * 0.0032;
+        targetYaw -= dx * 0.0035;
+        targetPitch -= dy * 0.0035;
         prevMouseX = e.clientX;
         prevMouseY = e.clientY;
       }
     });
 
+    // Touch support for mobile devices & trackpads
+    window.addEventListener("touchstart", (e) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, select, textarea, kbd, #star-info-card, [role='button'], header, footer")) {
+        return;
+      }
+      if (isBackgroundMode && !isStargazeActive) return;
+
+      if (e.touches.length === 1) {
+        isDragging = true;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+      if (isDragging && e.touches.length === 1) {
+        const dx = e.touches[0].clientX - prevMouseX;
+        const dy = e.touches[0].clientY - prevMouseY;
+        targetYaw -= dx * 0.0035;
+        targetPitch -= dy * 0.0035;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchend", () => {
+      isDragging = false;
+    });
+
     // Click to view star / planet data
-    canvas.addEventListener("click", (e) => {
+    window.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, select, textarea, kbd, #star-info-card, [role='button'], header, footer")) {
+        return;
+      }
+      if (isBackgroundMode && !isStargazeActive) return;
+
       const cx = width * 0.5;
       const cy = height * 0.5;
 
@@ -892,7 +1160,7 @@ interface StarNode {
         const p = project3D(m.x, m.y, m.z, cx, cy);
         if (p) {
           const d = Math.hypot(e.clientX - p.sx, e.clientY - p.sy);
-          if (d < (isHighZoom ? 55 : 32)) {
+          if (d < (isHighZoom ? 60 : 36)) {
             showTelemetryCard(m, true);
             return;
           }
@@ -1557,11 +1825,45 @@ interface StarNode {
         if (proj) {
           const distFromReticle = Math.hypot(proj.sx - cx, proj.sy - cy);
           const alignPercent = Math.max(0, Math.min(100, Math.round(100 - (distFromReticle / (width * 0.4)) * 100)));
-          if (hudReticleDist) hudReticleDist.textContent = `ALIGNMENT: ${alignPercent}%`;
+          const alignText = `${alignPercent}%`;
+
+          // Update alignment readout across all HUD variants
+          if (hudReticleDist) hudReticleDist.textContent = `ALIGNMENT: ${alignText}`;
+          if (pillAlignment) pillAlignment.textContent = alignText;
+          if (reticleAlignment) reticleAlignment.textContent = `ALIGN ${alignText}`;
+          if (tickerAlignment) tickerAlignment.textContent = `ALIGNMENT: ${alignText}`;
 
           const alignThreshold = isHighZoom ? 65 : 42;
           isTargetCentered = distFromReticle < alignThreshold;
 
+          // Prototype 1 (Pill) feedback
+          if (pillStatusDot) {
+            pillStatusDot.className = isTargetCentered
+              ? "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse shrink-0"
+              : (distFromReticle < 220 ? "w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse shrink-0" : "w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse shrink-0");
+          }
+          if (pillActionHint) {
+            pillActionHint.textContent = isHighZoom
+              ? (isTargetCentered ? "RESOLVED" : "CENTER CROSSHAIR")
+              : (isTargetCentered ? "PRESS [2] 150x" : "LOCATE SIGNAL");
+          }
+
+          // Prototype 2 (Reticle HUD) feedback
+          if (reticleActionHint) {
+            reticleActionHint.textContent = isHighZoom
+              ? (isTargetCentered ? "VERIFIED" : "FINE-TUNE")
+              : (isTargetCentered ? "PRESS [2] 150x" : "LOCATE BEACON");
+          }
+
+          // Prototype 3 (Ticker) feedback
+          if (tickerStatusBadge) {
+            tickerStatusBadge.textContent = isTargetCentered ? (isHighZoom ? "VERIFIED" : "LOCKED") : (distFromReticle < 220 ? "IN VIEW" : "SEARCHING");
+            tickerStatusBadge.className = isTargetCentered
+              ? "px-1.5 py-0.5 rounded bg-white text-black font-bold text-[9px]"
+              : "px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[9px]";
+          }
+
+          // Prototype 0 (Classic Card) feedback
           if (hudLockStatus) {
             if (isTargetCentered) {
               hudLockStatus.textContent = isHighZoom ? "DISCOVERY VERIFIED" : "CENTER LOCKED";

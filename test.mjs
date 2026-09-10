@@ -33,7 +33,7 @@ test('Project Integrity & Smoke Tests', async (t) => {
     );
   });
 
-  await t.test('2. Homepage Dual-Mode Elements', () => {
+  await t.test('2. Homepage Dual-Mode Elements & Overlap Prevention', () => {
     const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
 
     // Canvas background
@@ -41,7 +41,9 @@ test('Project Integrity & Smoke Tests', async (t) => {
 
     // Dual mode overlay & controls
     assert.ok(indexHtml.includes('id="web-overlay"'), 'Web overlay container must exist on homepage');
+    assert.ok(indexHtml.includes('id="stargaze-floating-toggle-wrap"'), 'Floating Stargaze toggle wrap must exist');
     assert.ok(indexHtml.includes('id="btn-stargaze-toggle"'), 'Floating Stargaze toggle button must exist');
+    assert.ok(indexHtml.includes('id="btn-header-return"'), 'In-header non-overlapping Return to Site button must exist');
     assert.ok(indexHtml.includes('id="nav-stargaze-btn"'), 'Navbar Stargaze button must exist');
     assert.ok(indexHtml.includes('id="viewfinder-trigger-stargaze"'), 'News viewfinder trigger button must exist');
 
@@ -49,7 +51,7 @@ test('Project Integrity & Smoke Tests', async (t) => {
     assert.ok(indexHtml.includes('Whirlpool') || indexHtml.includes('M51'), 'M51 Whirlpool galaxy must be featured');
   });
 
-  await t.test('3. Standalone Telescope Lab Elements', () => {
+  await t.test('3. Standalone Telescope Lab Elements & Controls', () => {
     const labHtml = fs.readFileSync(path.join(distDir, 'telescope-lab', 'index.html'), 'utf-8');
 
     // Sky canvas present
@@ -62,9 +64,21 @@ test('Project Integrity & Smoke Tests', async (t) => {
     assert.ok(labHtml.includes('scope-btn-20x'), '20x finder mode button must exist');
     assert.ok(labHtml.includes('scope-btn-150x'), '150x zoom mode button must exist');
     assert.ok(labHtml.includes('btn-spawn-target'), 'New Anomaly spawner button must exist');
+    assert.ok(labHtml.includes('id="key-cap-r"'), 'Keybind [R] cap must exist for Random Anomaly');
+    assert.ok(labHtml.includes('id="btn-cycle-hud"'), 'HUD layout switcher button must exist');
   });
 
-  await t.test('4. Bloat Removal & Over-Engineering Cleanliness', () => {
+  await t.test('4. Finder Mission Minimal HUD Prototypes', () => {
+    const labHtml = fs.readFileSync(path.join(distDir, 'telescope-lab', 'index.html'), 'utf-8');
+
+    // All 3 minimal prototypes + classic card must exist
+    assert.ok(labHtml.includes('id="hud-pill-view"'), 'Prototype 1: Floating Pill HUD must exist');
+    assert.ok(labHtml.includes('id="hud-reticle-view"'), 'Prototype 2: Optical Reticle HUD must exist');
+    assert.ok(labHtml.includes('id="hud-ticker-view"'), 'Prototype 3: Edge Ticker HUD must exist');
+    assert.ok(labHtml.includes('id="hud-card-view"'), 'Prototype 0: Classic Card HUD must exist');
+  });
+
+  await t.test('5. Bloat Removal & Over-Engineering Cleanliness', () => {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
     const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
     const labHtml = fs.readFileSync(path.join(distDir, 'telescope-lab', 'index.html'), 'utf-8');
@@ -88,7 +102,7 @@ test('Project Integrity & Smoke Tests', async (t) => {
     assert.ok(!indexHtml.includes('id="audio-toggle-btn"'), 'Audio toggle button must be removed pending sound design session');
   });
 
-  await t.test('5. Astro Config Redirects', () => {
+  await t.test('6. Astro Config Redirects', () => {
     const configContent = fs.readFileSync(path.join(__dirname, 'astro.config.mjs'), 'utf-8');
     assert.ok(
       configContent.includes("'/telescope-cluster': '/telescope-lab'"),
