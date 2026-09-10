@@ -71,10 +71,11 @@ const navLinks = [
       <!-- Direct Launch Telescope Lab -->
       <a
         href="/telescope-lab"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 rounded-lg shadow-sm transition hover:scale-105 font-orbitron"
-        title="Launch 3D Telescope Lab & Stargazing Simulator"
+        id="nav-stargaze-btn"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 rounded-lg shadow-sm transition hover:scale-105 font-orbitron cursor-pointer"
+        title="Launch 3D Telescope Lab or Toggle Stargaze (Hotkey: TAB)"
       >
-        <span>🔭 Telescope Lab</span>
+        <span>🔭 Stargaze</span>
       </a>
 
       <!-- Instagram Join (Monochrome) -->
@@ -144,6 +145,14 @@ const navLinks = [
   const audioBtn = document.getElementById("audio-toggle-btn");
   const audioLabel = document.getElementById("audio-label");
   const audioBars = document.getElementById("audio-wave-bars");
+  const navStargazeBtn = document.getElementById("nav-stargaze-btn");
+
+  navStargazeBtn?.addEventListener("click", (e) => {
+    if (document.getElementById("web-overlay")) {
+      e.preventDefault();
+      window.dispatchEvent(new CustomEvent("toggle-stargaze"));
+    }
+  });
 
   audioBtn?.addEventListener("click", () => {
     window.dispatchEvent(new CustomEvent("cosmic-toggle-sound"));

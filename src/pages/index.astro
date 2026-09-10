@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import TelescopeCockpit from "../components/TelescopeCockpit.astro";
 import Navbar from "../components/Navbar.astro";
 import WelcomeHero from "../components/WelcomeHero.astro";
 import AboutLeadership from "../components/AboutLeadership.astro";
@@ -12,14 +13,17 @@ import Footer from "../components/Footer.astro";
 <Layout
   title="Constructor University Astronomical Society | Official Club Portal"
   description="Official home of the Constructor University Astronomical Society in Bremen. Stargazing on Campus Green, deep-sky astrophotography, telescope access, and cosmic cinema nights."
+  hideStarfield={true}
 >
-  <Navbar />
-  <main>
-    <WelcomeHero />
-    <AboutLeadership />
-    <NewsHighlights />
-    <EventCalendar />
-    <RegistrationCTA />
-  </main>
-  <Footer />
+  <TelescopeCockpit mode="background">
+    <Navbar />
+    <main>
+      <WelcomeHero />
+      <AboutLeadership />
+      <NewsHighlights />
+      <EventCalendar />
+      <RegistrationCTA />
+    </main>
+    <Footer />
+  </TelescopeCockpit>
 </Layout>

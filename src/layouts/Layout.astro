@@ -7,11 +7,13 @@ import AudioSynthesizer from "../components/AudioSynthesizer.astro";
 interface Props {
   title?: string;
   description?: string;
+  hideStarfield?: boolean;
 }
 
 const {
   title = "Constructor University Astronomical Society | Official Club Portal",
   description = "Official digital portal of Constructor University Astronomical Society in Bremen. Stargazing on Campus Green, deep-sky astrophotography, telescope access, and cosmic cinema.",
+  hideStarfield = false,
 } = Astro.props;
 ---
 
@@ -34,7 +36,7 @@ const {
   </head>
   <body class="min-h-screen antialiased selection:bg-purple-600 selection:text-white bg-black">
     <!-- 3D Three.js Interactive WebGL Starfield -->
-    <ThreeStarfield />
+    {!hideStarfield && <ThreeStarfield />}
 
     <!-- Gravitational Lensing / Black Hole Cursor -->
     <BlackHoleCursor />
