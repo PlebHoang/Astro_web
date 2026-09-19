@@ -72,10 +72,15 @@ test('Suite 3: Desktop Browser Interactive E2E & Hotkey Protocol (Chrome CDP)', 
 
     // 6. Keypress [H] -> HUD Cycle & Card HUD Telemetry Verification
     const cardHudCheck = await evaluate(`(() => {
-      for (let i = 0; i < 4; i++) {
+      const btnCycle = document.getElementById('btn-cycle-hud');
+      const cycleOne = () => {
+        if (btnCycle) btnCycle.click();
+        else window.dispatchEvent(new KeyboardEvent('keydown', { key: 'h', code: 'KeyH', bubbles: true }));
+      };
+      for (let i = 0; i < 5; i++) {
         const label = document.getElementById('hud-cycle-label')?.textContent || '';
         if (label.includes('Card')) break;
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'h', code: 'KeyH', bubbles: true }));
+        cycleOne();
       }
       const cardEl = document.getElementById('hud-card-view');
       const pillEl = document.getElementById('hud-pill-view');

@@ -161,7 +161,8 @@ test('Suite 4: Mobile Viewport, Touch Gestures & Responsive Layout (Chrome CDP)'
         returnInBounds: retRect ? (retRect.right <= window.innerWidth && retRect.left >= 0) : false,
         pillInBounds: pill ? (pill.right <= window.innerWidth && pill.left >= 0) : false,
         hasHuntLabel: (pillText || '').includes('HUNT:'),
-        hasAlignLabel: (pillText || '').includes('ALIGN:')
+        hasAlignLabel: (pillText || '').includes('ALIGN:'),
+        hasSolidMask: (document.getElementById('eyepiece-circle')?.className || '').includes('9999px')
       };
     })()`);
     assert.equal(mobileCockpitCheck.headerOverflow, false, 'Mobile cockpit header must not overflow horizontally');
@@ -169,6 +170,7 @@ test('Suite 4: Mobile Viewport, Touch Gestures & Responsive Layout (Chrome CDP)'
     assert.equal(mobileCockpitCheck.pillInBounds, true, 'HUD telemetry pill must be within mobile screen bounds');
     assert.equal(mobileCockpitCheck.hasHuntLabel, true, 'HUD pill must display visible HUNT: label on mobile');
     assert.equal(mobileCockpitCheck.hasAlignLabel, true, 'HUD pill must display visible ALIGN: label on mobile');
+    assert.equal(mobileCockpitCheck.hasSolidMask, true, 'Eyepiece circle must have solid black outer shadow mask hiding everything outside the middle circle');
 
     // G. Touch Gestures: Double-Tap Zoom Toggle, Pinch-to-Zoom & Pan Simulation
     const touchGestureCheck = await evaluate(`(async () => {

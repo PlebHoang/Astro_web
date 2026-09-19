@@ -778,8 +778,9 @@ const isBackground = mode === 'background';
       const sinP = Math.sin(camPitch);
       const y2 = y * cosP - z1 * sinP;
       const z2 = y * sinP + z1 * cosP;
-
-      const fov = 700 * currentZoom;
+      // Responsive FOV: 700px on standard desktop (1080p), scaled proportionally on mobile (244px on 375px phone)
+      const baseFov = Math.min(700, Math.min(width, height) * 0.65);
+      const fov = baseFov * currentZoom;
       const depth = z2;
 
       if (depth <= 10) return null;
@@ -836,7 +837,11 @@ const isBackground = mode === 'background';
       }
 
       const isStarWarsTheme = document.documentElement.classList.contains("theme-starwars");
-      for (let i = 0; i < backgroundStars.length; i++) {
+      const isMobile = width < 640;
+      const starCountToRender = isMobile ? 800 : backgroundStars.length;
+      const ambientDim = (isBackgroundMode && !isStargazeActive) ? (isMobile ? 0.6 : 0.8) : 1.0;
+
+      for (let i = 0; i < starCountToRender; i++) {
         const s = backgroundStars[i];
         s.z -= warpSpeed * s.speedMul;
 
@@ -858,14 +863,15 @@ const isBackground = mode === 'background';
             ctx.beginPath();
             ctx.moveTo(prev.sx, prev.sy);
             ctx.lineTo(curr.sx, curr.sy);
-            ctx.strokeStyle = isStarWarsTheme ? s.color : `rgba(255, 255, 255, ${Math.min(1, s.alpha + 0.35)})`;
+            ctx.strokeStyle = isStarWarsTheme ? s.color : `rgba(255, 255, 255, ${Math.min(1, (s.alpha + 0.35) * ambientDim)})`;
             ctx.lineWidth = Math.min(4.2, (1 - s.z / 2600) * 3.2 + 0.8);
             ctx.stroke();
           }
         } else {
           ctx.beginPath();
-          ctx.arc(curr.sx, curr.sy, Math.max(0.6, s.size * curr.scale), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+          const starRadius = Math.max(0.4, (s.size * (isMobile ? 0.75 : 1.0)) * curr.scale);
+          ctx.arc(curr.sx, curr.sy, starRadius, 0, Math.PI * 2);
+          ctx.fillStyle = isStarWarsTheme ? s.color : `rgba(255, 255, 255, ${s.alpha * ambientDim})`;
           ctx.fill();
         }
       }

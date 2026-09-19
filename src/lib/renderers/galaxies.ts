@@ -54,8 +54,10 @@ export function renderAndromeda(
   const sinTX = Math.sin(galaxyTiltX);
   const cosTY = Math.cos(galaxyTiltY);
   const sinTY = Math.sin(galaxyTiltY);
+  const isMobile = cx < 320;
+  const step = isMobile ? 2 : 1;
 
-  for (let i = 0; i < particles.length; i++) {
+  for (let i = 0; i < particles.length; i += step) {
     const p = particles[i];
     p.angle += p.angularSpeed * reactiveSpeedBoost;
 
@@ -162,8 +164,10 @@ export function renderWhirlpool(
   const sinTX = Math.sin(tiltX);
   const cosTY = Math.cos(tiltY);
   const sinTY = Math.sin(tiltY);
+  const isMobile = cx < 320;
+  const step = isMobile ? 2 : 1;
 
-  for (let i = 0; i < particles.length; i++) {
+  for (let i = 0; i < particles.length; i += step) {
     const p = particles[i];
     p.angle += p.angularSpeed * speedBoost51;
 

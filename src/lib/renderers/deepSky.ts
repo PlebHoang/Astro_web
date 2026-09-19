@@ -32,18 +32,33 @@ export function renderPillarsOfCreation(
   cy: number,
   scale: number
 ) {
-  const s = Math.max(0.6, scale);
   const img = getPillarsImg();
 
   if (img) {
-    // Upscaled authentic JWST NIRCam Infrared Composite
-    // Edges are smoothly feathered to 0 alpha, dissolving seamlessly into obsidian black
-    const size = 640 * s;
-    const h = (img.naturalHeight / img.naturalWidth) * size;
+    const vpMin = Math.min(ctx.canvas.width, ctx.canvas.height);
+    const isMobile = ctx.canvas.width < 640;
 
+    // Eyepiece reticle aperture diameter (~84% of viewport minimum)
+    const eyepieceDiameter = vpMin * 0.84;
+    const aspect = img.naturalHeight / img.naturalWidth; // 1108 / 640 ≈ 1.73
+
+    // Height calibrated to almost fill the eyepiece circle vertically (~94% on mobile, ~92% on desktop)
+    const maxTargetHeight = isMobile
+      ? eyepieceDiameter * 0.94
+      : Math.min(eyepieceDiameter * 0.92, 820);
+
+    const h = maxTargetHeight * Math.min(1.12, Math.max(0.85, (isMobile ? 1.0 : scale * 0.45)));
+    const size = h / aspect;
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(img, cx - size / 2, cy - h / 2, size, h);
+    ctx.restore();
     return;
   }
+
+  const s = Math.min(2.0, Math.max(0.6, scale * 0.6));
 
   // Procedural mathematical fallback
   ctx.save();
@@ -122,12 +137,18 @@ export function renderM42Nebula(
   const img = getOrionImg();
 
   if (img) {
-    // Upscaled authentic Hubble ACS 2006 mosaic
-    // Edges smoothly feather into obsidian black
-    const size = 560 * scale;
+    const vpMin = Math.min(ctx.canvas.width, ctx.canvas.height);
+    const eyepieceDiameter = vpMin * 0.84;
+
+    // Orion is a vast diffuse emission cloud that comfortably expands past the scope circle (~135% of aperture)
+    const size = Math.max(eyepieceDiameter * 1.35, 520 * scale);
     const h = (img.naturalHeight / img.naturalWidth) * size;
 
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(img, cx - size / 2, cy - h / 2, size, h);
+    ctx.restore();
     return;
   }
 

@@ -79,7 +79,9 @@ export async function createCdpSession(targetUrl = 'http://localhost:4321/') {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.method === 'Runtime.exceptionThrown') {
-        consoleErrors.push(data.params.exceptionDetails?.text || 'Uncaught exception');
+        const details = data.params.exceptionDetails;
+        const msg = details?.exception?.description || details?.text || 'Uncaught exception';
+        consoleErrors.push(msg);
       }
       if (data.method === 'Runtime.consoleAPICalled') {
         const text = data.params.args?.map(a => a.value ?? a.description ?? '').join(' ');
