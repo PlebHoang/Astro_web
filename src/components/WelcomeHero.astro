@@ -5,29 +5,28 @@
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
     
     <!-- University Portal Context Badge -->
-    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md mb-6 hover:border-white/30 transition">
-      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-      <span class="text-[11px] font-space-mono text-slate-300 uppercase tracking-widest">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md mb-6 hover:border-white/30 transition hero-context-badge">
+      <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse hero-badge-dot"></span>
+      <span class="text-[11px] font-space-mono text-slate-300 uppercase tracking-widest hero-badge-text">
         Constructor University • Student Club Portal
       </span>
     </div>
 
     <!-- Main Title (Orbitron Font in Monochromatic Starlight) -->
     <h1 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black font-orbitron tracking-tight text-white leading-[1.06] mb-6 gravitational-warp-target">
-      MY CLUB'S <br class="hidden sm:inline" />
-      <span class="text-white drop-shadow-[0_0_35px_rgba(255,255,255,0.6)]">
-        HOMEPAGE
+      EXPLORE THE COSMOS <br class="hidden sm:inline" />
+      <span class="text-white drop-shadow-[0_0_35px_rgba(255,255,255,0.6)] starwars-pop">
+        ASTRONOMICAL SOCIETY
       </span>
     </h1>
 
-    <!-- University Customized Welcome Message -->
-    <div class="max-w-2xl mx-auto mb-10 space-y-3">
-      <p class="text-base sm:text-lg text-slate-200 font-medium font-inter leading-relaxed">
-        Welcome to the <strong class="text-white font-semibold">Constructor University Astronomical Society</strong>!
-      </p>
-      <p class="text-xs sm:text-sm text-slate-400 font-inter leading-relaxed">
-        We are thrilled to welcome you to our official homepage. Here at CUB Astro Soc, we are dedicated to exploring observational astronomy, astrophotography, and deep-space science together. Whether you are a first-year student or a senior stargazer, join us on our journey to make our student community stronger and more fun!
-      </p>
+    <!-- University Customized Welcome Message (Translucent Gradient Box) -->
+    <div class="max-w-2xl mx-auto mb-10">
+      <div class="p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-white/[0.01] border border-white/15 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]">
+        <p class="text-base sm:text-lg md:text-xl font-bold font-inter text-white leading-relaxed drop-shadow-[0_0_20px_rgba(255,255,255,0.35)]">
+          We are thrilled to welcome you to our official homepage! Here at the club, we are dedicated to exploring observational astronomy, astrophotography, and deep space science together.
+        </p>
+      </div>
     </div>
 
     <!-- Action Buttons (Monochromatic High Contrast) -->
@@ -42,20 +41,7 @@
         </svg>
       </a>
 
-      <a
-        href="/telescope-lab"
-        class="w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold font-orbitron text-white bg-white/10 hover:bg-white/20 border border-white/25 rounded-xl transition flex items-center justify-center gap-2 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-      >
-        <span>🔭 Telescope Lab [1][2]</span>
-      </a>
 
-      <button
-        type="button"
-        id="nebula-blast-btn"
-        class="w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-space-mono text-slate-200 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/15 rounded-xl transition flex items-center justify-center gap-2 hover:border-white/40"
-      >
-        <span>💥 Spawn Star Burst</span>
-      </button>
 
       <a
         href="https://www.instagram.com/astronomy.cub/"
@@ -67,41 +53,34 @@
       </a>
     </div>
 
-    <!-- Monochromatic Telemetry Bar -->
+    <!-- Monochromatic Telemetry Bar with Kyber Hooks -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
-      <div class="space-card p-4 text-left">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1">Campus Coordinates</span>
-        <div class="text-sm font-bold font-orbitron text-white">53.1672° N</div>
+      <div class="space-card p-4 text-left" data-kyber="blue">
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Campus Coordinates</span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">53.1672° N</div>
         <div class="text-[10px] font-space-mono text-slate-400">8.6534° E Bremen</div>
       </div>
 
-      <div class="space-card p-4 text-left">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1">Observatory Base</span>
-        <div class="text-sm font-bold font-orbitron text-white">Campus Green</div>
+      <div class="space-card p-4 text-left" data-kyber="green">
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Observatory Base</span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">Campus Green</div>
         <div class="text-[10px] font-space-mono text-slate-300">Bortle Class 5 Dark Sky</div>
       </div>
 
-      <div class="space-card p-4 text-left">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1">Optics Arsenal</span>
-        <div class="text-sm font-bold font-orbitron text-white">8" Dobsonian</div>
+      <div class="space-card p-4 text-left" data-kyber="red">
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Optics Arsenal</span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">8" Dobsonian</div>
         <div class="text-[10px] font-space-mono text-slate-400">1200mm Focal Length</div>
       </div>
 
-      <div class="space-card p-4 text-left">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1">Student Access</span>
-        <div class="text-sm font-bold font-orbitron text-white">100% Free</div>
+      <div class="space-card p-4 text-left" data-kyber="purple">
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub flex items-center justify-between">
+          <span>Student Access</span>
+          <span class="hidden supreme-tag px-1.5 py-0.2 rounded bg-purple-500/25 text-purple-200 border border-purple-400/40 text-[8px] font-bold">KEY ACCESS</span>
+        </span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">100% Free</div>
         <div class="text-[10px] font-space-mono text-slate-300">All Majors Welcome</div>
       </div>
     </div>
   </div>
 </section>
-
-<script>
-  const blastBtn = document.getElementById("nebula-blast-btn");
-  blastBtn?.addEventListener("click", (e) => {
-    const rect = blastBtn.getBoundingClientRect();
-    if ((window as any).triggerNebulaBurst) {
-      (window as any).triggerNebulaBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    }
-  });
-</script>

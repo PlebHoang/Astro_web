@@ -1,100 +1,150 @@
 ---
-const events = [
+interface ClubEvent {
+  title: string;
+  tag: string;
+  day: string;
+  time: string;
+  location: string;
+  venueBadge: string;
+  hook: string;
+  perk: string;
+}
+
+const events: ClubEvent[] = [
   {
-    title: "Campus Green Stargazing: Saturn Rings & Lunar Craters",
-    tag: "Stargazing",
-    date: "Every Clear Friday / Saturday",
-    time: "20:30 - 23:30 CET",
+    title: "Campus Green Stargazing & Hot Tea",
+    tag: "STARGAZING",
+    day: "Clear Fridays & Saturdays",
+    time: "20:30 – 23:30 CET",
     location: "Campus Green (near South Hall lawn)",
-    details: "Our flagship weekend outdoor session. We set up the 8\" Dobsonian telescope, track planetary targets, and share hot tea. Weather confirmation posted 3 hours prior on Instagram.",
+    venueBadge: "Outdoors • Grass Lawn",
+    hook: "8\" Dobsonian telescope tracking Saturn's rings, Jupiter's moons, and the Orion Nebula. Hot tea provided—bring warm layers!",
+    perk: "Hot Tea Provided • Free Admission",
   },
   {
-    title: "Cosmic Cinema: 'Interstellar' & Kip Thorne Astrophysics",
-    tag: "Indoor Cinema",
-    date: "Thursday, 20:00 CET",
-    time: "20:00 - 23:00 CET",
+    title: "Cosmic Cinema: 'Interstellar' Night",
+    tag: "CINEMA NIGHT",
+    day: "Thursday",
+    time: "20:00 – 23:00 CET",
     location: "Student Activity Center (SAC) Lounge",
-    details: "Popcorn, drinks, and a full screening followed by an engaging discussion on black hole physics, event horizons, and gravitational lensing.",
+    venueBadge: "SAC Lounge • Big Screen",
+    hook: "Movie night on the big screen! Fresh popcorn, drinks, and a fun post-film discussion on black holes and gravitational time dilation.",
+    perk: "Free Popcorn & Drinks • Drop-in",
   },
   {
-    title: "Hands-on Astrophotography & Stacking Workshop",
-    tag: "Workshop",
-    date: "Wednesday, 18:00 CET",
-    time: "18:00 - 19:45 CET",
+    title: "Astrophotography & Stacking Lab",
+    tag: "WORKSHOP",
+    day: "Wednesday",
+    time: "18:00 – 19:45 CET",
     location: "Research III Seminar Room + Lawn",
-    details: "Learn how to use manual focus, long exposure, and free software (Siril) to capture colorful nebulae with your phone or camera.",
-  }
+    venueBadge: "Research III • Room 204",
+    hook: "Bring your smartphone or camera! Learn manual night exposure, tracking tricks, and free Siril software to photograph galaxies.",
+    perk: "Phones & DSLRs Welcome",
+  },
 ];
 ---
 
 <section id="events" class="py-20 relative overflow-hidden">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     
-    <!-- Section Header (Matching University Layout Section 3) -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 reveal">
+    <!-- Section Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 reveal">
       <div>
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.04] border border-white/10 text-[10px] font-space-mono text-slate-300 uppercase tracking-widest mb-3">
           Calendar
         </div>
         <h2 class="text-3xl sm:text-4xl font-bold font-orbitron text-white tracking-tight gravitational-warp-target">
-          Club Events: Save the date!
+          Club Events: Save the Date!
         </h2>
       </div>
-      <p class="mt-3 md:mt-0 text-slate-400 text-xs sm:text-sm max-w-md font-inter">
-        Upcoming society activities open to all Constructor University students, faculty, and guests.
+      <p class="mt-2 md:mt-0 text-slate-400 text-xs sm:text-sm max-w-md font-inter">
+        Straight to the point: open to all Constructor students, faculty, and campus guests. No RSVP required.
       </p>
     </div>
 
-    <!-- Weather Call Rule Card -->
-    <div class="mb-8 p-4 rounded-xl bg-white/[0.02] border border-white/10 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 reveal">
+    <!-- Weather Quick-Status Strip -->
+    <div class="mb-8 p-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 reveal">
       <div class="flex items-center gap-3">
-        <span class="text-xl">📡</span>
+        <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
         <div class="text-xs">
-          <strong class="text-white font-space-mono">Weather Protocols:</strong>
-          <span class="text-slate-300 ml-1">Outdoor Campus Green sessions depend on clear skies. Confirmations are posted 3 hours before sunset on <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="text-white underline font-semibold">@astronomy.cub</a>.</span>
+          <strong class="text-white font-space-mono">Weather Protocol:</strong>
+          <span class="text-slate-300 ml-1">Outdoor Campus Green sessions run on clear nights. Confirmed 3 hours before sunset on <a href="https://www.instagram.com/astronomy.cub/" target="_blank" rel="noopener noreferrer" class="text-white underline font-semibold">@astronomy.cub</a>.</span>
         </div>
       </div>
       <a
         href="https://www.instagram.com/astronomy.cub/"
         target="_blank"
         rel="noopener noreferrer"
-        class="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-white font-space-mono text-xs shrink-0 transition"
+        class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-space-mono text-xs shrink-0 transition hover:scale-105"
       >
-        Check Live Stories
+        Check Live Stories ↗
       </a>
     </div>
 
-    <!-- Events Grid -->
+    <!-- Lively High-Impact Events Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       {events.map((ev, idx) => (
-        <div class={`space-card p-6 flex flex-col justify-between reveal reveal-delay-${idx + 1}`}>
+        <div class={`space-card p-6 sm:p-7 flex flex-col justify-between reveal reveal-delay-${idx + 1} bg-black/60 border-white/15 hover:border-white/35 backdrop-blur-xl transition-all group`}>
           <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-space-mono border border-white/10 bg-white/5 text-slate-300">
+            <!-- Header Badge & Tag -->
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-space-mono font-bold border border-white/20 bg-white/10 text-white">
                 {ev.tag}
               </span>
               <span class="text-[10px] font-space-mono text-slate-400">
-                {ev.time}
+                {ev.venueBadge}
               </span>
             </div>
 
-            <h3 class="text-base font-bold font-orbitron text-white mb-2 leading-snug">
+            <!-- TIME & DATE HERO BLOCK (HIGH CONTRAST & SCAN-FRIENDLY) -->
+            <div class="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 mb-4 group-hover:border-white/25 transition">
+              <div class="flex items-center gap-2 font-orbitron font-bold text-sm text-white mb-1">
+                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>{ev.day}</span>
+              </div>
+              <div class="flex items-center gap-2 font-space-mono text-xs text-emerald-400 font-bold">
+                <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9" stroke-width="2"></circle>
+                  <path stroke-linecap="round" stroke-width="2" d="M12 7v5l3 3"></path>
+                </svg>
+                <span>{ev.time}</span>
+              </div>
+            </div>
+
+            <!-- PLACE BLOCK -->
+            <div class="flex items-center gap-2 text-xs font-space-mono text-slate-300 mb-4 pb-3 border-b border-white/10">
+              <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="font-bold text-white">{ev.location}</span>
+            </div>
+
+            <!-- Event Title -->
+            <h3 class="text-base font-bold font-orbitron text-white mb-2 leading-snug group-hover:text-slate-100 transition">
               {ev.title}
             </h3>
 
-            <div class="text-[11px] font-space-mono text-slate-400 space-y-1 mb-4 pb-3 border-b border-white/5">
-              <div class="text-slate-300">📅 {ev.date}</div>
-              <div class="text-slate-400">📍 {ev.location}</div>
-            </div>
-
+            <!-- Lively 1-Liner Hook -->
             <p class="text-xs text-slate-300 font-inter leading-relaxed mb-6">
-              {ev.details}
+              {ev.hook}
             </p>
           </div>
 
-          <div class="pt-3 border-t border-white/10 flex items-center justify-between">
-            <span class="text-[10px] font-space-mono text-slate-400">Free Admission</span>
-            <span class="text-[10px] font-space-mono text-slate-400">Drop-in Welcome • No RSVP</span>
+          <!-- Card Footer: Perks & Drop-in note -->
+          <div class="pt-3.5 border-t border-white/10 flex flex-col gap-1.5">
+            <div class="text-[11px] font-space-mono text-slate-300 font-semibold flex items-center justify-between">
+              <span>{ev.perk}</span>
+            </div>
+            <div class="text-[10px] font-space-mono text-slate-400 flex items-center justify-between">
+              <span>All Students & Guests</span>
+              <span class="text-emerald-400">No RSVP • Drop-in</span>
+            </div>
           </div>
         </div>
       ))}

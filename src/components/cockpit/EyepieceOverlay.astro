@@ -1,0 +1,47 @@
+---
+interface Props {
+  isBackground?: boolean;
+}
+
+const { isBackground = false } = Astro.props;
+---
+
+<!-- Circular Eyepiece Reticle (20x Finder vs 150x High Zoom) -->
+<div
+  class={`eyepiece-overlay fixed inset-0 pointer-events-none z-10 shadow-[inset_0_0_160px_80px_rgba(0,0,0,0.96)] transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`}
+  id="eyepiece-overlay"
+></div>
+
+<div
+  class={`eyepiece-circle fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/20 shadow-[0_0_0_2500px_rgba(0,0,0,0.72),inset_0_0_60px_rgba(0,0,0,0.92)] pointer-events-none z-10 transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`}
+  id="eyepiece-circle"
+>
+  <!-- Reticle Crosshairs & Mil-Dots -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent"></div>
+    <div class="h-full w-[1px] bg-gradient-to-b from-transparent via-white/25 to-transparent absolute"></div>
+    <div class="w-1/3 h-1/3 rounded-full border border-dashed border-white/20 absolute" id="reticle-inner-ring"></div>
+    <div class="w-2/3 h-2/3 rounded-full border border-white/10 absolute" id="reticle-mid-ring"></div>
+    <div class="w-16 h-16 rounded-full border border-white/40 absolute opacity-0 transition-opacity duration-300" id="high-zoom-cross">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-2 h-2 rounded-full border border-white/60"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compass Bearings -->
+  <span class="absolute top-3 left-1/2 -translate-x-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">N 000°</span>
+  <span class="absolute bottom-3 left-1/2 -translate-x-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">S 180°</span>
+  <span class="absolute left-3 top-1/2 -translate-y-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">E 090°</span>
+  <span class="absolute right-3 top-1/2 -translate-y-1/2 font-space-mono text-[9px] text-white/50 tracking-widest">W 270°</span>
+</div>
+
+<!-- Directional Target Indicator Arrow (Points to off-screen target in Finder) -->
+<div id="target-dir-arrow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-52 h-52 pointer-events-none z-20 opacity-0 transition-opacity duration-200">
+  <div class="w-full h-full flex items-start justify-center relative">
+    <div class="flex flex-col items-center gap-1 -translate-y-7">
+      <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-white animate-bounce"></div>
+      <span class="font-space-mono text-[9px] bg-black/85 px-2 py-0.5 rounded border border-white/25 text-white whitespace-nowrap shadow-lg" id="target-dir-label">TARGET</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,134 @@
+---
+// TelemetryHUD: Star Info Card, Discovery Fanfare, Mode Toast, and 4 Mission HUD Variants
+---
+
+<!-- Star / Planet / Nebula Information Popup Card -->
+<div
+  id="star-info-card"
+  class="fixed bottom-16 sm:bottom-8 right-3 sm:right-8 max-w-[calc(100vw-24px)] w-84 bg-black/92 border border-white/25 shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,255,255,0.12)] rounded-2xl backdrop-blur-2xl p-3.5 sm:p-4.5 z-40 opacity-0 pointer-events-none translate-y-3 transition-all duration-300"
+>
+  <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-white/10">
+    <div>
+      <div class="font-orbitron text-sm font-bold text-white tracking-wide" id="sic-title">Pillars of Creation</div>
+      <div class="font-space-mono text-[10px] text-slate-400" id="sic-bayer">M16 • Eagle Nebula</div>
+    </div>
+    <span class="text-[9px] font-space-mono px-2 py-0.5 rounded bg-white/10 text-slate-300 border border-white/15" id="sic-badge">DEEP-SKY</span>
+  </div>
+  <div class="grid grid-cols-2 gap-2 font-space-mono text-[10px] mb-2.5">
+    <div><span class="text-slate-500 block">DISTANCE</span><strong class="text-slate-200" id="sic-dist">6,500 ly</strong></div>
+    <div><span class="text-slate-500 block">SIZE / SPEC</span><strong class="text-slate-200" id="sic-spec">4-5 ly Spire Height</strong></div>
+    <div><span class="text-slate-500 block">MAGNITUDE</span><strong class="text-slate-200" id="sic-mag">+6.00</strong></div>
+    <div><span class="text-slate-500 block">CLASSIFICATION</span><strong class="text-slate-200" id="sic-role">Elephant Trunk Nursery</strong></div>
+  </div>
+  <div class="text-[11px] leading-relaxed text-slate-300 font-inter mb-3" id="sic-desc">
+    Towering spires of interstellar molecular gas and dust in the Eagle Nebula. In 150x zoom, you can see newborn protostars evaporating gas fingers into space.
+  </div>
+  <button
+    type="button"
+    id="sic-close-btn"
+    class="w-full py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-space-mono text-[10px] uppercase tracking-wider border border-white/15 transition cursor-pointer"
+  >
+    Close Telemetry [✕]
+  </button>
+</div>
+
+<!-- Optical Mode HUD Toast -->
+<div
+  id="zoom-mode-toast"
+  class="fixed top-20 left-1/2 -translate-x-1/2 max-w-[calc(100vw-32px)] bg-black/95 border border-white/40 shadow-[0_0_25px_rgba(255,255,255,0.3)] rounded-full px-4 sm:px-5 py-1.5 sm:py-2 z-40 opacity-0 pointer-events-none -translate-y-2 transition-all duration-200 flex items-center gap-2 font-space-mono text-[11px] sm:text-xs font-bold text-white tracking-wider"
+>
+  <span id="toast-icon">🔭</span>
+  <span id="toast-text">20x FINDER ENGAGED</span>
+</div>
+
+<!-- PROTOTYPE 1: FLOATING PILL (Default Minimal, Responsive on Mobile) -->
+<div
+  id="hud-pill-view"
+  class="hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto z-30 transition-all duration-300 max-w-[calc(100vw-24px)] flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-black/85 border border-white/25 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] font-space-mono text-[10px] sm:text-xs"
+>
+  <span id="pill-status-dot" class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse shrink-0"></span>
+  <div class="flex items-center gap-1 sm:gap-1.5 min-w-0">
+    <span class="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-wider">HUNT:</span>
+    <strong class="text-white font-orbitron text-[10px] sm:text-xs tracking-wide truncate" id="pill-mission-name">M16 PILLARS</strong>
+  </div>
+  <div class="h-3 w-[1px] bg-white/20"></div>
+  <div class="flex items-center gap-1 text-[10px]">
+    <span class="text-slate-400 text-[9px] sm:text-[10px]">ALIGN:</span>
+    <span id="pill-alignment" class="text-white font-bold">0%</span>
+  </div>
+  <div class="h-3 w-[1px] bg-white/20"></div>
+  <span id="pill-action-hint" class="px-1.5 sm:px-2 py-0.5 rounded bg-white/10 text-slate-300 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
+    ZOOM 150x
+  </span>
+  <div class="h-3 w-[1px] bg-white/20"></div>
+  <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold shrink-0" id="pill-catalog">0/6</span>
+</div>
+
+<!-- PROTOTYPE 2: OPTICAL RETICLE HUD -->
+<div id="hud-reticle-view" class="hidden fixed top-[calc(50%+min(42vh,42vw)+14px)] left-1/2 -translate-x-1/2 pointer-events-auto z-25 transition-all duration-300 max-w-[calc(100vw-24px)]">
+  <div class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl bg-black/85 border border-white/20 backdrop-blur-xl shadow-2xl font-space-mono text-[9px] sm:text-[10px] text-slate-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+    <span class="text-white font-bold font-orbitron truncate" id="reticle-mission-name">M16 PILLARS</span>
+    <span class="text-white/30">•</span>
+    <span id="reticle-alignment" class="text-amber-300 font-bold">ALIGN 0%</span>
+    <span class="text-white/30">•</span>
+    <span id="reticle-action-hint" class="text-slate-300 uppercase tracking-wide">ZOOM 150x</span>
+    <span class="text-white/30">•</span>
+    <span id="reticle-catalog" class="text-slate-400 font-bold">0/6 FOUND</span>
+  </div>
+</div>
+
+<!-- PROTOTYPE 3: EDGE TICKER -->
+<div id="hud-ticker-view" class="hidden fixed bottom-0 inset-x-0 h-9 pointer-events-auto z-30 transition-all duration-300 bg-black/90 border-t border-white/15 backdrop-blur-2xl px-3 sm:px-6 flex items-center justify-between font-space-mono text-[9px] sm:text-[10px] text-slate-300">
+  <div class="flex items-center gap-1.5 sm:gap-2 truncate">
+    <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0"></span>
+    <span class="text-slate-400 uppercase text-[9px] sm:text-[10px]">HUNT:</span>
+    <span id="ticker-mission-name" class="font-orbitron font-bold text-white truncate">M16 PILLARS</span>
+    <span class="text-white/30">•</span>
+    <span id="ticker-alignment" class="text-slate-200 whitespace-nowrap">ALIGN: 0%</span>
+  </div>
+  <div class="hidden lg:flex items-center gap-3 text-slate-400 text-[9px]">
+    <span>[1] FINDER</span>
+    <span>[2] ZOOM</span>
+    <span>[3] RANDOM</span>
+    <span>[H] HUD STYLE</span>
+    <span>[DRAG / WASD] PAN</span>
+  </div>
+  <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+    <span id="ticker-catalog" class="text-slate-400 font-bold">0/6</span>
+    <span class="hidden sm:inline text-white/30">•</span>
+    <span id="ticker-coords" class="hidden sm:inline text-slate-300 font-orbitron text-[9px]">RA 11h / DEC +55°</span>
+  </div>
+</div>
+
+<!-- PROTOTYPE 0: CLASSIC CARD -->
+<footer
+  id="hud-card-view"
+  class="hidden fixed bottom-3 sm:bottom-5 inset-x-0 px-3 sm:px-5 pointer-events-none z-30 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 w-full transition-all duration-300"
+>
+  <div class="p-3 sm:p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 max-w-md w-full shadow-2xl pointer-events-auto">
+    <div class="flex justify-between items-center mb-1">
+      <span class="text-[9px] text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+        FINDER MISSION: HUNT UNRESOLVED ANOMALIES
+      </span>
+      <span class="text-[9px] text-slate-400" id="hud-catalog-count">0/6 FOUND</span>
+    </div>
+    <div class="flex items-center justify-between gap-2 my-1">
+      <div class="font-orbitron text-xs sm:text-sm font-bold text-white tracking-wide truncate" id="hud-mission-name">
+        Signal [Pillars of Creation]
+      </div>
+      <div id="hud-lock-status" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/10 text-slate-300 border border-white/15 shrink-0">
+        SEARCHING
+      </div>
+    </div>
+    <div class="text-[10px] text-slate-400 mt-0.5" id="hud-mission-hint">
+      Tap [1] for 20x Finder. Tap [2] for 150x Zoom!
+    </div>
+  </div>
+
+  <div class="hidden sm:block p-3.5 rounded-2xl bg-black/90 border border-white/20 backdrop-blur-2xl font-space-mono text-xs text-slate-300 text-right shadow-2xl pointer-events-auto">
+    <div id="hud-target-name" class="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">CURRENT FIELD: NORTHERN CIRCUMPOLAR</div>
+    <div id="hud-target-coords" class="font-bold text-white font-orbitron text-xs">RA 11h 03m / DEC +55°11'</div>
+  </div>
+</footer>

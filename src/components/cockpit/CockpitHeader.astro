@@ -1,0 +1,103 @@
+---
+interface Props {
+  isBackground?: boolean;
+}
+
+const { isBackground = false } = Astro.props;
+---
+
+<header class="flex items-center justify-between gap-1.5 sm:gap-3 w-full max-w-full bg-black/85 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl border border-white/15 backdrop-blur-2xl shadow-2xl pointer-events-auto">
+  <!-- Brand & Main Portal Link -->
+  <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+    {!isBackground && (
+      <a
+        href={import.meta.env.BASE_URL}
+        class="px-2 sm:px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-[11px] sm:text-xs font-space-mono text-slate-300 hover:text-white transition"
+      >
+        ← <span class="hidden sm:inline">Main</span> Portal
+      </a>
+    )}
+    <div class="flex items-center gap-1 sm:gap-1.5">
+      <span class="font-orbitron text-[10px] sm:text-xs font-black tracking-wider text-white uppercase">
+        <span class="sm:hidden text-xs">🔭</span>
+        <span class="hidden sm:inline">CUB TELESCOPE LAB</span>
+      </span>
+      <span class="hidden md:inline px-1.5 py-0.2 rounded text-[8px] font-space-mono bg-white/10 text-slate-300 border border-white/15">V3.3</span>
+    </div>
+  </div>
+
+  <!-- Stargazing Controls & Scope Keys -->
+  <div class="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto">
+    <!-- Tactile Dual Scope Keys [1] and [2] -->
+    <div class="flex items-center bg-[#070707] p-0.5 sm:p-1 rounded-xl border border-white/30 shadow-[0_0_15px_rgba(0,0,0,0.8)]">
+      <!-- Key 1: 20x Finder -->
+      <button
+        type="button"
+        id="scope-btn-20x"
+        class="scope-key-btn active px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-space-mono text-[10px] sm:text-xs font-bold transition-all duration-150 flex items-center gap-1 sm:gap-2 bg-white text-black shadow-[0_0_12px_rgba(255,255,255,0.4)] cursor-pointer select-none"
+      >
+        <kbd id="key-cap-1" class="hidden sm:flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded bg-black text-white border border-black font-mono text-[9px] sm:text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.3)] pointer-events-none">
+          1
+        </kbd>
+        <span class="font-orbitron text-[9px] sm:text-[10px] font-bold tracking-wider pointer-events-none">
+          20x<span class="hidden md:inline"> FINDER</span>
+        </span>
+        <span id="led-1" class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse pointer-events-none"></span>
+      </button>
+
+      <!-- Key 2: 150x High Zoom -->
+      <button
+        type="button"
+        id="scope-btn-150x"
+        class="scope-key-btn px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-space-mono text-[10px] sm:text-xs font-bold transition-all duration-150 flex items-center gap-1 sm:gap-2 text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer select-none"
+      >
+        <kbd id="key-cap-2" class="hidden sm:flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[9px] sm:text-[10px] font-black shadow-[0_1.5px_0_rgba(255,255,255,0.15)] pointer-events-none">
+          2
+        </kbd>
+        <span class="font-orbitron text-[9px] sm:text-[10px] font-bold tracking-wider pointer-events-none">
+          150x<span class="hidden md:inline"> ZOOM</span>
+        </span>
+        <span id="led-2" class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/20 transition-all pointer-events-none"></span>
+      </button>
+    </div>
+
+    <!-- Random Anomaly Spawner (Hotkey: 3) -->
+    <button
+      type="button"
+      id="btn-spawn-target"
+      class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl font-space-mono text-[10px] sm:text-xs font-bold transition text-white bg-white/10 border border-white/20 hover:bg-white/20 flex items-center gap-1 sm:gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
+      title="Spawn a new random deep-sky anomaly (Hotkey: 3)"
+    >
+      <kbd id="key-cap-3" class="hidden sm:flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/15 text-white border border-white/25 font-mono text-[9px] sm:text-[10px] font-black pointer-events-none">
+        3
+      </kbd>
+      <span class="pointer-events-none text-[9px] sm:text-xs">Target</span>
+    </button>
+
+    <!-- HUD Layout Switcher (Hotkey: H) -->
+    <button
+      type="button"
+      id="btn-cycle-hud"
+      class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl font-space-mono text-[10px] sm:text-xs font-bold transition text-slate-300 hover:text-white bg-white/5 border border-white/15 hover:bg-white/15 flex items-center gap-1 sm:gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
+      title="Cycle Finder Mission HUD layout (Hotkey: H)"
+    >
+      <kbd id="key-cap-h" class="hidden sm:flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/10 text-slate-300 border border-white/20 font-mono text-[9px] sm:text-[10px] font-black pointer-events-none">
+        H
+      </kbd>
+      <span id="hud-cycle-label" class="pointer-events-none text-[9px] sm:text-xs">HUD</span>
+    </button>
+
+    <!-- Return to Site Button -->
+    {isBackground && (
+      <button
+        type="button"
+        id="btn-header-return"
+        class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl font-space-mono text-[10px] sm:text-xs font-bold transition text-black bg-white hover:bg-slate-200 shadow-sm flex items-center gap-1 sm:gap-1.5 cursor-pointer hover:scale-105 active:scale-95 shrink-0"
+        title="Return to Website (Hotkey: TAB or ESC)"
+      >
+        <span class="pointer-events-none">← Return<span class="hidden md:inline"> to Site</span></span>
+        <kbd class="hidden sm:inline bg-black/15 text-black px-1 rounded text-[9px] font-mono font-bold pointer-events-none">TAB</kbd>
+      </button>
+    )}
+  </div>
+</header>
