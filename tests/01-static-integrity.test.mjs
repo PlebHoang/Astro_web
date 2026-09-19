@@ -81,4 +81,40 @@ test('Suite 1: Static Integrity & Dev Server Safety', async (t) => {
       'astro.config.mjs must configure Vite to ignore dist/ and dev artifacts to prevent multi-tab reload loops'
     );
   });
+
+  await t.test('5. Security Headers & Console Defense Banner Static Integrity', () => {
+    const indexPath = path.join(distDir, 'index.html');
+    const labPath = path.join(distDir, 'telescope-lab', 'index.html');
+    const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+    const labHtml = fs.readFileSync(labPath, 'utf-8');
+
+    assert.ok(
+      indexHtml.includes('http-equiv="Content-Security-Policy"'),
+      'dist/index.html must define Content-Security-Policy'
+    );
+    assert.ok(
+      labHtml.includes('http-equiv="Content-Security-Policy"'),
+      'dist/telescope-lab/index.html must define Content-Security-Policy'
+    );
+    assert.ok(
+      indexHtml.includes("pls dont, we're student"),
+      'dist/index.html must log student defense message'
+    );
+    assert.ok(
+      labHtml.includes("pls dont, we're student"),
+      'dist/telescope-lab/index.html must log student defense message'
+    );
+  });
+
+  await t.test('6. Vite Host Rebinding Mitigation', () => {
+    const configContent = fs.readFileSync(path.join(rootDir, 'astro.config.mjs'), 'utf-8');
+    assert.ok(
+      !configContent.includes('allowedHosts: true'),
+      'astro.config.mjs must not disable host validation with allowedHosts: true'
+    );
+    assert.ok(
+      configContent.includes("allowedHosts: ['localhost', '127.0.0.1']"),
+      'astro.config.mjs must explicitly pin allowedHosts to localhost and 127.0.0.1'
+    );
+  });
 });

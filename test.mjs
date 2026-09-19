@@ -12,7 +12,8 @@ const testFiles = [
   path.join(rootDir, 'tests/02-architecture-audit.test.mjs'),
   path.join(rootDir, 'tests/03-browser-desktop.test.mjs'),
   path.join(rootDir, 'tests/04-browser-mobile.test.mjs'),
-  path.join(rootDir, 'tests/05-browser-lab.test.mjs')
+  path.join(rootDir, 'tests/05-browser-lab.test.mjs'),
+  path.join(rootDir, 'tests/06-security-defense.test.mjs')
 ];
 
 let hasFailure = false;

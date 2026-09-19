@@ -20,6 +20,11 @@ const {
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.instagram.com; img-src 'self' data: https:; connect-src 'self' ws: http: https:;"
+    />
+    
     <!-- Astro Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,8 +40,14 @@ const {
       <slot />
     </div>
 
-    <!-- Scroll Reveal Intersection Observer -->
+    <!-- Scroll Reveal & Console Banner -->
     <script>
+      console.log(
+        "%c🔭 CUB Astronomical Society: pls dont, we're student",
+        "color: #38bdf8; font-size: 13px; font-weight: bold; font-family: monospace;"
+      );
+      console.log("pls dont, we're student");
+
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {

@@ -13,7 +13,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      allowedHosts: true,
+      allowedHosts: ['localhost', '127.0.0.1'],
       watch: {
         // ponytail: ignore build artifacts, dev lock/logs, and tests to stop HMR multi-tab reload storms
         ignored: ['**/dist/**', '**/.astro/**', '**/test.mjs', '**/reference/**']

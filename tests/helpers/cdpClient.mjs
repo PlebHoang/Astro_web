@@ -74,11 +74,16 @@ export async function createCdpSession(targetUrl = 'http://localhost:4321/') {
     let msgId = 1;
     const pending = new Map();
     const consoleErrors = [];
+    const consoleLogs = [];
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.method === 'Runtime.exceptionThrown') {
         consoleErrors.push(data.params.exceptionDetails?.text || 'Uncaught exception');
+      }
+      if (data.method === 'Runtime.consoleAPICalled') {
+        const text = data.params.args?.map(a => a.value ?? a.description ?? '').join(' ');
+        consoleLogs.push(text);
       }
       if (data.id && pending.has(data.id)) {
         pending.get(data.id)(data);
@@ -114,6 +119,7 @@ export async function createCdpSession(targetUrl = 'http://localhost:4321/') {
       send,
       evaluate,
       consoleErrors,
+      consoleLogs,
       cleanup: () => {
         try { ws.close(); } catch {}
         cleanup();

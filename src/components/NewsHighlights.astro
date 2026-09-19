@@ -209,7 +209,6 @@ const eventPosts: EventPost[] = [
       ))}
     </div>
 
-
     <!-- Social Media Community Connect Strip -->
     <div class="mt-8 p-5 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
       <div class="flex items-center gap-3 text-center sm:text-left">
@@ -332,23 +331,30 @@ const eventPosts: EventPost[] = [
 
   let currentEmbedUrl = "";
 
+  const isSafeInstagram = (u: string) => {
+    try {
+      const p = new URL(u, window.location.origin);
+      return p.protocol === "https:" && (p.hostname === "instagram.com" || p.hostname.endsWith(".instagram.com"));
+    } catch {
+      return false;
+    }
+  };
+
   closeBtn?.addEventListener("click", () => dialog?.close());
   dialog?.addEventListener("click", (e) => {
     if (e.target === dialog) dialog.close();
   });
 
   embedBtn?.addEventListener("click", () => {
-    if (!embedContainer || !currentEmbedUrl) return;
+    if (!embedContainer || !currentEmbedUrl || !isSafeInstagram(currentEmbedUrl)) return;
     embedContainer.classList.remove("hidden");
-    embedContainer.innerHTML = `
-      <iframe
-        src="${currentEmbedUrl}"
-        class="w-full h-80 rounded-xl border border-white/20 bg-black"
-        frameborder="0"
-        scrolling="no"
-        allow="encrypted-media"
-      ></iframe>
-    `;
+    const frame = document.createElement("iframe");
+    frame.src = currentEmbedUrl;
+    frame.className = "w-full h-80 rounded-xl border border-white/20 bg-black";
+    frame.setAttribute("frameborder", "0");
+    frame.setAttribute("scrolling", "no");
+    frame.setAttribute("allow", "encrypted-media");
+    embedContainer.replaceChildren(frame);
     embedBtn.style.display = "none";
   });
 
@@ -365,11 +371,18 @@ const eventPosts: EventPost[] = [
         if (modalTitle) modalTitle.textContent = data.title;
         if (modalRecap) modalRecap.textContent = data.recap;
         if (modalEquip) modalEquip.textContent = data.equipment;
-        if (modalLink) modalLink.href = data.instagramUrl;
+        if (modalLink) {
+          if (data.instagramUrl && isSafeInstagram(data.instagramUrl)) {
+            modalLink.href = data.instagramUrl;
+          } else {
+            modalLink.removeAttribute("href");
+          }
+        }
 
-        currentEmbedUrl = data.embedUrl || (data.instagramUrl?.includes("/p/") ? data.instagramUrl.replace(/\/?$/, "/embed/") : "");
+        const rawUrl = data.embedUrl || (data.instagramUrl?.includes("/p/") ? data.instagramUrl.replace(/\/?$/, "/embed/") : "");
+        currentEmbedUrl = isSafeInstagram(rawUrl) ? rawUrl : "";
         if (embedContainer) {
-          embedContainer.innerHTML = "";
+          embedContainer.replaceChildren();
           embedContainer.classList.add("hidden");
         }
         if (embedBtn) {
