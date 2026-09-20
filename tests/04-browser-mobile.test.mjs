@@ -162,7 +162,11 @@ test('Suite 4: Mobile Viewport, Touch Gestures & Responsive Layout (Chrome CDP)'
         pillInBounds: pill ? (pill.right <= window.innerWidth && pill.left >= 0) : false,
         hasHuntLabel: (pillText || '').includes('HUNT:'),
         hasAlignLabel: (pillText || '').includes('ALIGN:'),
-        hasSolidMask: (document.getElementById('eyepiece-circle')?.className || '').includes('9999px')
+        hasSolidMask: (() => {
+          const el = document.getElementById('eyepiece-circle');
+          const bs = el ? (el.style.boxShadow || window.getComputedStyle(el).boxShadow || '') : '';
+          return bs.includes('#000000') || bs.includes('rgb(0, 0, 0)') || bs.includes('max(100vh');
+        })()
       };
     })()`);
     assert.equal(mobileCockpitCheck.headerOverflow, false, 'Mobile cockpit header must not overflow horizontally');

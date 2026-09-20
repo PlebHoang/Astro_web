@@ -13,7 +13,8 @@ const { isBackground = false } = Astro.props;
 ></div>
 
 <div
-  class={`eyepiece-circle fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/30 shadow-[0_0_0_9999px_#000000,inset_0_0_60px_rgba(0,0,0,0.92)] pointer-events-none z-10 transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`}
+  class={`eyepiece-circle fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(84vh,84vw)] h-[min(84vh,84vw)] rounded-full border border-white/30 pointer-events-none z-10 transition-all duration-500 ${isBackground ? 'opacity-0' : 'opacity-100'}`}
+  style="box-shadow: 0 0 0 max(100vh, 100vw) #000000, inset 0 0 60px rgba(0, 0, 0, 0.92);"
   id="eyepiece-circle"
 >
   <!-- Reticle Crosshairs & Mil-Dots -->
