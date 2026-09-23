@@ -51,26 +51,39 @@
       >
         <span>@astronomy.cub</span>
       </a>
+
+      <!-- Cosmic Star Alignment (WhatsApp) Trigger Button -->
+      <button
+        type="button"
+        id="btn-trigger-star-align"
+        class="w-full sm:w-auto px-6 py-3 text-xs sm:text-sm font-bold font-orbitron uppercase tracking-wider text-white bg-gradient-to-r from-emerald-500/25 to-cyan-500/25 hover:from-emerald-500/40 hover:to-cyan-500/40 border border-emerald-400/50 hover:border-emerald-400 rounded-xl shadow-[0_0_25px_rgba(37,211,102,0.35)] hover:shadow-[0_0_35px_rgba(37,211,102,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+      >
+        <span class="text-emerald-400 group-hover:rotate-180 transition-transform duration-500">✦</span>
+        <span>Align Stars (WhatsApp)</span>
+      </button>
     </div>
+
+<script>
+  document.getElementById("btn-trigger-star-align")?.addEventListener("click", () => {
+    window.dispatchEvent(new CustomEvent("cub:trigger-align"));
+  });
+</script>
 
     <!-- Monochromatic Telemetry Bar with Kyber Hooks -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
       <div class="space-card p-4 text-left" data-kyber="blue">
         <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Campus Coordinates</span>
-        <div class="text-sm font-bold font-orbitron text-white card-main">53.1672° N</div>
-        <div class="text-[10px] font-space-mono text-slate-400">8.6534° E Bremen</div>
+        <div class="text-sm font-bold font-orbitron text-white card-main">53.1672° N 8.6534° E Bremen</div>
       </div>
 
       <div class="space-card p-4 text-left" data-kyber="green">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Observatory Base</span>
-        <div class="text-sm font-bold font-orbitron text-white card-main">Campus Green</div>
-        <div class="text-[10px] font-space-mono text-slate-300">Bortle Class 5 Dark Sky</div>
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Location</span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">Campus Green :)</div>
       </div>
 
       <div class="space-card p-4 text-left" data-kyber="red">
-        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Optics Arsenal</span>
-        <div class="text-sm font-bold font-orbitron text-white card-main">8" Dobsonian</div>
-        <div class="text-[10px] font-space-mono text-slate-400">1200mm Focal Length</div>
+        <span class="text-[10px] font-space-mono text-slate-500 uppercase tracking-wider block mb-1 card-sub">Primary Telescope</span>
+        <div class="text-sm font-bold font-orbitron text-white card-main">idk really, borrowed from SMP lol</div>
       </div>
 
       <div class="space-card p-4 text-left" data-kyber="purple">

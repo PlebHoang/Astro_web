@@ -170,7 +170,42 @@ test('Suite 3: Desktop Browser Interactive E2E & Hotkey Protocol (Chrome CDP)', 
     assert.equal(dialogCheck.hasImg, true, 'Preview dialog must load post image source');
     assert.equal(dialogCheck.closed, true, 'Clicking dialog close button must dismiss preview modal');
 
-    // 11. Verify zero uncaught browser runtime exceptions
+    // 11. Cosmic Star Alignment WhatsApp QR Protocol
+    const qrAlignCheck = await evaluate(`(async () => {
+      const trigger = document.getElementById('btn-trigger-star-align');
+      if (!trigger) return { error: 'btn-trigger-star-align not found' };
+      trigger.click();
+
+      // Small delay for state transition
+      await new Promise(r => setTimeout(r, 300));
+      const modal = document.getElementById('whatsapp-qr-modal');
+      const webOverlay = document.getElementById('web-overlay');
+      const targetBox = document.getElementById('qr-target-box');
+      const opened = !modal?.classList.contains('opacity-0');
+      const overlayFaded = webOverlay?.style.opacity === '0';
+      const hasTargetBox = !!targetBox && targetBox.offsetWidth > 0;
+
+      // Toggle contrast plate
+      const togglePlate = document.getElementById('btn-toggle-contrast');
+      togglePlate?.click();
+      const plateOn = togglePlate?.textContent?.includes('ON');
+
+      // Dismiss / release stars
+      document.getElementById('btn-release-stars')?.click();
+      await new Promise(r => setTimeout(r, 200));
+      const released = modal?.classList.contains('opacity-0');
+      const overlayRestored = webOverlay?.style.opacity === '1';
+
+      return { opened, overlayFaded, hasTargetBox, plateOn, released, overlayRestored };
+    })()`);
+    assert.equal(qrAlignCheck.opened, true, 'Clicking btn-trigger-star-align must open WhatsApp QR modal');
+    assert.equal(qrAlignCheck.overlayFaded, true, 'Triggering star alignment must fade web overlay to 0 opacity');
+    assert.equal(qrAlignCheck.hasTargetBox, true, 'Target reticle box must have non-zero geometry');
+    assert.equal(qrAlignCheck.plateOn, true, 'Clicking contrast toggle must switch plate to ON');
+    assert.equal(qrAlignCheck.released, true, 'Clicking release stars must dismiss modal');
+    assert.equal(qrAlignCheck.overlayRestored, true, 'Releasing stars must restore web overlay opacity to 1');
+
+    // 12. Verify zero uncaught browser runtime exceptions
     assert.equal(consoleErrors.length, 0, `Browser must have zero uncaught exceptions: ${consoleErrors.join(', ')}`);
   } finally {
     cleanup();

@@ -1,0 +1,149 @@
+---
+// WhatsApp Cosmic Star Alignment Modal & Interactive Action Deck
+// Features: Floating reticle corner brackets, one-tap direct join, and high-contrast toggle.
+---
+
+<div
+  id="whatsapp-qr-modal"
+  class="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-all duration-500"
+  aria-hidden="true"
+>
+  <!-- Reticle Target Box (Dimensions dynamically synchronized with canvas QR grid) -->
+  <div
+    id="qr-target-box"
+    class="relative flex items-center justify-center pointer-events-none transition-all duration-300"
+  >
+    <div class="reticle-corner top-left"></div>
+    <div class="reticle-corner top-right"></div>
+    <div class="reticle-corner bottom-left"></div>
+    <div class="reticle-corner bottom-right"></div>
+
+    <!-- Floating Action Pill Deck -->
+    <div
+      id="qr-info-pill"
+      class="absolute top-[calc(100%+20px)] left-1/2 -translate-x-1/2 flex flex-col sm:flex-row items-center gap-3 bg-black/90 border border-white/20 rounded-2xl px-4 py-2.5 backdrop-blur-xl shadow-[0_20px_45px_rgba(0,0,0,0.85)] pointer-events-auto whitespace-nowrap text-center sm:text-left"
+    >
+      <div>
+        <div class="font-orbitron text-[11px] font-bold text-white tracking-wider">ASTRONOMICAL SOCIETY</div>
+        <div id="scan-verif-text" class="font-space-mono text-[9px] text-emerald-400">WHATSAPP CONSTELLATION</div>
+      </div>
+
+      <a
+        href="https://chat.whatsapp.com/Gmc75DmFu5tAirxARMtxTV?mode=gi_t"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="bg-[#25d366] hover:bg-[#20ba5a] text-black font-orbitron text-[11px] font-extrabold px-4 py-2 rounded-xl transition-all shadow-[0_0_20px_rgba(37,211,102,0.4)] hover:shadow-[0_0_30px_rgba(37,211,102,0.7)] hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5"
+      >
+        <span>Open WhatsApp</span>
+        <span>↗</span>
+      </a>
+
+      <button
+        type="button"
+        id="btn-toggle-contrast"
+        class="bg-white/10 hover:bg-white/20 border border-white/20 text-slate-200 font-space-mono text-[10px] px-3 py-2 rounded-xl transition cursor-pointer"
+        title="Toggle high-contrast white plate for older phone camera decoders"
+      >
+        Plate: OFF
+      </button>
+
+      <button
+        type="button"
+        id="btn-release-stars"
+        class="bg-white/10 hover:bg-white/20 border border-white/20 text-slate-200 font-space-mono text-[10px] px-3 py-2 rounded-xl transition cursor-pointer"
+      >
+        Release Stars ⟲
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .reticle-corner {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: rgba(37, 211, 102, 0.95);
+    border-style: solid;
+    pointer-events: none;
+    filter: drop-shadow(0 0 6px rgba(37, 211, 102, 0.6));
+  }
+  .top-left { top: -8px; left: -8px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+  .top-right { top: -8px; right: -8px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+  .bottom-left { bottom: -8px; left: -8px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+  .bottom-right { bottom: -8px; right: -8px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+</style>
+
+<script>
+  let audioCtx: AudioContext | null = null;
+  function playQuantumChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.6);
+    } catch {}
+  }
+
+  let isAligned = false;
+  let usePlate = false;
+
+  const modal = document.getElementById("whatsapp-qr-modal");
+  const webOverlay = document.getElementById("web-overlay");
+  const btnRelease = document.getElementById("btn-release-stars");
+  const btnToggleContrast = document.getElementById("btn-toggle-contrast");
+  const scanVerifText = document.getElementById("scan-verif-text");
+
+  function setAlignment(align: boolean) {
+    isAligned = align;
+    if (align) playQuantumChime();
+
+    if (modal) {
+      modal.classList.toggle("opacity-0", !align);
+      modal.classList.toggle("pointer-events-none", !align);
+      modal.classList.toggle("pointer-events-auto", align);
+      modal.setAttribute("aria-hidden", (!align).toString());
+    }
+
+    if (webOverlay) {
+      webOverlay.style.transition = "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+      webOverlay.style.opacity = align ? "0" : "1";
+      webOverlay.style.pointerEvents = align ? "none" : "auto";
+    }
+
+    window.dispatchEvent(new CustomEvent("cub:align-stars", {
+      detail: { align, usePlate }
+    }));
+  }
+
+  window.addEventListener("cub:trigger-align", () => setAlignment(true));
+  btnRelease?.addEventListener("click", () => setAlignment(false));
+
+  btnToggleContrast?.addEventListener("click", () => {
+    usePlate = !usePlate;
+    btnToggleContrast.textContent = `Plate: ${usePlate ? "ON" : "OFF"}`;
+    btnToggleContrast.classList.toggle("bg-emerald-500", usePlate);
+    btnToggleContrast.classList.toggle("text-black", usePlate);
+    if (scanVerifText) {
+      scanVerifText.textContent = usePlate ? "100% SCANNABLE (PLATE ACTIVE)" : "WHATSAPP CONSTELLATION";
+    }
+    window.dispatchEvent(new CustomEvent("cub:align-stars", {
+      detail: { align: isAligned, usePlate }
+    }));
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isAligned) {
+      setAlignment(false);
+    }
+  });
+</script>

@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Star Alignment: WhatsApp QR Code Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #030712;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Fullscreen Canvas */
+    #space-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+
+    /* Ambient Web Hero Section */
+    .ui-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      pointer-events: none;
+      width: 100%;
+      max-width: 900px;
+      padding: 24px;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s ease;
+    }
+
+    .ui-container.faded {
+      opacity: 0;
+      transform: scale(0.92) translateY(-20px);
+      pointer-events: none;
+    }
+
+    /* Club Badge */
+    .club-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      margin-bottom: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    /* Hero Headline */
+    .hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(28px, 5.5vw, 56px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+    }
+
+    .hero-sub {
+      font-size: clamp(14px, 2vw, 17px);
+      color: #94a3b8;
+      max-width: 580px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Button Deck */
+    .button-deck {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      pointer-events: auto;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-session {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+    }
+    .btn-session:hover {
+      background: #e2e8f0;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-insta {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      font-family: 'Space Mono', monospace;
+      text-transform: none;
+    }
+    .btn-insta:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* THE STAR ALIGNMENT TRIGGER BUTTON */
+    .btn-star-align {
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.25), rgba(6, 182, 212, 0.3));
+      border-color: rgba(37, 211, 102, 0.6);
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(37, 211, 102, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-star-align::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .btn-star-align:hover {
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.4), rgba(6, 182, 212, 0.45));
+      border-color: #25d366;
+      box-shadow: 0 0 35px rgba(37, 211, 102, 0.6), 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-star-align:hover::before {
+      opacity: 1;
+    }
+
+    .star-icon {
+      color: #25d366;
+      font-size: 15px;
+      animation: spin-slow 8s linear infinite;
+    }
+
+    /* WhatsApp Aligned Floating Action Deck */
+    .qr-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .qr-modal.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .qr-target-box {
+      position: relative;
+      /* Dynamic width and height precisely bound to canvas gridTotalWidth */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    /* Target Reticle Corners - exactly 8px outside QR matrix bounds */
+    .reticle-corner {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-color: rgba(37, 211, 102, 0.95);
+      border-style: solid;
+      pointer-events: none;
+      filter: drop-shadow(0 0 6px rgba(37, 211, 102, 0.6));
+    }
+    .top-left { top: -8px; left: -8px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+    .top-right { top: -8px; right: -8px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+    .bottom-left { bottom: -8px; left: -8px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+    .bottom-right { bottom: -8px; right: -8px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+    /* Modal Action Pill positioned cleanly below without offsetting the reticle frame */
+    .qr-info-pill {
+      position: absolute;
+      top: calc(100% + 22px);
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 18px;
+      padding: 10px 18px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.85);
+    }
+
+    .qr-link-btn {
+      background: #25d366;
+      color: #000000;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 8px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .qr-link-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(37, 211, 102, 0.7);
+    }
+
+    .dismiss-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #e2e8f0;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dismiss-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    /* Top Telemetry Readout */
+    .top-telemetry-bar {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 7px 18px;
+      background: rgba(3, 7, 18, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      pointer-events: auto;
+    }
+
+    .top-telemetry-bar strong {
+      color: #f8fafc;
+    }
+
+    .dock-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .dock-btn.active {
+      background: #25d366;
+      color: #000000;
+      font-weight: 700;
+      border-color: #25d366;
+      box-shadow: 0 0 10px rgba(37, 211, 102, 0.4);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+    @keyframes spin-slow {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 640px) {
+      .top-telemetry-bar {
+        font-size: 9px;
+        padding: 5px 12px;
+        gap: 8px;
+        width: calc(100vw - 24px);
+        justify-content: center;
+      }
+      .qr-info-pill {
+        flex-direction: column;
+        gap: 10px;
+        padding: 8px 14px;
+        top: calc(100% + 14px);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen Interactive Celestial Canvas -->
+  <canvas id="space-canvas"></canvas>
+
+  <!-- Top Telemetry Status Header with Live Performance Metrics -->
+  <div class="top-telemetry-bar">
+    <span>SYSTEM: <strong id="dock-status" style="color:#38bdf8;">COSMIC DRIFT</strong></span>
+    <span>•</span>
+    <span>FPS: <strong id="fps-display" style="color:#25d366;">60</strong> (<span id="ms-display">16.6ms</span>)</span>
+    <span>•</span>
+    <span>STARS: <strong>2,400</strong></span>
+    <span>•</span>
+    <span>MODE: <strong id="mode-display" style="color:#38bdf8;">CELESTIAL STARS</strong></span>
+    <span>•</span>
+    <button type="button" class="dock-btn" id="btn-toggle-contrast">Plate: OFF</button>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="ui-container" id="hero-deck">
+    <div class="club-badge">
+      <span class="badge-dot"></span>
+      Constructor University • Student Club Portal
+    </div>
+
+    <h1 class="hero-title">
+      EXPLORE THE COSMOS<br>
+      <span style="color:#ffffff; text-shadow:0 0 35px rgba(255,255,255,0.7);">ASTRONOMICAL SOCIETY</span>
+    </h1>
+
+    <p class="hero-sub">
+      We are dedicated to observational astronomy, deep-space imaging, and cosmic expeditions on Campus Green.
+    </p>
+
+    <!-- The Action Buttons -->
+    <div class="button-deck">
+      <a href="#events" class="btn btn-session">
+        Next Stargazing Session →
+      </a>
+
+      <a href="https://www.instagram.com/astronomy.cub/" target="_blank" class="btn btn-insta">
+        @astronomy.cub
+      </a>
+
+      <!-- Star Alignment WhatsApp Trigger Button -->
+      <button type="button" id="btn-trigger-align" class="btn btn-star-align">
+        <span class="star-icon">✦</span>
+        <span>Align Stars (WhatsApp)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- QR Alignment Modal Frame -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-target-box" id="qr-target-box">
+      <div class="reticle-corner top-left"></div>
+      <div class="reticle-corner top-right"></div>
+      <div class="reticle-corner bottom-left"></div>
+      <div class="reticle-corner bottom-right"></div>
+    </div>
+
+    <div class="qr-info-pill">
+      <div style="text-align: left;">
+        <div style="font-family:'Orbitron'; font-size:11px; font-weight:700; color:#ffffff;">ASTRONOMICAL SOCIETY</div>
+        <div style="font-family:'Space Mono'; font-size:9px; color:#25d366;" id="scan-verif-text">SCAN WITH PHONE CAMERA</div>
+      </div>
+      <a href="https://chat.whatsapp.com/Gmc75DmFu5tAirxARMtxTV?mode=gi_t" target="_blank" class="qr-link-btn">
+        Open WhatsApp ↗
+      </a>
+      <button type="button" class="dismiss-btn" id="btn-release-stars">
+        Release Stars ⟲
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 1. EXACT QR MATRIX COORDINATES (Version 4, 33x33, Error Correction Level M)
+    // Decodes: https://chat.whatsapp.com/Gmc75DmFu5tAirxARMtxTV?mode=gi_t
+    const QR_SIZE = 33;
+    const QR_POINTS = [
+      [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,9],[0,13],[0,14],[0,18],[0,19],[0,21],[0,22],[0,23],[0,26],[0,27],[0,28],[0,29],[0,30],[0,31],[0,32],
+      [1,0],[1,6],[1,9],[1,12],[1,13],[1,14],[1,15],[1,16],[1,21],[1,22],[1,24],[1,26],[1,32],
+      [2,0],[2,2],[2,3],[2,4],[2,6],[2,8],[2,9],[2,11],[2,12],[2,13],[2,21],[2,23],[2,26],[2,28],[2,29],[2,30],[2,32],
+      [3,0],[3,2],[3,3],[3,4],[3,6],[3,8],[3,11],[3,12],[3,14],[3,15],[3,16],[3,17],[3,18],[3,22],[3,23],[3,26],[3,28],[3,29],[3,30],[3,32],
+      [4,0],[4,2],[4,3],[4,4],[4,6],[4,8],[4,10],[4,15],[4,17],[4,19],[4,20],[4,21],[4,22],[4,23],[4,26],[4,28],[4,29],[4,30],[4,32],
+      [5,0],[5,6],[5,8],[5,12],[5,13],[5,14],[5,15],[5,16],[5,17],[5,22],[5,26],[5,32],
+      [6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[6,8],[6,10],[6,12],[6,14],[6,16],[6,18],[6,20],[6,22],[6,24],[6,26],[6,27],[6,28],[6,29],[6,30],[6,31],[6,32],
+      [7,8],[7,9],[7,14],[7,15],[7,18],[7,20],[7,21],[7,22],
+      [8,0],[8,2],[8,3],[8,4],[8,5],[8,6],[8,11],[8,12],[8,13],[8,15],[8,17],[8,20],[8,22],[8,23],[8,24],[8,26],[8,27],[8,28],[8,29],[8,30],
+      [9,0],[9,2],[9,4],[9,7],[9,14],[9,16],[9,17],[9,18],[9,19],[9,20],[9,23],[9,24],[9,26],[9,27],[9,29],[9,30],
+      [10,3],[10,4],[10,5],[10,6],[10,8],[10,11],[10,12],[10,15],[10,16],[10,21],[10,24],[10,26],[10,28],[10,30],[10,31],
+      [11,3],[11,5],[11,7],[11,8],[11,14],[11,15],[11,16],[11,21],[11,25],[11,28],[11,29],[11,30],[11,31],
+      [12,0],[12,5],[12,6],[12,7],[12,8],[12,9],[12,12],[12,17],[12,21],[12,22],[12,24],[12,25],[12,27],[12,28],[12,29],[12,31],[12,32],
+      [13,0],[13,2],[13,7],[13,8],[13,10],[13,14],[13,15],[13,16],[13,18],[13,19],[13,20],[13,22],[13,25],[13,26],[13,29],[13,30],[13,31],[13,32],
+      [14,0],[14,3],[14,5],[14,6],[14,10],[14,12],[14,13],[14,14],[14,17],[14,18],[14,20],[14,21],[14,24],[14,25],[14,26],[14,31],
+      [15,1],[15,2],[15,3],[15,4],[15,9],[15,10],[15,11],[15,12],[15,13],[15,16],[15,19],[15,20],[15,21],[15,23],[15,24],[15,25],[15,26],[15,27],[15,29],[15,30],
+      [16,0],[16,2],[16,3],[16,5],[16,6],[16,9],[16,13],[16,14],[16,17],[16,19],[16,20],[16,22],[16,25],[16,27],[16,28],[16,29],[16,32],
+      [17,1],[17,2],[17,3],[17,11],[17,14],[17,16],[17,18],[17,19],[17,20],[17,21],[17,23],[17,26],[17,27],[17,29],[17,30],[17,32],
+      [18,0],[18,1],[18,2],[18,4],[18,5],[18,6],[18,7],[18,8],[18,9],[18,11],[18,13],[18,15],[18,16],[18,17],[18,20],[18,21],[18,22],[18,27],[18,28],[18,30],[18,31],
+      [19,3],[19,4],[19,8],[19,10],[19,11],[19,12],[19,13],[19,14],[19,16],[19,21],[19,24],[19,26],[19,27],[19,28],[19,29],[19,30],
+      [20,1],[20,2],[20,5],[20,6],[20,10],[20,13],[20,14],[20,15],[20,17],[20,21],[20,22],[20,25],[20,27],[20,29],[20,31],
+      [21,0],[21,2],[21,3],[21,4],[21,5],[21,9],[21,11],[21,12],[21,13],[21,14],[21,15],[21,17],[21,18],[21,19],[21,20],[21,21],[21,22],[21,25],[21,26],[21,29],[21,30],[21,32],
+      [22,0],[22,2],[22,5],[22,6],[22,7],[22,8],[22,15],[22,17],[22,20],[22,21],[22,27],[22,29],[22,30],[22,31],
+      [23,0],[23,2],[23,3],[23,4],[23,7],[23,9],[23,10],[23,11],[23,14],[23,15],[23,16],[23,20],[23,21],[23,22],[23,24],[23,25],[23,26],[23,30],[23,32],
+      [24,0],[24,2],[24,3],[24,4],[24,5],[24,6],[24,10],[24,12],[24,13],[24,14],[24,15],[24,17],[24,19],[24,22],[24,24],[24,25],[24,26],[24,27],[24,28],[24,29],[24,32],
+      [25,8],[25,9],[25,10],[25,14],[25,15],[25,16],[25,17],[25,18],[25,19],[25,20],[25,21],[25,22],[25,24],[25,28],[25,30],
+      [26,0],[26,1],[26,2],[26,3],[26,4],[26,5],[26,6],[26,9],[26,13],[26,14],[26,15],[26,16],[26,18],[26,20],[26,22],[26,23],[26,24],[26,26],[26,28],[26,30],[26,31],
+      [27,0],[27,6],[27,8],[27,11],[27,12],[27,16],[27,19],[27,21],[27,23],[27,24],[27,28],[27,29],[27,30],[27,31],
+      [28,0],[28,2],[28,3],[28,4],[28,6],[28,8],[28,9],[28,13],[28,16],[28,24],[28,25],[28,26],[28,27],[28,28],[28,29],[28,31],
+      [29,0],[29,2],[29,3],[29,4],[29,6],[29,8],[29,9],[29,10],[29,11],[29,16],[29,17],[29,19],[29,20],[29,21],[29,22],[29,24],[29,25],[29,28],[29,29],[29,30],[29,31],[29,32],
+      [30,0],[30,2],[30,3],[30,4],[30,6],[30,8],[30,11],[30,12],[30,13],[30,14],[30,15],[30,16],[30,20],[30,21],[30,22],[30,26],[30,27],[30,29],[30,30],
+      [31,0],[31,6],[31,9],[31,10],[31,11],[31,12],[31,14],[31,16],[31,19],[31,20],[31,21],[31,24],[31,26],[31,28],[31,29],[31,30],
+      [32,0],[32,1],[32,2],[32,3],[32,4],[32,5],[32,6],[32,8],[32,9],[32,14],[32,17],[32,18],[32,19],[32,20],[32,22],[32,23],[32,24],[32,27],[32,29],[32,31]
+    ];
+
+    const canvas = document.getElementById('space-canvas');
+    const ctx = canvas.getContext('2d');
+    const heroDeck = document.getElementById('hero-deck');
+    const qrModal = document.getElementById('qr-modal');
+    const qrTargetBox = document.getElementById('qr-target-box');
+    const dockStatus = document.getElementById('dock-status');
+    const btnTrigger = document.getElementById('btn-trigger-align');
+    const btnRelease = document.getElementById('btn-release-stars');
+    const btnToggleContrast = document.getElementById('btn-toggle-contrast');
+    const scanVerifText = document.getElementById('scan-verif-text');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    // 2. STAR PARTICLES & DUAL-STATE GALAXY KINEMATICS
+    const TOTAL_STARS = 2400;
+    const stars = [];
+
+    let isAligned = false;
+    let alignmentProgress = 0; // 0.0 (Free Space Drift) -> 1.0 (Locked QR)
+    let targetProgress = 0;
+    let useStarlightPlate = false; // Default: CELESTIAL STARS (Stars keep natural colors in space void)
+
+    const fpsDisplay = document.getElementById('fps-display');
+    const msDisplay = document.getElementById('ms-display');
+    const modeDisplay = document.getElementById('mode-display');
+
+    // Synthetic audio chime on star quantum lock
+    let audioCtx = null;
+    function playChime() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } catch {}
+    }
+
+    // Initialize 2400 stars with 4-arm Grand Design Galaxy kinematics
+    for (let i = 0; i < TOTAL_STARS; i++) {
+      const isQRModule = i < QR_POINTS.length;
+      const qrRow = isQRModule ? QR_POINTS[i][0] : -1;
+      const qrCol = isQRModule ? QR_POINTS[i][1] : -1;
+
+      // Identify the 3 Finder Pattern eyes (7x7 corners):
+      // Must maintain 1:1:3:1:1 geometric ratio for camera orientation detection
+      const isFinder = isQRModule && (
+        (qrRow <= 7 && qrCol <= 7) ||
+        (qrRow <= 7 && qrCol >= 25) ||
+        (qrRow >= 25 && qrCol <= 7)
+      );
+
+      // Radial coordinates relative to QR matrix center (16, 16)
+      const dRow = qrRow - 16;
+      const dCol = qrCol - 16;
+      const distFromCenter = Math.hypot(dCol, dRow);
+      const angleFromCenter = Math.atan2(dRow, dCol);
+
+      // Ambient galactic spiral arm parameters (4-arm M51/Pinwheel Grand Design)
+      const armCount = 4;
+      const armIndex = (i - QR_POINTS.length) % armCount;
+      const armBaseAngle = armIndex * (Math.PI * 2 / armCount);
+      const normalized = (i - QR_POINTS.length) / (TOTAL_STARS - QR_POINTS.length);
+      const armDist = 120 + Math.pow(normalized, 0.72) * 650 + (Math.random() - 0.5) * 45;
+      const spiralAngle = Math.log(Math.max(1, armDist / 85)) * 2.6 + armBaseAngle + (Math.random() - 0.5) * 0.35;
+      const galacticOrbitalSpeed = 0.0016 * (1 + 160 / (armDist + 40));
+
+      stars.push({
+        x: (Math.random() - 0.5) * 3400,
+        y: (Math.random() - 0.5) * 2600,
+        z: Math.random() * 2600 + 40,
+        speedMul: Math.random() * 0.9 + 0.5,
+        baseSize: Math.random() * 1.6 + 0.8,
+        alpha: Math.random() * 0.7 + 0.3,
+        color: Math.random() > 0.8 ? '#38bdf8' : (Math.random() > 0.92 ? '#fbbf24' : '#ffffff'),
+
+        // QR Module Target
+        isQRModule: isQRModule,
+        qrRow: qrRow,
+        qrCol: qrCol,
+        isFinder: isFinder,
+        distFromCenter: distFromCenter,
+        angleFromCenter: angleFromCenter,
+
+        // Data star micro-orbit parameters: energetic spin (2.8+ rad/s)
+        orbitSpeed: 2.8 + Math.random() * 0.6,
+        spiralPhase: 3.0 * angleFromCenter - 0.42 * distFromCenter,
+
+        // Ambient outer spiral galaxy stars:
+        armIndex: armIndex,
+        armDist: armDist,
+        spiralAngle: spiralAngle,
+        galacticOrbitalSpeed: galacticOrbitalSpeed,
+
+        // Motion Stagger delay
+        delay: Math.random() * 0.22,
+      });
+    }
+
+    function setAlignment(align) {
+      isAligned = align;
+      targetProgress = align ? 1.0 : 0.0;
+      if (align) {
+        heroDeck.classList.add('faded');
+        qrModal.classList.add('active');
+        dockStatus.textContent = 'ALIGNING...';
+        dockStatus.style.color = '#fbbf24';
+      } else {
+        heroDeck.classList.remove('faded');
+        qrModal.classList.remove('active');
+        dockStatus.textContent = 'COSMIC DRIFT';
+        dockStatus.style.color = '#38bdf8';
+        scanVerifText.textContent = 'WHATSAPP CONSTELLATION';
+        scanVerifText.style.color = '#25d366';
+      }
+    }
+
+    btnTrigger.addEventListener('click', () => {
+      playChime();
+      setAlignment(true);
+    });
+
+    btnRelease.addEventListener('click', () => setAlignment(false));
+
+    btnToggleContrast.addEventListener('click', () => {
+      useStarlightPlate = !useStarlightPlate;
+      btnToggleContrast.textContent = `Plate: ${useStarlightPlate ? 'ON' : 'OFF'}`;
+      btnToggleContrast.classList.toggle('active', useStarlightPlate);
+      modeDisplay.textContent = useStarlightPlate ? 'HIGH-CONTRAST PLATE' : 'CELESTIAL STARS';
+      modeDisplay.style.color = useStarlightPlate ? '#25d366' : '#38bdf8';
+    });
+
+    // Smooth cubic easing
+    function easeOutCubic(t) {
+      return --t * t * t + 1;
+    }
+
+    // 3. MAIN RENDER LOOP & PERFORMANCE PROFILER
+    let hasChimedLock = false;
+    let lastFrameTime = performance.now();
+    let frameTimeSamples = [];
+
+    function render() {
+      requestAnimationFrame(render);
+
+      // Measure real-time frame duration and FPS
+      const now = performance.now();
+      const delta = now - lastFrameTime;
+      lastFrameTime = now;
+      frameTimeSamples.push(delta);
+      if (frameTimeSamples.length > 20) {
+        frameTimeSamples.shift();
+        const avgDelta = frameTimeSamples.reduce((a, b) => a + b, 0) / frameTimeSamples.length;
+        const currentFPS = Math.round(1000 / avgDelta);
+        if (fpsDisplay) fpsDisplay.textContent = currentFPS;
+        if (msDisplay) msDisplay.textContent = avgDelta.toFixed(1) + 'ms';
+      }
+
+      // Smooth progress interpolation
+      alignmentProgress += (targetProgress - alignmentProgress) * 0.055;
+
+      if (isAligned && alignmentProgress > 0.95 && !hasChimedLock) {
+        hasChimedLock = true;
+        dockStatus.textContent = 'CONSTELLATION LOCKED';
+        dockStatus.style.color = '#25d366';
+        scanVerifText.textContent = useStarlightPlate ? '100% SCANNABLE (INVITE VERIFIED)' : 'WHATSAPP CONSTELLATION ALIGNED';
+      }
+      if (!isAligned && alignmentProgress < 0.1) {
+        hasChimedLock = false;
+      }
+
+      // Clear Canvas to Obsidian Space
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, width, height);
+
+      const cx = width * 0.5;
+      const cy = height * 0.5;
+
+      // Draw subtle background cosmic nebulae
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(width, height) * 0.55);
+      grad.addColorStop(0, 'rgba(6, 182, 212, 0.06)');
+      grad.addColorStop(0.4, 'rgba(37, 211, 102, 0.03)');
+      grad.addColorStop(1, 'rgba(3, 7, 18, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Compute QR Grid Geometry on Screen
+      const maxGridDim = Math.min(width * 0.8, height * 0.48, 300);
+      const moduleSize = Math.floor(maxGridDim / QR_SIZE);
+      const gridTotalWidth = QR_SIZE * moduleSize;
+      const qrLeft = Math.floor(cx - gridTotalWidth / 2);
+      const qrTop = Math.floor(cy - gridTotalWidth / 2);
+
+      const time = performance.now() * 0.001;
+
+      // Rotating Grand Galactic Accretion Disk Nebula (Active when aligning)
+      if (alignmentProgress > 0.25) {
+        const nebAlpha = Math.min(0.85, (alignmentProgress - 0.25) / 0.75);
+        ctx.save();
+        ctx.globalAlpha = nebAlpha;
+        ctx.translate(cx, cy);
+        ctx.rotate(time * 0.08);
+
+        // Core Grand Spiral Nebula 1 (Emerald & Cyan)
+        const nebGrad1 = ctx.createRadialGradient(0, 0, 10, 0, 0, gridTotalWidth * 0.95);
+        nebGrad1.addColorStop(0, 'rgba(37, 211, 102, 0.12)');
+        nebGrad1.addColorStop(0.35, 'rgba(6, 182, 212, 0.08)');
+        nebGrad1.addColorStop(0.7, 'rgba(56, 189, 248, 0.03)');
+        nebGrad1.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, gridTotalWidth * 1.0, gridTotalWidth * 0.58, -0.4, 0, Math.PI * 2);
+        ctx.fillStyle = nebGrad1;
+        ctx.fill();
+
+        // Core Companion Dust Lane 2 (Golden Amber & Starlight White)
+        ctx.rotate(Math.PI * 0.5);
+        const nebGrad2 = ctx.createRadialGradient(0, 0, 20, 0, 0, gridTotalWidth * 0.75);
+        nebGrad2.addColorStop(0, 'rgba(251, 191, 36, 0.09)');
+        nebGrad2.addColorStop(0.4, 'rgba(56, 189, 248, 0.05)');
+        nebGrad2.addColorStop(1, 'transparent');
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, gridTotalWidth * 0.8, gridTotalWidth * 0.48, 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = nebGrad2;
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // Lock DOM reticle target box to EXACT canvas grid geometry
+      if (qrTargetBox) {
+        qrTargetBox.style.width = gridTotalWidth + 'px';
+        qrTargetBox.style.height = gridTotalWidth + 'px';
+      }
+
+      // 1. High-Contrast Starlight Backing Plate (ONLY when plate mode is enabled)
+      if (alignmentProgress > 0.15 && useStarlightPlate) {
+        const platePadding = moduleSize * 4;
+        const plateAlpha = Math.min(1, Math.max(0, (alignmentProgress - 0.2) / 0.8));
+
+        ctx.save();
+        ctx.globalAlpha = plateAlpha;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        const px = qrLeft - platePadding;
+        const py = qrTop - platePadding;
+        const pw = gridTotalWidth + platePadding * 2;
+        const ph = gridTotalWidth + platePadding * 2;
+        ctx.roundRect(px, py, pw, ph, 14);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 2. Subtle Constellation Framing Grid (Active in Celestial Stars Mode)
+      if (alignmentProgress > 0.4 && !useStarlightPlate) {
+        const frameAlpha = Math.min(0.35, (alignmentProgress - 0.4) * 0.6);
+        ctx.save();
+        ctx.globalAlpha = frameAlpha;
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        // Draw bounding box and quadrant reticles
+        ctx.strokeRect(qrLeft - 8, qrTop - 8, gridTotalWidth + 16, gridTotalWidth + 16);
+
+        // Highlight the 3 Finder Pattern Eyes with subtle cyan borders
+        const eyeSize = 7 * moduleSize;
+        ctx.setLineDash([]);
+        ctx.strokeStyle = 'rgba(37, 211, 102, 0.5)';
+        ctx.strokeRect(qrLeft - 2, qrTop - 2, eyeSize + 4, eyeSize + 4);
+        ctx.strokeRect(qrLeft + (QR_SIZE - 7) * moduleSize - 2, qrTop - 2, eyeSize + 4, eyeSize + 4);
+        ctx.strokeRect(qrLeft - 2, qrTop + (QR_SIZE - 7) * moduleSize - 2, eyeSize + 4, eyeSize + 4);
+
+        ctx.restore();
+      }
+
+      // 3. Draw Stars & QR Particles (Optimized: Zero expensive shadowBlur calls)
+      const warpSpeed = 1.2;
+      const fov = 700;
+
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+
+        // Free 3D Drift Position
+        s.z -= warpSpeed * s.speedMul;
+        if (s.z <= 20) {
+          s.z = 2600;
+          s.x = (Math.random() - 0.5) * 3400;
+          s.y = (Math.random() - 0.5) * 2600;
+        }
+
+        const driftSx = cx + (s.x / s.z) * fov;
+        const driftSy = cy + (s.y / s.z) * fov;
+        const driftScale = fov / s.z;
+
+        if (s.isQRModule) {
+          const localProgress = Math.max(0, Math.min(1, (alignmentProgress - s.delay) / (1 - s.delay)));
+          const ease = easeOutCubic(localProgress);
+
+          const baseTargetX = qrLeft + (s.qrCol + 0.5) * moduleSize;
+          const baseTargetY = qrTop + (s.qrRow + 0.5) * moduleSize;
+
+          // Micro-orbital galaxy swirl:
+          // Finder patterns stay geometrically fixed (anchor) with subtle shimmer.
+          // Data modules perform an energetic micro-orbit (radius <= 0.22 * moduleSize)
+          // coupled with the logarithmic spiral arms for a breathtaking "spinny" vortex!
+          let ox = 0;
+          let oy = 0;
+          let lumPulse = 1.0;
+
+          if (!s.isFinder && ease > 0.6) {
+            const swirlStrength = (ease - 0.6) / 0.4;
+            const orbitR = Math.min(1.65, moduleSize * 0.22) * swirlStrength;
+            const orbitAngle = time * s.orbitSpeed + s.spiralPhase;
+            ox = Math.cos(orbitAngle) * orbitR;
+            oy = Math.sin(orbitAngle) * orbitR;
+
+            // Spiral density wave of luminance sweeping across the constellation
+            lumPulse = 0.76 + 0.24 * Math.sin(time * 3.6 - s.distFromCenter * 0.42 + 3 * s.angleFromCenter);
+          } else if (s.isFinder && ease > 0.6) {
+            lumPulse = 0.90 + 0.10 * Math.sin(time * 4.2 + (s.qrRow + s.qrCol) * 0.4);
+          }
+
+          const targetX = baseTargetX + ox;
+          const targetY = baseTargetY + oy;
+
+          const curX = driftSx + (targetX - driftSx) * ease;
+          const curY = driftSy + (targetY - driftSy) * ease;
+
+          if (ease > 0.88 && useStarlightPlate) {
+            // High-Contrast Mode: Solid black module
+            const pixelSize = moduleSize + 0.6;
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(
+              Math.floor(curX - moduleSize / 2),
+              Math.floor(curY - moduleSize / 2),
+              Math.ceil(pixelSize),
+              Math.ceil(pixelSize)
+            );
+          } else {
+            // Celestial Stars Mode: Stars keep their natural cyan, amber, or starlight-white color!
+            const starRadius = Math.max(1.2, (moduleSize * 0.44) * ease + (s.baseSize * driftScale) * (1 - ease));
+
+            ctx.beginPath();
+            ctx.arc(curX, curY, starRadius, 0, Math.PI * 2);
+            ctx.fillStyle = s.color;
+            ctx.globalAlpha = lumPulse;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            // Soft glowing starlight corona (direct alpha, zero shadowBlur GPU penalty)
+            if (ease > 0.8) {
+              ctx.beginPath();
+              ctx.arc(curX, curY, starRadius * 1.5, 0, Math.PI * 2);
+              ctx.fillStyle = s.color === '#fbbf24' ? 'rgba(251, 191, 36, 0.22)' : 'rgba(56, 189, 248, 0.25)';
+              ctx.fill();
+            }
+
+            // Starlight micro-trail showing the spin direction inside the QR constellation
+            if (ease > 0.85 && !s.isFinder) {
+              const microTailAngle = (time * s.orbitSpeed + s.spiralPhase) - 0.45;
+              const tx = curX - Math.cos(microTailAngle) * (Math.min(1.65, moduleSize * 0.22) * 0.9);
+              const ty = curY - Math.sin(microTailAngle) * (Math.min(1.65, moduleSize * 0.22) * 0.9);
+              ctx.beginPath();
+              ctx.moveTo(curX, curY);
+              ctx.lineTo(tx, ty);
+              ctx.strokeStyle = s.color === '#fbbf24' ? 'rgba(251, 191, 36, 0.35)' : 'rgba(56, 189, 248, 0.38)';
+              ctx.lineWidth = 1.0;
+              ctx.stroke();
+            }
+
+            // Starlight flight trail during initial convergence
+            if (ease > 0.05 && ease < 0.85) {
+              ctx.beginPath();
+              ctx.moveTo(curX, curY);
+              ctx.lineTo(curX - (targetX - driftSx) * 0.035, curY - (targetY - driftSy) * 0.035);
+              ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+              ctx.lineWidth = 1.3;
+              ctx.stroke();
+            }
+          }
+
+        } else {
+          // Ambient cosmic stars:
+          // Smoothly form a sweeping, grand 4-arm rotating spiral galaxy (M51 Whirlpool & Pinwheel style)
+          const easeAlign = easeOutCubic(alignmentProgress);
+
+          // Current galactic angle with differential rotation (inner faster, outer slower)
+          const currentGalaxyAngle = s.spiralAngle + time * s.galacticOrbitalSpeed * 60;
+
+          // 3D perspective tilt (tiltX = 20 deg, tiltY = -12 deg)
+          const rawGx = Math.cos(currentGalaxyAngle) * s.armDist;
+          const rawGy = Math.sin(currentGalaxyAngle) * s.armDist;
+          const tiltedGx = rawGx * 0.98;
+          const tiltedGy = rawGy * 0.82 - rawGx * 0.08;
+
+          const galaxyX = cx + tiltedGx;
+          const galaxyY = cy + tiltedGy;
+
+          const curAmbientX = driftSx * (1 - easeAlign) + galaxyX * easeAlign;
+          const curAmbientY = driftSy * (1 - easeAlign) + galaxyY * easeAlign;
+          const ambientAlpha = Math.max(0.18, s.alpha * (0.8 + 0.2 * Math.sin(time * 2.5 + s.armIndex)));
+
+          // Velocity stream trails for spiral arm stars
+          if (easeAlign > 0.4) {
+            const trailProgress = (easeAlign - 0.4) / 0.6;
+            const trailAngle = currentGalaxyAngle - 0.12 * trailProgress;
+            const tRawGx = Math.cos(trailAngle) * (s.armDist * 0.98);
+            const tRawGy = Math.sin(trailAngle) * (s.armDist * 0.98);
+            const trailX = cx + (tRawGx * 0.98);
+            const trailY = cy + (tRawGy * 0.82 - tRawGx * 0.08);
+
+            ctx.beginPath();
+            ctx.moveTo(curAmbientX, curAmbientY);
+            ctx.lineTo(trailX, trailY);
+            ctx.strokeStyle = s.color === '#fbbf24' ? 'rgba(251, 191, 36, 0.28)' : (s.color === '#38bdf8' ? 'rgba(56, 189, 248, 0.28)' : 'rgba(255, 255, 255, 0.22)');
+            ctx.lineWidth = Math.min(1.4, s.baseSize * 0.85);
+            ctx.stroke();
+          }
+
+          ctx.beginPath();
+          ctx.arc(curAmbientX, curAmbientY, Math.max(0.7, s.baseSize * (1 - easeAlign * 0.25) + easeAlign * 1.15), 0, Math.PI * 2);
+          ctx.fillStyle = s.color;
+          ctx.globalAlpha = ambientAlpha;
+          ctx.fill();
+          ctx.globalAlpha = 1.0;
+        }
+      }
+
+      // 4. Draw Center WhatsApp Emblem Badge
+      if (alignmentProgress > 0.4) {
+        const logoAlpha = Math.min(1, Math.max(0, (alignmentProgress - 0.4) / 0.6));
+        const badgeRadius = moduleSize * 2.8;
+
+        ctx.save();
+        ctx.globalAlpha = logoAlpha;
+        ctx.translate(cx, cy);
+
+        // Soft accretion aura
+        const auraRadius = badgeRadius * (1.25 + 0.15 * Math.sin(time * 3.5));
+        const auraGrad = ctx.createRadialGradient(0, 0, badgeRadius * 0.8, 0, 0, auraRadius);
+        auraGrad.addColorStop(0, 'rgba(37, 211, 102, 0.45)');
+        auraGrad.addColorStop(0.6, 'rgba(56, 189, 248, 0.2)');
+        auraGrad.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(0, 0, auraRadius, 0, Math.PI * 2);
+        ctx.fillStyle = auraGrad;
+        ctx.fill();
+
+        // Circular background backing
+        ctx.beginPath();
+        ctx.arc(0, 0, badgeRadius, 0, Math.PI * 2);
+        ctx.fillStyle = useStarlightPlate ? '#ffffff' : '#030712';
+        ctx.fill();
+
+        // Emerald WhatsApp Green Circle
+        ctx.beginPath();
+        ctx.arc(0, 0, badgeRadius - 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#25d366';
+        ctx.fill();
+
+        // Crisp White Handset Symbol
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${Math.round(badgeRadius * 0.85)}px system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✆', 0, 1);
+
+        ctx.restore();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
