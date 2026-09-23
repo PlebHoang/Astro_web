@@ -12,34 +12,14 @@ interface ClubEvent {
 
 const events: ClubEvent[] = [
   {
-    title: "Campus Green Stargazing & Hot Tea",
-    tag: "STARGAZING",
-    day: "Clear Fridays & Saturdays",
+    title: "Campus Green Moon Gazing",
+    tag: "MOON GAZING",
+    day: "This Friday & Saturday",
     time: "20:30 – 23:30 CET",
     location: "Campus Green (near South Hall lawn)",
     venueBadge: "Outdoors • Grass Lawn",
-    hook: "8\" Dobsonian telescope tracking Saturn's rings, Jupiter's moons, and the Orion Nebula. Hot tea provided—bring warm layers!",
-    perk: "Hot Tea Provided • Free Admission",
-  },
-  {
-    title: "Cosmic Cinema: 'Interstellar' Night",
-    tag: "CINEMA NIGHT",
-    day: "Thursday",
-    time: "20:00 – 23:00 CET",
-    location: "Student Activity Center (SAC) Lounge",
-    venueBadge: "SAC Lounge • Big Screen",
-    hook: "Movie night on the big screen! Fresh popcorn, drinks, and a fun post-film discussion on black holes and gravitational time dilation.",
-    perk: "Free Popcorn & Drinks • Drop-in",
-  },
-  {
-    title: "Astrophotography & Stacking Lab",
-    tag: "WORKSHOP",
-    day: "Wednesday",
-    time: "18:00 – 19:45 CET",
-    location: "Research III Seminar Room + Lawn",
-    venueBadge: "Research III • Room 204",
-    hook: "Bring your smartphone or camera! Learn manual night exposure, tracking tricks, and free Siril software to photograph galaxies.",
-    perk: "Phones & DSLRs Welcome",
+    hook: "Observing the Moon up close through our 8\" Dobsonian telescope—craters, maria, and crisp surface details. Bring warm layers!",
+    perk: "Free Admission • All Welcome",
   },
 ];
 ---
@@ -82,7 +62,7 @@ const events: ClubEvent[] = [
     </div>
 
     <!-- Lively High-Impact Events Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class={events.length === 1 ? "max-w-xl mx-auto" : "grid grid-cols-1 md:grid-cols-3 gap-6"}>
       {events.map((ev, idx) => (
         <div class={`space-card p-6 sm:p-7 flex flex-col justify-between reveal reveal-delay-${idx + 1} bg-black/60 border-white/15 hover:border-white/35 backdrop-blur-xl transition-all group`}>
           <div>
